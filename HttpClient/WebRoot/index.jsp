@@ -33,7 +33,13 @@
 			.tbody_td{ padding-left:5px}
 			.tbody_tr2{ background:#F0F5F9 url(../images/s_r19_c17.jpg) bottom repeat-x; height:26px;}
 			.tbody_tr_on{ background:#FF9 url(../images/s_r5_c422.jpg) bottom repeat-x; height:26px;}
-			.infor{display:inline-block;float:left;width:30%;}
+			.infor div{display:inline-block;float:left;width:30%;}
+			.button {
+				height: 22px;
+				width: 60px;
+				border:1px solid #7F9DB9;font-size:12px; margin-top:2px; margin-bottom:2px;margin-right:8px;	
+				FONT-SIZE: 9pt;BACKGROUND: url(../images/botton.gif);CURSOR: hand;HEIGHT: 22px;
+			}
 		</style>
 	</head>
 	<body>
@@ -46,16 +52,16 @@
 						class="textarea_style">http://www.alibaba.com/trade/search/3i1p5tyfchms/shanghai.html?tracelog=24581_searchbar_keywords</textarea>
 					<br>
 					<div style="margin-top: 10px;">
-					<input type="button" id="retry"   onclick="request(this);" value="搜索" />
-					<input type="button" id="submit"  onclick="request(this);" value="暂停" />
-					<input type="submit" id="excel"  value="下载搜索结果(excel)" />
-					<input type="button" id="submit"  onclick="" value="" />
-					<input type="hidden" name="operation" value="downloadExcel" />
+					<input type="button" class="button"id="retry"  onclick="request(this,retry);" value="搜索" />
+					<input type="button" class="button"id="pause" disabled="true" onclick="pause(this);" value="暂停" />
+					<input type="submit" class="button" id="excel" disabled="true" value="下载搜索结果(excel)" />
+					<input type="button" class="button" id="submit"  onclick="" value="" />
+					<input type="hidden" class="button" name="operation" value="downloadExcel" />
 					</form>
 					</div>
 				</div>
 				<div class="infor">
-					<div id="reTitle" >获取到[<span style="color:red;" id="reRows">&nbsp;</span>]条信息</div>&nbsp;&nbsp;&nbsp;<span id="runningInfor"></span><div id="MSG"></div>
+					<div id="reTitle" >获取到[<span style="color:red;" id="reRows">&nbsp;</span>]条信息</div>&nbsp;&nbsp;&nbsp;<div id="runningInfor"></div><div id="MSG"></div>
 				</div>
 				<div id="datadiv" class="border_n"
 					style="display: block; width: 96%; height: 500px; overflow: auto;margin-top: 10px;">

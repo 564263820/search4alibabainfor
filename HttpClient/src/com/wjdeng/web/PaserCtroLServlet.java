@@ -104,6 +104,10 @@ public class PaserCtroLServlet extends HttpServlet {
 		if("retry".equals(operation)){
 			writContentMap.remove(request.getRequestedSessionId());
 			map.remove(request.getRequestedSessionId());
+			if(null != par){
+				AppContext.exeCommand(new PuaseCommand(), par);//停止
+			}
+			
 		}
 		if("pause".equals(operation)){
 			AppContext.exeCommand(new PuaseCommand(), par);//暂停
@@ -154,7 +158,11 @@ public class PaserCtroLServlet extends HttpServlet {
 	
 	private void runTask(StringBuffer sb,ModeParament par,HttpServletRequest request) throws Exception{
 		String url = request.getParameter("url");
-		Integer deep =2;
+		String deepStr = request.getParameter("deep");
+		Integer deep =-1;
+		if(StringUtils.trim2null(deepStr)!=null ){
+			deep = new Integer(deepStr).intValue();
+		}
 		//String operation = request.getParameter("operation");
 		AppContext app;
 		if(par ==null ){

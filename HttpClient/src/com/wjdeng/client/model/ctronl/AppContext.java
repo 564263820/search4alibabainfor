@@ -164,9 +164,11 @@ public class AppContext  implements Runnable{
 			for(String purl :urlset){
 				if(par.isEndTask())return par;//任务结束
 				if(tem== deep)return par;
-				if(pages.contains(purl))continue;
+				if(pages.contains(purl))continue;// 过滤重复地址
 				pages.add(purl);
-				Map<String,String> datatemp = dpa.execuPaseInforPage(AppContext.getHtmlDocByUrl(purl));
+				Document temDoc  = AppContext.getHtmlDocByUrl(purl);
+				Map<String,String> datatemp = dpa.execuPaseInforPage(temDoc);
+				par.setCurDoc(temDoc);
 				par.addDatatemp(datatemp);//获取的当前客户数据存入参数对象中并触发解析一个客户数据成功事件
 				par.getMlist().add(datatemp);
 			}
@@ -202,7 +204,7 @@ public class AppContext  implements Runnable{
 			str = (String) map.get(URLContentManage.KEY_CONTENT);//抓取到的页面html
 		} catch (Exception e) {
 			try {
-				PrintWriter p; p = new PrintWriter(SysUtils.getFilePathStr("log"));p.println(SysUtils.formatDateTime(System.currentTimeMillis())+" 抓取"+url+"失败................\n");p.write(str); p.flush(); p.close();
+				PrintWriter p= new PrintWriter(SysUtils.getFilePathStr("log"));p.println(SysUtils.formatDateTime(System.currentTimeMillis())+" 抓取"+url+"失败................\n");p.write(str); p.flush(); p.close();
 				e.printStackTrace();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
