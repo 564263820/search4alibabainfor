@@ -71,7 +71,7 @@ dorequest.prototype.subServer = function ()
 	      			}
 	      		}
 	      		var rowc = document.getElementById("databody").getElementsByTagName("TR").length;
-	      		$("#reRows").html(rowc);
+	      		$("#reRows").html(rowc+1);
 	      		var htmstr = "<tr ";
 	      		if(rowc%2 == 1){
 	      			htmstr += "class=\"tbody_tr1\" onmouseover=\"this.className='tbody_tr_on'\" onmouseout=\"this.className='tbody_tr1'\" >";
@@ -87,13 +87,15 @@ dorequest.prototype.subServer = function ()
 	      		$("#databody").append(htmstr);
 	      		///alert($("#databody").html());
 	      	}
+  			$("#runningInfor").html("正在解析："+obj.url+"中的数据");
       		if(obj.state != 'end' && obj.state != 'error'){
       			server.subServer();
 	      	}else if(obj.state != 'error'){
       			$("#MSG").append("<br>"+obj.msg);
-	      	}else{
+	      	}else if(obj.state != 'end'){
 	      		document.getElementById("retry").disabled= false;
 	      		$("#MSG").append("<br>搜索完毕！");
+	      		$("#runningInfor").html("");
 	      	}
 	      },
 	      error: function(XMLHttpRequest, textStatus, errorThrown){

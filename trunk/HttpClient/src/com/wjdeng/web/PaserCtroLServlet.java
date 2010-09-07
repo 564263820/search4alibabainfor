@@ -94,9 +94,6 @@ public class PaserCtroLServlet extends HttpServlet {
 	 */
 	public void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
-		PrintWriter ps = new PrintWriter(SysUtils.getFilePath("log"));
-		ps.print("wo de shi yan!!!!!!!!!!!!!!!!!!!!!!!!");
-		ps.flush();ps.close();
 		//this.getServletContext().getRequestDispatcher(path);
 		String url = request.getParameter("url");
 		String operation = request.getParameter("operation");
@@ -200,7 +197,6 @@ public class PaserCtroLServlet extends HttpServlet {
 				temp.append("},");
 				sb.append(temp);
 			}
-			//map.clear();
 		}
 		list.clear();
 	}

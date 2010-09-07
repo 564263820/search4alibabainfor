@@ -173,6 +173,34 @@ public class SysUtils {
 		return fileName;
 	}
 	
+	/**
+	 * 
+	 * 文件路径及全名
+	 * @param modeName
+	 * @return
+	 */
+	public static String  getFilePathStr( String modeName){
+		String path  = SysUtils.class.getClassLoader().getResource("").getPath();
+		path =path.replaceAll("%20", " ");
+		String filePath =path+ File.separator+"_";
+		String fileName = filePath + modeName;
+		File pathFile = new File(filePath);
+		if(!pathFile.exists()){//如果文件夹不存在，创建文件夹
+			//pathFile.mkdirs();
+		}else{//文件夹存在，则先删除该文件夹下原来的文件
+			try {
+				File file = new File(fileName);
+				if (file.exists()&& file.isFile()){
+					file.delete();
+				}
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		return fileName;
+	}
+	
+	
 	
 
 }
