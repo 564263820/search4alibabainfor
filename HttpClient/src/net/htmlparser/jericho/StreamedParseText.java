@@ -20,8 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
-import java.nio.*;
 
 final class StreamedParseText extends CharSequenceParseText {
 	private final StreamedText streamedText;

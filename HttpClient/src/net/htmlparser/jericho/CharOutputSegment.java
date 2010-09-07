@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Implements an {@link OutputSegment} whose content is a single character constant.

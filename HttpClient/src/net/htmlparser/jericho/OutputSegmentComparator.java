@@ -20,7 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Comparator;
 
 final class OutputSegmentComparator implements Comparator<OutputSegment> {
 	public int compare(final OutputSegment outputSegment1, final OutputSegment outputSegment2) {

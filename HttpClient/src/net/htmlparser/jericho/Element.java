@@ -20,7 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents an <a target="_blank" href="http://www.w3.org/TR/html401/intro/sgmltut.html#h-3.2.1">element</a>

@@ -20,9 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Compacts HTML source by removing all unnecessary white space.

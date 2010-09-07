@@ -20,7 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * An enumerated type representing the three major output styles of a {@linkplain FormControl form control's}

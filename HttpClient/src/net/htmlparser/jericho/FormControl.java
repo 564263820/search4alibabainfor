@@ -20,8 +20,17 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Represents an HTML form <a target="_blank" href="http://www.w3.org/TR/html401/interact/forms.html#form-controls">control</a>.

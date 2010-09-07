@@ -1,7 +1,12 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.URL;
+
+import net.htmlparser.jericho.CharacterReference;
+import net.htmlparser.jericho.Segment;
+import net.htmlparser.jericho.StreamedSource;
+import net.htmlparser.jericho.Tag;
 
 public class StreamedSourceCopy {
 	public static void main(String[] args) throws Exception {

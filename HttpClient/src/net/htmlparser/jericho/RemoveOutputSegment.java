@@ -20,7 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
+import java.io.Writer;
 
 /**
  * Implements an {@link OutputSegment} with no content.

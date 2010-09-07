@@ -6,6 +6,10 @@
  ********************************************************************************/
 package com.wjdeng.client.model.Ipaser;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
+
 import com.wjdeng.client.model.Document;
 
 public interface IpaserAdapter {
@@ -14,7 +18,7 @@ public interface IpaserAdapter {
 	
 	public boolean hasNext();
 	
-	public Document nextUrl();
+	public Document nextUrl() throws ClientProtocolException, IOException;
 
 }
 

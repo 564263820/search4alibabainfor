@@ -7,9 +7,14 @@
 package com.wjdeng.client.model.ctronl;
 
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.http.client.ClientProtocolException;
 
 import net.htmlparser.jericho.Source;
 
@@ -180,8 +185,10 @@ public class AppContext  implements Runnable{
 	 * 
 	 * @param url
 	 * @return
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
 	 */
-	public static Document getHtmlDocByUrl(String url){
+	public static Document getHtmlDocByUrl(String url) throws ClientProtocolException, IOException{
 		URLContentManage um= new URLContentManage();
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
 		Map<String,Object> map =null;
@@ -193,6 +200,14 @@ public class AppContext  implements Runnable{
 		String str = (String) map.get(URLContentManage.KEY_CONTENT);//抓取到的页面html
 		//System.out.println(str);
 		//StringUtils.wirtfile(str);
+		try {
+			PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
+			p.write(str);
+			p.flush();
+			p.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		return new Document(new Source(str),url);
 	}
 	

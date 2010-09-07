@@ -20,8 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
-import java.nio.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * Contains static utility methods for manipulating the way data is retrieved from a {@link CharStreamSource} object.

@@ -20,7 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * Represents the row and column number of a character position in the source document.

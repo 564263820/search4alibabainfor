@@ -20,10 +20,15 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
-import java.nio.charset.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 
 final class EncodingDetector {
 	private final InputStream inputStream;

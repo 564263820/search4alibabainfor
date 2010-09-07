@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Represents a character stream source.  The purpose of a class that implements this interface is to output text.

@@ -20,8 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Comparator;
 
 /**
  * Defines the interface for an output segment, which is used in an {@link OutputDocument} to

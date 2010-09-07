@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
 
 final class HTMLElementNameSet extends HashSet<String> {
 	public HTMLElementNameSet() {

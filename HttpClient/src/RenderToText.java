@@ -1,7 +1,6 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.net.URL;
+
+import net.htmlparser.jericho.Source;
 
 public class RenderToText {
 	public static void main(String[] args) throws Exception {

@@ -20,8 +20,16 @@
 
 package net.htmlparser.jericho.nodoc;
 
-import net.htmlparser.jericho.*;
-import java.util.*;
+import java.util.AbstractList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+
+import net.htmlparser.jericho.Attributes;
+import net.htmlparser.jericho.Segment;
+import net.htmlparser.jericho.Source;
 
 /**
  * A base class used internally to simulate multiple inheritance of {@link Segment} and <code>java.util.AbstractSequentialList</code>.

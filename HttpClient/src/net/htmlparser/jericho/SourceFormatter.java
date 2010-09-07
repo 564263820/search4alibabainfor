@@ -20,9 +20,10 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Formats HTML source by laying out each non-inline-level element on a new line with an appropriate indent.

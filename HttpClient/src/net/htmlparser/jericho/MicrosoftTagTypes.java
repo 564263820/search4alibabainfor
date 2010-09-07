@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 /**
  * Contains {@linkplain TagType tag types} recognised exclusively by Microsoft&reg; Internet Explorer.

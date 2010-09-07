@@ -20,8 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * Implements an {@link OutputSegment} whose content is a list of attribute name/value pairs.

@@ -20,9 +20,14 @@
 
 package net.htmlparser.jericho;
 
-import net.htmlparser.jericho.nodoc.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Map;
+
+import net.htmlparser.jericho.nodoc.SequentialListSegment;
 
 /**
  * Represents the list of {@link Attribute} objects present within a particular {@link StartTag}.

@@ -14,7 +14,6 @@ import java.util.Set;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.Tag;
 
 
 public class ModelManager {

@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Iterates over the "nodes" in a segment.

@@ -1,7 +1,11 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+
+import net.htmlparser.jericho.MasonTagTypes;
+import net.htmlparser.jericho.MicrosoftTagTypes;
+import net.htmlparser.jericho.PHPTagTypes;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.SourceFormatter;
 
 public class FormatSource {
 	public static void main(String[] args) throws Exception {

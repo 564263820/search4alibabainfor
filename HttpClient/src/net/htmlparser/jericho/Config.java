@@ -20,7 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Encapsulates global configuration properties which determine the behaviour of various functions.

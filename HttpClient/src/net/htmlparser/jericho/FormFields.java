@@ -20,7 +20,14 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.io.Writer;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a collection of {@link FormField} objects.

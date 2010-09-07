@@ -1,5 +1,20 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.CharacterReference;
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.EndTagType;
+import net.htmlparser.jericho.HTMLElementName;
+import net.htmlparser.jericho.HTMLElements;
+import net.htmlparser.jericho.OutputDocument;
+import net.htmlparser.jericho.Segment;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.StartTagType;
+import net.htmlparser.jericho.Tag;
 
 /**
  * Provides facilities to sanitise HTML containing unwanted or invalid tags into clean HTML.

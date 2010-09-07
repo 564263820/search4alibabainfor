@@ -20,8 +20,10 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * Contains miscellaneous utility methods not directly associated with the HTML Parser library.

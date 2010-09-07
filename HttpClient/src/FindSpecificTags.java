@@ -1,7 +1,14 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.net.URL;
+import java.util.List;
+
+import net.htmlparser.jericho.EndTagType;
+import net.htmlparser.jericho.HTMLElementName;
+import net.htmlparser.jericho.MasonTagTypes;
+import net.htmlparser.jericho.MicrosoftTagTypes;
+import net.htmlparser.jericho.PHPTagTypes;
+import net.htmlparser.jericho.Segment;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTagType;
 
 public class FindSpecificTags {
 	public static void main(String[] args) throws Exception {

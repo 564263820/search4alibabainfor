@@ -1,7 +1,13 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+
+import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.Attributes;
+import net.htmlparser.jericho.EndTag;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.Tag;
 
 public class SplitLongLines {
 	private static final int MAX_LENGTH=70;

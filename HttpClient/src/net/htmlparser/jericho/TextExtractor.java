@@ -20,9 +20,10 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Extracts the textual content from HTML markup.

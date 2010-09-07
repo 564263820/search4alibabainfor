@@ -9,6 +9,7 @@
 package com.wjdeng.imp;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class URLContentManage implements URLContent {
 	
 	public static String KEY_CHARSET="CharSet";
 
-	public Map<String, Object> getContentByURL(String url,boolean get){
+	public Map<String, Object> getContentByURL(String url,boolean get) throws ClientProtocolException, IOException{
 		if(!get){
 			return this.getContentByURL(url);
 		}
@@ -45,27 +46,17 @@ public class URLContentManage implements URLContent {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet httget = new HttpGet(url);
 		HttpResponse response;
-		try {
-			response = client.execute(httget);
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				map.put(KEY_CONTENT, EntityUtils.toString(entity));
-				map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
-			}
-		} catch (ClientProtocolException e) {
-			SysUtils.wirtfile(e.getMessage());
-			System.out.print(e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
-			SysUtils.wirtfile(e.getMessage());
-			System.out.print(e.getMessage());
-			e.printStackTrace();
+		response = client.execute(httget);
+		HttpEntity entity = response.getEntity();
+		if (entity != null) {
+			map.put(KEY_CONTENT, EntityUtils.toString(entity));
+			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		return map;
 	}
 	
 	
-	public Map<String, Object> getContentByURL(String url){
+	public Map<String, Object> getContentByURL(String url) throws ClientProtocolException, IOException{
 		//System.out.println(url);
 		Map<String, Object> map = new HashMap<String, Object>();
 		HttpClient client = new DefaultHttpClient();
@@ -73,22 +64,12 @@ public class URLContentManage implements URLContent {
 		String urltem = this.setPairByUrl(url, nvps);
 		HttpPost httpost = new HttpPost(urltem);
 		HttpResponse response;
-		try {
-			httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-			response = client.execute(httpost);
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				map.put(KEY_CONTENT, EntityUtils.toString(entity));
-				map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
-			}
-		} catch (ClientProtocolException e) {
-			SysUtils.wirtfile(e.getMessage());
-			System.out.print(e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
-			SysUtils.wirtfile(e.getMessage());
-			System.out.print(e.getMessage());
-			e.printStackTrace();
+		httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+		response = client.execute(httpost);
+		HttpEntity entity = response.getEntity();
+		if (entity != null) {
+			map.put(KEY_CONTENT, EntityUtils.toString(entity));
+			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		return map;
 	}

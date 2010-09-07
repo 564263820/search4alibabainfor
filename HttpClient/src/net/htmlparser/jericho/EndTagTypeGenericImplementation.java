@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 /**
  * Provides a generic implementation of the abstract {@link EndTagType} class based on the most common end tag behaviour.
