@@ -1,0 +1,327 @@
+/******************************************************************************** 
+ * Create Author   : Administrator
+ * Create Date     : Sep 3, 2010
+ * File Name       : PaserCtroLServlet.java
+ *
+ * Apex OssWorks是上海泰信科技有限公司自主研发的一款IT运维产品，公司拥有完全自主知识产权及专利，
+ * 本系统的源代码归公司所有，任何团体或个人不得以任何形式拷贝、反编译、传播，更不得作为商业用途，对
+ * 侵犯产品知识产权的任何行为，上海泰信科技有限公司将依法对其追究法律责任。
+ *
+ * Copyright 1999 - 2009 Tekview Technology Co.,Ltd. All right reserved.
+ ********************************************************************************/
+package com.wjdeng.web;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jxl.write.WriteException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import com.wjdeng.client.model.ctronl.AppContext;
+import com.wjdeng.client.model.ctronl.AppStatus;
+import com.wjdeng.client.model.ctronl.ModeParament;
+import com.wjdeng.client.model.ctronl.PuaseCommand;
+import com.wjdeng.client.model.ctronl.event.Event;
+import com.wjdeng.client.model.ctronl.event.Listener;
+import com.wjdeng.client.util.StringUtils;
+import com.wjdeng.client.util.SysUtils;
+import com.wjdeng.imp.ExcelUtils;
+
+public class PaserCtroLServlet extends HttpServlet {
+	
+	private static String nullKey="end";
+	
+	static public Map<String,ModeParament> map = new HashMap<String,ModeParament>();
+	
+	static public Map<String,StringBuffer> writContentMap = new HashMap<String,StringBuffer>();
+
+	/**
+	 */
+	public PaserCtroLServlet() {
+		super();
+	}
+
+	/**
+	 */
+	public void destroy() {
+		super.destroy(); 
+	}
+
+	/**
+	 * 
+	 * @param request the request send by the client to the server
+	 * @param response the response send by the server to the client
+	 * @throws ServletException if an error occurred
+	 * @throws IOException if an error occurred
+	 */
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		this.doPost(request, response);
+	}
+
+	
+	private void downloadExcel(HttpServletResponse response,ModeParament par){
+		if(par==null)return;
+		response.setContentType("application/x-msdownload");
+		String fileName = par.getModeName()+SysUtils.formatDateTime(System.currentTimeMillis())+".xsl";
+		ExcelUtils eu = new ExcelUtils();
+		try {
+			response.setHeader("Content-Disposition", "attachment; filename="+new String(fileName.getBytes("GBK"),"iso8859-1"));
+			synchronized(par){
+				eu.createExcelUtil(par,response.getOutputStream());
+			}
+		}  catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param request the request send by the client to the server
+	 * @param response the response send by the server to the client
+	 * @throws ServletException if an error occurred
+	 * @throws IOException if an error occurred
+	 */
+	public void doPost(final HttpServletRequest request, final HttpServletResponse response)
+			throws ServletException, IOException {
+		//this.getServletContext().getRequestDispatcher(path);
+		String url = request.getParameter("url");
+		String operation = request.getParameter("operation");
+		ModeParament par =map.get(request.getRequestedSessionId());
+		if(par==null){
+			if(!this.testNet(url, request, response))return;
+		}
+		if("retry".equals(operation)){
+			writContentMap.remove(request.getRequestedSessionId());
+			map.remove(request.getRequestedSessionId());
+		}
+		if("pause".equals(operation)){
+			AppContext.exeCommand(new PuaseCommand(), par);//暂停
+		}
+		if("downloadExcel".equals(operation)){
+			this.downloadExcel(response, par);
+			return;
+		}
+		
+		response.setHeader("Cache-Control", "no-cache");
+		response.setContentType("application/json;charset=UTF-8");  
+		StringBuffer sb = writContentMap.get(request.getRequestedSessionId());
+		if(sb==null){
+			sb = new StringBuffer();
+			sb.append(nullKey);
+			writContentMap.put(request.getRequestedSessionId(),sb);
+		}
+		try {
+			if(!"running".equals(StringUtils.trim2null(operation))){//任务没有在运行中
+				this.runTask(sb, par, request);//执行任务
+			}
+			par =map.get(request.getRequestedSessionId());
+			
+			while(true){
+				Thread.sleep(50);
+				StringBuffer content = writContentMap.get(request.getRequestedSessionId());
+				synchronized(content){
+					if(!(content.length()==3 && content.indexOf(nullKey)==0)){
+						response.getWriter().write(content.toString());
+						content.delete(0, content.length());
+						content.append(nullKey);
+						break;
+					}else if(par.isEndTask()){
+						response.getWriter().write(getStatusJson(AppStatus.end,""));
+						break;
+					}
+				}
+			}
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//java.io.PrintWriter p = new PrintWriter("");
+			//e.printStackTrace(p);
+			e.printStackTrace(response.getWriter());
+			//response.getWriter().write(getStatusJson(AppStatus.error,p.toString()));
+		}
+	}
+	
+	private void runTask(StringBuffer sb,ModeParament par,HttpServletRequest request) throws Exception{
+		String url = request.getParameter("url");
+		Integer deep =2;
+		//String operation = request.getParameter("operation");
+		AppContext app;
+		if(par ==null ){
+			app = AppContext.getAppContext(url,deep);
+		}else {
+			app = AppContext.getAppContext(par);
+		}
+		par =app.getModeParament();
+		map.put(request.getRequestedSessionId(), par);
+		final Thread th= new Thread(app);
+		th.start();
+		app.addListener4AfterNextPage(new nextPage(sb));
+		app.addListener4AfterPaserInfor(new getPageInfor(sb));
+		app.addListener4End(new endtask(sb));
+	}
+	
+	
+	private String getStatusJson(AppStatus satu ,String msg){
+		StringBuffer sb = new StringBuffer();
+		sb.append("{ data:[");
+		sb.append("]");
+		sb.append(", state : '").append(satu.name()).append("' ");
+		sb.append(", url : ''");
+		sb.append(", msg : '").append(msg).append("' ");
+		sb.append("}");
+		return sb.toString();	
+	}
+	
+	private void creatJson(List<Map<String, String>> list ,StringBuffer sb){
+		for(Map<String,String> map : list){
+			StringBuffer temp = new StringBuffer();
+			Set<String> keys = map.keySet();
+			for(String key : keys){
+				if(StringUtils.trim2null(key)==null) continue;
+				temp.append("'").append(StringUtils.trim2empty(key)).append("':'").append(StringUtils.trim2empty(map.get(key))).append("',");
+			}
+			if(temp.length()>0){
+				temp.delete(temp.length()-1, temp.length());
+				temp.insert(0, "{");
+				temp.append("},");
+				sb.append(temp);
+			}
+			//map.clear();
+		}
+		list.clear();
+	}
+	
+	class getPageInfor implements Listener{
+		private StringBuffer sb;
+		public getPageInfor(StringBuffer sb){
+			this.sb = sb;
+		}
+
+		@Override
+		public void execute(Event ev) {
+			synchronized(sb){
+				System.out.println("infor:"+sb);
+				if(!(sb.length()==3 && sb.indexOf(nullKey)==0))return;
+				sb.delete(0, sb.length());
+				System.out.println(sb.toString());
+				List<Map<String, String>> list= ev.getModeParament().getDatatemp();
+				creatJson(list,sb);
+				if(sb.length()>0){
+					sb.delete(sb.length()-1, sb.length());
+				}
+				sb.insert(0, "{ data:[");
+				sb.append("]");
+				sb.append(", state : 'running' ");
+				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
+				sb.append("}");
+			}
+		}
+	}
+	
+	class nextPage implements Listener{
+		private StringBuffer sb;
+		public nextPage(StringBuffer sb){
+			this.sb = sb;
+		}
+		
+
+		@Override
+		public void execute(Event ev) {
+			synchronized(sb){
+				System.out.println("nextpage:"+sb);
+				if(!(sb.length()==3 && sb.indexOf(nullKey)==0))return;
+				sb.delete(0, sb.length());
+				List<Map<String, String>> list= ev.getModeParament().getDatatemp();
+				creatJson(list,sb);
+				if(sb.length()>0){
+					sb.delete(sb.length()-1, sb.length());
+				}
+				sb.insert(0, "{ data:[");
+				sb.append("]");
+				sb.append(", state : 'running' ");
+				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
+				sb.append("}");
+			}
+			
+		}
+		
+	}
+	
+	class endtask implements Listener{
+		private StringBuffer sb;
+		public endtask(StringBuffer sb){
+			this.sb = sb;
+		}
+		
+
+		@Override
+		public void execute(Event ev) {
+			synchronized(sb){
+				System.out.println("end:"+sb);
+				if(!(sb.length()==3 && sb.indexOf(nullKey)==0))return;
+				sb.delete(0, sb.length());
+				List<Map<String, String>> list= ev.getModeParament().getDatatemp();
+				creatJson(list,sb);
+				if(sb.length()>0){
+					sb.delete(sb.length()-1, sb.length());
+				}
+				sb.insert(0, "{ data:[");
+				sb.append("]");
+				sb.append(", state : 'end' ");
+				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
+				sb.append("}");
+			}
+			
+		}
+		
+	}
+	
+	
+	private boolean  testNet(String url,HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException{
+		try{
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httget = new HttpGet(url);
+			HttpResponse rp;
+			rp = client.execute(httget);
+			HttpEntity entity = rp.getEntity();
+			EntityUtils.toString(entity);
+		} catch (Exception e) {
+			//java.io.PrintWriter p = new PrintWriter("");
+			e.printStackTrace(response.getWriter());
+			//response.getWriter().write(this.getStatusJson(AppStatus.error, p.toString()));
+			return false;
+		} 
+		return true;
+	}
+
+	/**
+	 * Initialization of the servlet. <br>
+	 *
+	 * @throws ServletException if an error occurs
+	 */
+	public void init() throws ServletException {
+	}
+
+}
+

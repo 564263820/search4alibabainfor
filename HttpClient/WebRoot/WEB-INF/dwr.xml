@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC
+    "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN"
+    "http://directwebremoting.org/schema/dwr20.dtd">
+
+<dwr>
+	<allow>
+		<create creator="new" javascript="excelUtil">
+     		 <param name="class" value="com.wjdeng.imp.ExcelUtils"/>
+   		</create>
+		
+		<convert converter="exception" match="java.lang.Exception" /> 
+	    <filter class="org.directwebremoting.filter.ExtraLatencyAjaxFilter">
+	      <param name="delay" value="200"/>
+	    </filter>
+		
+	</allow>
+	<signatures>
+		<![CDATA[
+                import java.util.List;
+                import java.util.Map;
+                excelUtil.createExcelUtil(Map<String,String>[] maps);
+            ]]>
+	</signatures>
+</dwr>

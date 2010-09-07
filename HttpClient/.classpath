@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.j2eedt.core.MYECLIPSE_JAVAEE_5_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/httpclient"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/apache-mime4j-0.6.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpclient-4.0.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpcore-4.0.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpcore-nio-4.0.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpmime-4.0.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jericho-html-3.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jxl.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/slf4j-api-1.5.6.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/dwr-2.0.5.jar" sourcepath="E:/doc&amp;book/dwr-2.0.6-src.zip"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/log4j-api-1.2.15.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/standard-1.1.2.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/QQ.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jstl-1.2.jar"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>
