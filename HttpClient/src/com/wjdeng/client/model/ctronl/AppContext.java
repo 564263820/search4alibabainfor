@@ -36,7 +36,9 @@ import com.wjdeng.imp.URLContentManage;
  * @since
  */
 public class AppContext  implements Runnable{
-	
+	/**
+	 * 运行环境参数
+	 */
 	private final ModeParament par ; 
 	
 	public ModeParament getModeParament(){
@@ -75,7 +77,7 @@ public class AppContext  implements Runnable{
 		return new AppContext(par);
 	}
 	
-	public IPaser getHtmlPaser(ModeParament par){
+	public static IPaser getHtmlPaser(ModeParament par){
 		if(par==null)return null;
 		if(!"".equals(SysUtils.trim2empty(par.getModeclass()))){
 			try {
@@ -147,33 +149,31 @@ public class AppContext  implements Runnable{
 	
 	
 	@SuppressWarnings("unchecked")
-	public ModeParament getContent() throws Exception{
-		ModeParament par = getModeParament();
+	public ModeParament getContent() throws ClientProtocolException, IOException {
+		ModeParament par = getModeParament();//解析模块运行时环境
 		Document doc=AppContext.getHtmlDocByUrl(par.getEntranceUrl());
-		DefaultPaserAdapter dpa = new DefaultPaserAdapter(doc);
-		IPaser paser =this.getHtmlPaser(par);
-		dpa.setIpaser(paser);
-		Set<String> pages =new HashSet<String>();
+		IPaser paser = getHtmlPaser(par);//获取解析器
+		DefaultPaserAdapter dpa = new DefaultPaserAdapter(doc,paser,par);//创建循环迭代 代理
+		Set<String> pages =new HashSet<String>();//已经解析过资料的url地址 过滤重复地址
 		Document doct = doc;
 		par.setCurDoc(doct);
-		par.setEndTask(false);
 		int deep = par.getDeep();
 		int tem=0;
 		while(dpa.hasNext()){
-			Set<String> urlset= paser.getPageListUrl(doct);
+			Set<String> urlset= dpa.getPageListUrl(doct);
 			for(String purl :urlset){
 				if(par.isEndTask())return par;//任务结束
 				if(tem== deep)return par;
 				if(pages.contains(purl))continue;
 				pages.add(purl);
-				Map<String,String> datatemp = paser.execuPaseInforPage(AppContext.getHtmlDocByUrl(purl));
+				Map<String,String> datatemp = dpa.execuPaseInforPage(AppContext.getHtmlDocByUrl(purl));
 				par.addDatatemp(datatemp);//获取的当前客户数据存入参数对象中并触发解析一个客户数据成功事件
 				par.getMlist().add(datatemp);
 			}
 			tem ++;
 			par.setCurPage(tem);
 			if(tem== deep)break;
-			doct = dpa.nextUrl();
+			doct = dpa.nextUrl();//下一页
 			par.setCurDoc(doct);
 			par.setEntranceUrl(doct.getUrl());
 		}
@@ -188,26 +188,28 @@ public class AppContext  implements Runnable{
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 */
-	public static Document getHtmlDocByUrl(String url) throws ClientProtocolException, IOException{
+	public static Document getHtmlDocByUrl(String url) {
 		URLContentManage um= new URLContentManage();
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
 		Map<String,Object> map =null;
-		if("get".equals(par.getMethod())){
-			map = um.getContentByURL(url,true);
-		}else{
-			map = um.getContentByURL(url);
-		}
-		String str = (String) map.get(URLContentManage.KEY_CONTENT);//抓取到的页面html
+		String str = "";
+		try {
+			if("get".equals(par.getMethod())){
+					map = um.getContentByURL(url,true);
+			}else{
+				map = um.getContentByURL(url);
+			}
+			str = (String) map.get(URLContentManage.KEY_CONTENT);//抓取到的页面html
+		} catch (Exception e) {
+			try {
+				PrintWriter p; p = new PrintWriter(SysUtils.getFilePathStr("log"));p.println(SysUtils.formatDateTime(System.currentTimeMillis())+" 抓取"+url+"失败................\n");p.write(str); p.flush(); p.close();
+				e.printStackTrace();
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+		} 
 		//System.out.println(str);
 		//StringUtils.wirtfile(str);
-		try {
-			PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
-			p.write(str);
-			p.flush();
-			p.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 		return new Document(new Source(str),url);
 	}
 	

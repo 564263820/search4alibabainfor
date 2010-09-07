@@ -16,6 +16,7 @@ import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.Ipaser.IPaser;
 import com.wjdeng.client.model.Ipaser.IpaserAdapter;
 import com.wjdeng.client.model.ctronl.AppContext;
+import com.wjdeng.client.model.ctronl.ModeParament;
 
 public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	
@@ -24,13 +25,18 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	private String nextUrl;
 	
 	private Document doc;
+	
+	private ModeParament par ;
 
-	public DefaultPaserAdapter(String url) throws ClientProtocolException, IOException{
+	public DefaultPaserAdapter(String url) {
 		doc=AppContext.getHtmlDocByUrl(url);
 	}
 	
-	public DefaultPaserAdapter(Document doc){
+	
+	public DefaultPaserAdapter(Document doc,IPaser paser,ModeParament par ){
 		this.doc=doc;
+		this.paser = paser;
+		this.par = par;
 	}
 	
 	@Override

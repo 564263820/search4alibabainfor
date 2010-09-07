@@ -33,16 +33,17 @@
 			.tbody_td{ padding-left:5px}
 			.tbody_tr2{ background:#F0F5F9 url(../images/s_r19_c17.jpg) bottom repeat-x; height:26px;}
 			.tbody_tr_on{ background:#FF9 url(../images/s_r5_c422.jpg) bottom repeat-x; height:26px;}
+			.infor{display:inline-block;float:left;width:30%;}
 		</style>
 	</head>
 	<body>
+		<center>
 		<div class="ruanjian">
-			<center>
 				<div class="wrapper block1" align="center"
 					style="margin-top: 50px;">
 					<form action="<c:url value="/infor/getInfor"/>" id="urlFrom" method="post">
 					<textarea id="url" name="url" style="width: 700px; height: 60px;"
-						class="textarea_style"></textarea>
+						class="textarea_style">http://www.alibaba.com/trade/search/3i1p5tyfchms/shanghai.html?tracelog=24581_searchbar_keywords</textarea>
 					<br>
 					<div style="margin-top: 10px;">
 					<input type="button" id="retry"   onclick="request(this);" value="搜索" />
@@ -53,7 +54,9 @@
 					</form>
 					</div>
 				</div>
-				<div id="reTitle">获取到[<span id="reRows">&nbsp;</span>]条信息 </div>
+				<div class="infor">
+					<div id="reTitle" >获取到[<span style="color:red;" id="reRows">&nbsp;</span>]条信息</div>&nbsp;&nbsp;&nbsp;<span id="runningInfor"></span><div id="MSG"></div>
+				</div>
 				<div id="datadiv" class="border_n"
 					style="display: block; width: 96%; height: 500px; overflow: auto;margin-top: 10px;">
 					<table width="100%" cellspacing="0" cellpadding="0" border="0" id="tablelistci">
@@ -61,8 +64,8 @@
 						<tbody id="databody"></tbody>
 					</table>
 				</div>
-				<div id="MSG"></div>
-			</center>
+				
 		</div>
+		</center>
 	</body>
 </html>

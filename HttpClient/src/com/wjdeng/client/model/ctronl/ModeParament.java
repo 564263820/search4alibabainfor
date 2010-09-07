@@ -55,7 +55,7 @@ public class ModeParament {
 	 */
 	private Document curDoc;
 	
-	private boolean endTask;
+	private boolean endTask = false;
 	
 	/**
 	 * 最新新抓取的临时页面数据
