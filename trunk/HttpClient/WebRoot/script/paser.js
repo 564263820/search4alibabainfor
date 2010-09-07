@@ -13,7 +13,15 @@ function request(obj){
 function pause(obj){
 	server.operation = "pause";
 	server.submitRequest();
-	obj.disable= true;
+	obj.value= "继续";
+	obj.onclick = continuerun;
+}
+
+function continuerun(obj){
+	server.operation = "continuerun";
+	server.submitRequest();
+	obj.value= "暂停";
+	obj.onclick = pause;
 }
 
 function downloadExcel(obj){
@@ -78,14 +86,13 @@ dorequest.prototype.subServer = function ()
 	      		}else if(rowc%2 ==0 ){
 	      			htmstr += "class=\"tbody_tr2\" onmouseover=\"this.className='tbody_tr_on'\" onmouseout=\"this.className='tbody_tr2'\" >";
 	      		}
-	      		//$("#databody").append("<tr "+clastr +">");
 	      		for(var j=0 ; j<th.array.length;j++){
 	      			htmstr +="<td>"+row[th.array[j]]+"</td>";
 	      		}
 	      		htmstr += "</tr>";
-	      		//htmstr +="<td>"+row[th.array[j]]+"</td></tr>";
 	      		$("#databody").append(htmstr);
-	      		///alert($("#databody").html());
+	      		document.getElementById("excel").disabled= false;
+	      		document.getElementById("pause").disabled= false;
 	      	}
   			$("#runningInfor").html("正在解析："+obj.url+"中的数据");
       		if(obj.state != 'end' && obj.state != 'error'){
