@@ -20,8 +20,11 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Performs a simple rendering of HTML markup into text.

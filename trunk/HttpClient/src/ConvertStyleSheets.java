@@ -1,7 +1,15 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.util.List;
+
+import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.Attributes;
+import net.htmlparser.jericho.HTMLElementName;
+import net.htmlparser.jericho.OutputDocument;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.Util;
 
 public class ConvertStyleSheets {
 	public static void main(String[] args) throws Exception {

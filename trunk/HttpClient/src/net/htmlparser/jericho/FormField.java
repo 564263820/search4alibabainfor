@@ -20,7 +20,13 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a <em>field</em> in an HTML <a target="_blank" href="http://www.w3.org/TR/html401/interact/forms.html">form</a>,

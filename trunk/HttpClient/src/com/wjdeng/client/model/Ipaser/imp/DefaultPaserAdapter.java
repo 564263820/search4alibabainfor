@@ -6,10 +6,11 @@
  ********************************************************************************/
 package com.wjdeng.client.model.Ipaser.imp;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import net.htmlparser.jericho.Source;
+import org.apache.http.client.ClientProtocolException;
 
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.Ipaser.IPaser;
@@ -24,7 +25,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	
 	private Document doc;
 
-	public DefaultPaserAdapter(String url){
+	public DefaultPaserAdapter(String url) throws ClientProtocolException, IOException{
 		doc=AppContext.getHtmlDocByUrl(url);
 	}
 	
@@ -60,7 +61,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	}
 
 	@Override
-	public Document nextUrl() {
+	public Document nextUrl() throws ClientProtocolException, IOException {
 		this.doc=AppContext.getHtmlDocByUrl(nextUrl);
 		//System.out.println(doc.getFirstElement().getContent().toString());
 		return doc;

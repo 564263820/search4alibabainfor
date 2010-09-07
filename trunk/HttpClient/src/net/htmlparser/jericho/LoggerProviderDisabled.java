@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.logging.*;
 
 final class LoggerProviderDisabled implements LoggerProvider {
 	public static final LoggerProvider INSTANCE=new LoggerProviderDisabled();

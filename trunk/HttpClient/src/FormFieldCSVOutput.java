@@ -1,7 +1,12 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.htmlparser.jericho.FormFields;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.Util;
 
 public class FormFieldCSVOutput {
 	// newValuesMap is designed to emulate the data structure returned by the

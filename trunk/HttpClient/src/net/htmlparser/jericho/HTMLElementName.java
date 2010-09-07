@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 /**
  * Contains static fields representing the {@linkplain Element#getName() names} of

@@ -20,18 +20,17 @@
 
 package net.htmlparser.jericho;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.io.Closeable;
-import java.io.Reader;
-import java.io.Writer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.CharBuffer;
-import java.nio.BufferOverflowException;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.BufferOverflowException;
+import java.nio.CharBuffer;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Represents a streamed source HTML document.

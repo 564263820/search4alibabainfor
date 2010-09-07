@@ -20,8 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.util.logging.*;
-import java.io.*;
+import java.io.OutputStreamWriter;
 
 final class LoggerProviderSTDERR implements LoggerProvider {
 	public static final LoggerProvider INSTANCE=new LoggerProviderSTDERR();

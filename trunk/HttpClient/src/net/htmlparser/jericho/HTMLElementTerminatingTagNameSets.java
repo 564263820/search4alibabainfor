@@ -20,7 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Set;
 
 final class HTMLElementTerminatingTagNameSets {
 	// all fields are guaranteed not null and contain unique sets.

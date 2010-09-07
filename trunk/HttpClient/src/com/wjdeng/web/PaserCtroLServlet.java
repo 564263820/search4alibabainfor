@@ -6,13 +6,9 @@
  ********************************************************************************/
 package com.wjdeng.web;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import jxl.write.WriteException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -100,6 +94,9 @@ public class PaserCtroLServlet extends HttpServlet {
 	 */
 	public void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
+		PrintWriter ps = new PrintWriter(SysUtils.getFilePath("log"));
+		ps.print("wo de shi yan!!!!!!!!!!!!!!!!!!!!!!!!");
+		ps.flush();ps.close();
 		//this.getServletContext().getRequestDispatcher(path);
 		String url = request.getParameter("url");
 		String operation = request.getParameter("operation");
@@ -150,10 +147,11 @@ public class PaserCtroLServlet extends HttpServlet {
 			}
 		} catch (Exception e) {
 			//e.printStackTrace();
-			//java.io.PrintWriter p = new PrintWriter("");
-			//e.printStackTrace(p);
-			e.printStackTrace(response.getWriter());
-			//response.getWriter().write(getStatusJson(AppStatus.error,p.toString()));
+			PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
+			e.printStackTrace(p);
+			p.flush();
+			p.close();
+			response.getWriter().write(getStatusJson(AppStatus.error,e.getMessage()));
 		}
 	}
 	
@@ -302,9 +300,10 @@ public class PaserCtroLServlet extends HttpServlet {
 			HttpEntity entity = rp.getEntity();
 			EntityUtils.toString(entity);
 		} catch (Exception e) {
-			//java.io.PrintWriter p = new PrintWriter("");
-			e.printStackTrace(response.getWriter());
-			//response.getWriter().write(this.getStatusJson(AppStatus.error, p.toString()));
+			java.io.PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
+			e.printStackTrace(p);
+			p.flush();p.close();
+			response.getWriter().write(this.getStatusJson(AppStatus.error, e.getMessage()));
 			return false;
 		} 
 		return true;

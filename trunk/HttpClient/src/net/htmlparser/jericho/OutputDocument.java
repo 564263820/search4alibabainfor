@@ -20,8 +20,13 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a modified version of an original {@link Source} document or {@link Segment}.

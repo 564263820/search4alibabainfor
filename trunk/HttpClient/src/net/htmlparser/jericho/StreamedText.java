@@ -20,8 +20,11 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
-import java.nio.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.BufferOverflowException;
+import java.nio.CharBuffer;
 
 /**
  * Implements a buffered window into a stream of characters.

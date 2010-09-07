@@ -20,10 +20,15 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
-import java.nio.charset.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 
 /**
  * Based on information in:
@@ -202,9 +207,9 @@ final class StreamEncodingDetector {
 		// Assume the more likely case of four 8-bit characters <= U+00FF.
 		// Check whether it fits some common EBCDIC strings that might be found at the start of a document:
 		if (b1==0x4C) { // first character is EBCDIC '<' (ASCII 'L'), check a couple more characters before assuming EBCDIC encoding:
-			if (b2==0x6F && b3==0xA7 && b4==0x94) return setEncoding(EBCDIC,"default EBCDIC encoding (<?xml...> detected)"); // first four bytes are "<?xm" in EBCDIC ("Lo§”" in Windows-1252)
-			if (b2==0x5A && b3==0xC4 && b4==0xD6) return setEncoding(EBCDIC,"default EBCDIC encoding (<!DOCTYPE...> detected)"); // first four bytes are "<!DO" in EBCDIC ("LZÄÖ" in Windows-1252)
-			if ((b2&b3&b4&0x80)!=0) return setEncoding(EBCDIC,"default EBCDIC-compatible encoding (HTML element detected)"); // all of the 3 bytes after the '<' have the high-order bit set, indicating EBCDIC letters such as "<HTM" ("LÈãÔ" in Windows-1252), or "<htm" ("Lˆ£”" in Windows-1252)
+			if (b2==0x6F && b3==0xA7 && b4==0x94) return setEncoding(EBCDIC,"default EBCDIC encoding (<?xml...> detected)"); // first four bytes are "<?xm" in EBCDIC ("Loï¿½ï¿½" in Windows-1252)
+			if (b2==0x5A && b3==0xC4 && b4==0xD6) return setEncoding(EBCDIC,"default EBCDIC encoding (<!DOCTYPE...> detected)"); // first four bytes are "<!DO" in EBCDIC ("LZï¿½ï¿½" in Windows-1252)
+			if ((b2&b3&b4&0x80)!=0) return setEncoding(EBCDIC,"default EBCDIC-compatible encoding (HTML element detected)"); // all of the 3 bytes after the '<' have the high-order bit set, indicating EBCDIC letters such as "<HTM" ("Lï¿½ï¿½ï¿½" in Windows-1252), or "<htm" ("Lï¿½ï¿½ï¿½" in Windows-1252)
 			// although this is not an exhaustive check for EBCDIC, it is safer to assume a more common preliminary encoding if none of these conditions are met.
 		}
 		// Now confident that it is not EBCDIC, but some other 8-bit encoding.

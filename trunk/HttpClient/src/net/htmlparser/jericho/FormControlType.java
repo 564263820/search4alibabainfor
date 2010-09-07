@@ -20,7 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Represents the <a target="_blank" href="http://www.w3.org/TR/html401/interact/forms.html#h-17.2.1">control type</a>

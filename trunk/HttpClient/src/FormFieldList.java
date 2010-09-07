@@ -1,7 +1,8 @@
-import net.htmlparser.jericho.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.net.URL;
+
+import net.htmlparser.jericho.FormField;
+import net.htmlparser.jericho.FormFields;
+import net.htmlparser.jericho.Source;
 
 public class FormFieldList {
 	public static void main(String[] args) throws Exception {

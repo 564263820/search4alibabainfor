@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 class StartTagTypeMarkupDeclaration extends StartTagTypeGenericImplementation {
 	static final StartTagTypeMarkupDeclaration INSTANCE=new StartTagTypeMarkupDeclaration();

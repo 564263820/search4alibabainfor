@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Represents a single <a target="_blank" href="http://www.w3.org/TR/html401/intro/sgmltut.html#h-3.2.2">attribute</a>

@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 /**
  * This is an internal class used to efficiently map integers to strings, which is used in the CharacterEntityReference class.

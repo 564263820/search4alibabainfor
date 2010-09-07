@@ -16,13 +16,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.script.Bindings;
-import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import net.htmlparser.jericho.Element;
-import net.htmlparser.jericho.FormField;
 import net.htmlparser.jericho.FormFields;
 
 import com.wjdeng.client.model.Ipaser.IPaser;

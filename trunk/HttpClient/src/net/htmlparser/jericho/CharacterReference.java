@@ -20,8 +20,9 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
-import java.io.*;
+import java.io.FilterWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Represents an HTML <a target="_blank" href="http://www.w3.org/TR/REC-html40/charset.html#entities">Character Reference</a>,

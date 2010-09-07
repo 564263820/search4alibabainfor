@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 /**
  * Defines the syntax for a start tag type.

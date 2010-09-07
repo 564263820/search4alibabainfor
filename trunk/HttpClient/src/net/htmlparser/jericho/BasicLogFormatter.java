@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.util.logging.*;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
 /**
  * Provides basic formatting for log messages.

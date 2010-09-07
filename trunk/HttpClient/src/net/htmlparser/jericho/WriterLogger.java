@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Provides an implementation of the {@link Logger} interface that sends output to the specified <code>java.io.Writer</code>.

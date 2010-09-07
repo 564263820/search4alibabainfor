@@ -20,7 +20,8 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents a cached map of character positions to tags.

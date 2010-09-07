@@ -20,7 +20,6 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
 
 /**
  * Provides a generic implementation of the abstract {@link StartTagType} class based on the most common start tag behaviour.

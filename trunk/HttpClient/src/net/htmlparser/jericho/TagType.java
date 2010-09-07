@@ -20,7 +20,7 @@
 
 package net.htmlparser.jericho;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Defines the syntax for a tag type that can be recognised by the parser.
