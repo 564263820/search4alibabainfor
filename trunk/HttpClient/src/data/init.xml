@@ -1,0 +1,17 @@
+<model>
+	<name>alibaba</name>
+	<class>com.wjdeng.client.model.AlibabaPaser</class>
+	<url>http://www.alibaba.com/</url>
+</model>
+<model>
+	<name>busytrade</name>
+	<class>com.wjdeng.client.model.BusytradePaser</class>
+	<url>http://www.busytrade.com</url>
+</model>
+<model>
+	<name>globalsources</name>
+	<class>com.wjdeng.client.model.GllobalSourcesPaser</class>
+	<url>http://www.globalsources.com</url>
+	<method>get</method>
+</model>
+
