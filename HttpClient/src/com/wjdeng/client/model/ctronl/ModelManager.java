@@ -55,6 +55,7 @@ public class ModelManager {
 			if(url.indexOf(key)>-1){
 				ModeParament tem = map.get(key);
 				ModeParament mode = new ModeParament(tem.getUrl(),tem.getModeclass(),tem.getModeName());
+				mode.setMethod(tem.getMethod());
 				return mode;
 			}
 		}

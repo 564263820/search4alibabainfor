@@ -28,6 +28,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.client.model.ctronl.AppContext;
 import com.wjdeng.client.model.ctronl.AppStatus;
+import com.wjdeng.client.model.ctronl.ContinueRunCommand;
 import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.model.ctronl.PuaseCommand;
 import com.wjdeng.client.model.ctronl.event.Event;
@@ -72,10 +73,11 @@ public class PaserCtroLServlet extends HttpServlet {
 	private void downloadExcel(HttpServletResponse response,ModeParament par){
 		if(par==null)return;
 		response.setContentType("application/x-msdownload");
-		String fileName = par.getModeName()+SysUtils.formatDateTime(System.currentTimeMillis())+".xsl";
+		String fileName = par.getModeName()+SysUtils.formatDateTime(System.currentTimeMillis())+".xls";
 		ExcelUtils eu = new ExcelUtils();
 		try {
-			response.setHeader("Content-Disposition", "attachment; filename="+new String(fileName.getBytes("GBK"),"iso8859-1"));
+			fileName =new String(fileName.getBytes("GBK"),"iso8859-1");
+			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
 			synchronized(par){
 				eu.createExcelUtil(par,response.getOutputStream());
 			}
@@ -107,12 +109,14 @@ public class PaserCtroLServlet extends HttpServlet {
 			if(null != par){
 				AppContext.exeCommand(new PuaseCommand(), par);//停止
 			}
-			
-		}
-		if("pause".equals(operation)){
+			par = null;
+		}else if("pause".equals(operation)){
 			AppContext.exeCommand(new PuaseCommand(), par);//暂停
-		}
-		if("downloadExcel".equals(operation)){
+			response.getWriter().write(getStatusJson(AppStatus.end,"暂停"));
+			return;
+		}else if("continuerun".equals(operation)){
+			AppContext.exeCommand(new ContinueRunCommand(), par);//继续 回复运行
+		}else if("downloadExcel".equals(operation)){
 			this.downloadExcel(response, par);
 			return;
 		}
@@ -186,8 +190,9 @@ public class PaserCtroLServlet extends HttpServlet {
 		sb.append("]");
 		sb.append(", state : '").append(satu.name()).append("' ");
 		sb.append(", url : ''");
-		sb.append(", msg : '").append(msg).append("' ");
+		sb.append(", msg : '").append(msg).append("'");
 		sb.append("}");
+		System.out.println(sb.toString());;
 		return sb.toString();	
 	}
 	

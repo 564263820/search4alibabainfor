@@ -7,21 +7,24 @@ var server  = new dorequest();
 function request(obj){
 	server.operation = "retry";
 	server.submitRequest();
+	obj.value= "重新搜索";
 	obj.disabled= true;
 }
 
-function pause(obj){
+function pauserun(){
+	obj= document.getElementById("pause");
 	server.operation = "pause";
 	server.submitRequest();
 	obj.value= "继续";
 	obj.onclick = continuerun;
 }
 
-function continuerun(obj){
+function continuerun(){
+	obj= document.getElementById("pause");
 	server.operation = "continuerun";
 	server.submitRequest();
 	obj.value= "暂停";
-	obj.onclick = pause;
+	obj.onclick = pauserun;
 }
 
 function downloadExcel(obj){
@@ -79,7 +82,7 @@ dorequest.prototype.subServer = function ()
 	      			}
 	      		}
 	      		var rowc = document.getElementById("databody").getElementsByTagName("TR").length;
-	      		$("#reRows").html(rowc+1);
+	      		$("#reTitle").html("获取到[<span style='color:red;' id='reRows'>"+(rowc+1)+"</span>]条信息");
 	      		var htmstr = "<tr ";
 	      		if(rowc%2 == 1){
 	      			htmstr += "class=\"tbody_tr1\" onmouseover=\"this.className='tbody_tr_on'\" onmouseout=\"this.className='tbody_tr1'\" >";
@@ -93,16 +96,25 @@ dorequest.prototype.subServer = function ()
 	      		$("#databody").append(htmstr);
 	      		document.getElementById("excel").disabled= false;
 	      		document.getElementById("pause").disabled= false;
+	      		document.getElementById("retry").disabled= false;
+	      		document.getElementById("pause").className="button";
+	      		document.getElementById("excel").className="button";
 	      	}
-  			$("#runningInfor").html("正在解析："+obj.url+"中的数据");
+	      	if(obj.url!=''){
+  				$("#runningInfor").html("正在解析："+obj.url+"中的数据");
+	      	}else{
+	      		$("#runningInfor").html("");
+	      	}
       		if(obj.state != 'end' && obj.state != 'error'){
       			server.subServer();
 	      	}else if(obj.state != 'error'){
-      			$("#MSG").append("<br>"+obj.msg);
+	      		alert(html);
+	      		if(obj.msg!="") $("#MSG").html(""+obj.msg);
 	      	}else if(obj.state != 'end'){
 	      		document.getElementById("retry").disabled= false;
-	      		$("#MSG").append("<br>搜索完毕！");
-	      		$("#runningInfor").html("");
+	      		document.getElementById("retry").className="button";
+	      		//$("#MSG").html("end");
+	      		$("#runningInfor").html("&nbsp;");
 	      	}
 	      },
 	      error: function(XMLHttpRequest, textStatus, errorThrown){
