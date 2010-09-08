@@ -23,6 +23,7 @@ import com.wjdeng.client.model.Ipaser.IPaser;
 import com.wjdeng.client.model.Ipaser.imp.DefaultPaserAdapter;
 import com.wjdeng.client.model.ctronl.event.Event;
 import com.wjdeng.client.model.ctronl.event.Listener;
+import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
 import com.wjdeng.imp.URLContentManage;
@@ -53,20 +54,20 @@ public class AppContext  implements Runnable{
 	
 	public static AppContext getAppContext(String url,Integer deep) throws Exception{
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
-		par.setDeep(deep);
-		par.setEntranceUrl(url);
 		if(par==null){
 			throw new Exception(url+"未找到解析器，请检查配置。"+url+"是否是目前能够解析的网站？");
 		}
+		par.setDeep(deep);
+		par.setEntranceUrl(url);
 		return new AppContext(par);
 	}
 	
 	public static AppContext getAppContext(String url) throws Exception{
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
-		par.setEntranceUrl(url);
 		if(par==null){
 			throw new Exception(url+"未找到解析器，请检查配置。"+url+"是否是目前能够解析的网站？");
 		}
+		par.setEntranceUrl(url);
 		return new AppContext(par);
 	}
 	
@@ -211,7 +212,7 @@ public class AppContext  implements Runnable{
 			}
 		} 
 		//System.out.println(str);
-		//StringUtils.wirtfile(str);
+		StringUtils.wirtfile(str);
 		return new Document(new Source(str),url);
 	}
 	
@@ -224,9 +225,10 @@ public class AppContext  implements Runnable{
 			//List<Map<String,String>> mlist = AppContext.getAppContext().getContent("http://www.alibaba.com/trade/search?SearchText=zhejiang&Country=&CatId=43&IndexArea=product_en&fsb=y");
 			//List<Map<String,String>> mlist = AppContext.getAppContext().getContent("http://www.busytrade.com/selling-leads/3-185/Folk-Crafts.html");
 			//http://www.busytrade.com/selling-leads/2-2064/Toy-Agents.html
-			//http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&query=auto+part&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true
-			String url = "http://www.alibaba.com/trade/search/3i1p5tyfchms/shanghai.html?tracelog=24581_searchbar_keywords";
+			//String url ="http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&query=auto+part&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
+			//String url = "http://www.alibaba.com/trade/search/3i1p5tyfchms/shanghai.html?tracelog=24581_searchbar_keywords";
 			//ModeParament par = AppContext.getAppContext(url).getContent();
+			String url ="http://www.globalsources.com/gsol/GeneralManager?point_search=on&page=search%2FProductSearchResults&product_search=on&supplier_search=off&article_search=off&type=new&search_what=1&query=car+engine&point_id=3000000149681&catalog_id=2000000003844&from=&loc=t&AGG=N&action=GetPoint&action=DoFreeTextSearch&ctryVal=China%20%28mainland%29&catName=&stateVal=Zhejiang";
 			AppContext  app =AppContext.getAppContext(url,2);
 			Thread th= new Thread(app);
 			th.start();
