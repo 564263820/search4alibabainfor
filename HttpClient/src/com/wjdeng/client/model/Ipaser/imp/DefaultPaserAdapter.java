@@ -7,16 +7,20 @@
 package com.wjdeng.client.model.Ipaser.imp;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
+
 
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.Ipaser.IPaser;
 import com.wjdeng.client.model.Ipaser.IpaserAdapter;
 import com.wjdeng.client.model.ctronl.AppContext;
 import com.wjdeng.client.model.ctronl.ModeParament;
+import com.wjdeng.client.util.StringKeyMsg;
+import com.wjdeng.client.util.StringUtils;
 
 public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	
@@ -27,6 +31,8 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	private Document doc;
 	
 	private ModeParament par ;
+	
+	private Set<String> keySet = new HashSet<String>();
 
 	public DefaultPaserAdapter(String url) {
 		doc=AppContext.getHtmlDocByUrl(url);
@@ -41,7 +47,18 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	
 	@Override
 	public Map<String, String> execuPaseInforPage(Document doc) {
-		return this.paser.execuPaseInforPage(doc);
+		Map<String, String> dmap = this.paser.execuPaseInforPage(doc);
+		for(String key :dmap.keySet()){
+			String tem  = StringKeyMsg.getMsgByKey(key);
+			if(StringUtils.trim2null(tem)!=null){
+				dmap.put(tem,dmap.remove(key));
+			}
+		}
+		String key = dmap.get(StringKeyMsg.getMsgByKey(StringKeyMsg.complanyKey+par.getModeName()));
+		if(keySet.contains(key)){
+			return null;
+		}
+		return dmap;
 	}
 
 	@Override
