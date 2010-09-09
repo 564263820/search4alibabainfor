@@ -325,6 +325,7 @@ public class TextExtractor implements CharStreamSource {
 
 		public String toString() {
 			final StringBuilder sb=new StringBuilder(segment.length());
+			boolean brflag = false;
 			for (NodeIterator nodeIterator=new NodeIterator(segment); nodeIterator.hasNext();) {
 				Segment segment=nodeIterator.next();
 				if (segment instanceof Tag) {
@@ -353,11 +354,17 @@ public class TextExtractor implements CharStreamSource {
 					}
 					// Treat both start and end tags not belonging to inline-level elements as whitespace:
 					if (tag.getName()==HTMLElementName.BR || !HTMLElements.getInlineLevelElementNames().contains(tag.getName())) sb.append(' ');
+					// add by wjdeng
+					if (tag.getName()==HTMLElementName.BR ){
+						sb.append("\\n");
+						brflag = true;
+					}
 				} else {
 					sb.append(segment);
 				}
 			}
-			final String decodedText=CharacterReference.decodeCollapseWhiteSpace(sb,convertNonBreakingSpaces);
+			String decodedText=CharacterReference.decodeCollapseWhiteSpace(sb,convertNonBreakingSpaces);
+			if(brflag){decodedText = decodedText.replace("\\n", "\n");}
 			return decodedText;
 		}
 	}

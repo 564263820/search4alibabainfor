@@ -190,7 +190,7 @@ public class PaserCtroLServlet extends HttpServlet {
 		sb.append("]");
 		sb.append(", state : '").append(satu.name()).append("' ");
 		sb.append(", url : ''");
-		sb.append(", msg : '").append(msg).append("'");
+		sb.append(", msg : '").append(StringUtils.string2Json(msg)).append("'");
 		sb.append("}");
 		System.out.println(sb.toString());;
 		return sb.toString();	
@@ -202,7 +202,7 @@ public class PaserCtroLServlet extends HttpServlet {
 			Set<String> keys = map.keySet();
 			for(String key : keys){
 				if(StringUtils.trim2null(key)==null) continue;
-				temp.append("'").append(StringUtils.trim2empty(key)).append("':'").append(StringUtils.trim2empty(map.get(key))).append("',");
+				temp.append("'").append(StringUtils.string2Json(StringUtils.trim2empty(key))).append("':'").append(StringUtils.string2Json(StringUtils.trim2empty(map.get(key)))).append("',");
 			}
 			if(temp.length()>0){
 				temp.delete(temp.length()-1, temp.length());
