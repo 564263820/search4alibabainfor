@@ -108,9 +108,10 @@ dorequest.prototype.subServer = function ()
       		if(obj.state != 'end' && obj.state != 'error'){
       			server.subServer();
 	      	}else if(obj.state != 'error'){
-	      		alert(html);
+	      		//alert(html);
 	      		if(obj.msg!="") $("#MSG").html(""+obj.msg);
 	      	}else if(obj.state != 'end'){
+	      		//alert(html);
 	      		document.getElementById("retry").disabled= false;
 	      		document.getElementById("retry").className="button";
 	      		//$("#MSG").html("end");

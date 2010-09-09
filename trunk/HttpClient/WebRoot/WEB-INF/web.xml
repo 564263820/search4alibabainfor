@@ -22,6 +22,12 @@
 		<listener>
 			<listener-class>com.wjdeng.web.SessionListener</listener-class>
 		</listener>
+		
+		<context-param> 
+            <param-name>log4jConfigLocation</param-name> 
+            <param-value>/WEB-INF/log4j.properties</param-value> 
+        </context-param> 
+        
 	<servlet>
 	    <description>主页录入入口URL地址</description>
 	    <display-name>This is the display name of my J2EE component</display-name>
