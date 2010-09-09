@@ -228,33 +228,33 @@ public class AppContext  implements Runnable{
 			//String url ="http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&query=auto+part&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
 			//String url = "http://www.alibaba.com/trade/search/3i1p5tyfchms/shanghai.html?tracelog=24581_searchbar_keywords";
 			//ModeParament par = AppContext.getAppContext(url).getContent();
-			String url ="http://www.globalsources.com/gsol/GeneralManager?point_search=on&page=search%2FProductSearchResults&product_search=on&supplier_search=off&article_search=off&type=new&search_what=1&query=car+engine&point_id=3000000149681&catalog_id=2000000003844&from=&loc=t&AGG=N&action=GetPoint&action=DoFreeTextSearch&ctryVal=China%20%28mainland%29&catName=&stateVal=Zhejiang";
-			AppContext  app =AppContext.getAppContext(url,2);
+			String url ="http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search%2FProductSearchResults&ctryVal=China%20%28mainland%29&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
+			AppContext  app =AppContext.getAppContext(url);
 			Thread th= new Thread(app);
 			th.start();
 			ModeParament par =app.getModeParament();
 			par.addListener4AfterNextPage(new Listener (){
 				@Override
 				public void execute(Event ev) {
-					System.out.println("啊！这么快就分页了。。。。嘿嘿 哈哈哈");
+					System.out.println("分页了哈");
 					
 				}});
 			par.addListener4AfterPaserInfor(new Listener(){
 				@Override
 				public void execute(Event ev) {
 					ev.getModeParament().getDatatemp();
-					System.out.println("抓取到一个 嘿嘿");
+					System.out.println("一个");
 					//ev.getModeParament().getCurDoc().getUrl();
 				}});
 			par.addListener4End(new Listener(){
 				@Override
 				public void execute(Event ev) {
 					//ev.getModeParament().getDatatemp();
-					System.out.println("嘿嘿 抓完了 手工");
-					ExcelUtils eu = new ExcelUtils();
-					eu.createExcelUtil(ev.getModeParament().getMlist());
-					//ev.getModeParament().getCurDoc().getUrl();
+					System.out.println("抓完");
 				}});
+			ExcelUtils eu = new ExcelUtils();
+			eu.createExcelUtil(par.getMlist());
+			//ev.getModeParament().getCurDoc().getUrl();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpcore-4.0.1.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpcore-nio-4.0.1.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpmime-4.0.1.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jericho-html-3.1.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jxl.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/slf4j-api-1.5.6.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/dwr-2.0.5.jar" sourcepath="E:/doc&amp;book/dwr-2.0.6-src.zip"/>
