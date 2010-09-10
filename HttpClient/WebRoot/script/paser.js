@@ -46,7 +46,7 @@ dorequest.prototype.backFunc = function(){
 /**jqury  请求方法*/
 dorequest.prototype.subServer = function ()
 {
-   var paramUrl = this.paramUrl;
+   var paramUrl = encodeURI(this.paramUrl);
    var operation = this.operation;
    var param ={
 	   	url :paramUrl,

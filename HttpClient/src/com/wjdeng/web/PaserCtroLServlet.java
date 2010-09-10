@@ -100,9 +100,14 @@ public class PaserCtroLServlet extends HttpServlet {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setContentType("text/html;charset=UTF-8");  
 		String url = request.getParameter("url");
+		url =java.net.URLDecoder.decode(url,"utf-8");
 		String operation = request.getParameter("operation");
 		ModeParament par =map.get(request.getRequestedSessionId());
 		if(par==null){
+			if(!SysUtils.IsUrl(url)){
+				response.getWriter().write(getStatusJson(AppStatus.error,"填写的网址不正确！"));
+				return;
+			}
 			if(!this.testNet(url, request, response))return;
 		}
 		if("retry".equals(operation)){
@@ -259,7 +264,7 @@ public class PaserCtroLServlet extends HttpServlet {
 				sb.append("]");
 				sb.append(", state : 'running' ");
 				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append(", msg:'分页完成' }");
+				sb.append(", msg:'分页完成!当前第：").append(ev.getModeParament().getCurPage()+1).append("页。' }");
 			}
 			
 		}

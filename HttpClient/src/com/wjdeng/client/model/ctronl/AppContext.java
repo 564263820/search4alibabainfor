@@ -59,7 +59,7 @@ public class AppContext  implements Runnable{
 	public static AppContext getAppContext(String url,Integer deep) throws Exception{
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
 		if(par==null){
-			throw new Exception(url+"未找到解析器，请检查配置。"+url+"是否是目前能够解析的网站？");
+			throw new Exception("暂不支持该："+url+"网站？");
 		}
 		par.setDeep(deep);
 		par.setEntranceUrl(url);
@@ -69,7 +69,7 @@ public class AppContext  implements Runnable{
 	public static AppContext getAppContext(String url) throws Exception{
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
 		if(par==null){
-			throw new Exception(url+"未找到解析器，请检查配置。"+url+"是否是目前能够解析的网站？");
+			throw new Exception("暂不支持该："+url+"网站？");
 		}
 		par.setEntranceUrl(url);
 		return new AppContext(par);

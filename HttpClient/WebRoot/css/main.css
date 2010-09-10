@@ -24,8 +24,8 @@
 			.tbody_td{ padding-left:5px}
 			.tbody_tr2{ background:#F0F5F9 url(../images/s_r19_c17.jpg) bottom repeat-x; height:26px;}
 			.tbody_tr_on{ background:#FF9 url(../images/s_r5_c422.jpg) bottom repeat-x; height:26px;}
-			.infor{ margin-top:15px;}
-			.infor div{display:inline-block;float:left;width:10%; margin-left:10px;}
+			.infor{ margin-top:15px;width: 1200px;overflow:hidden;}
+			.infor div{overflow:hidden;display:inline-block;float:left;width:10%; margin-left:10px;}
 			.button1{
 				 border:#95BFDF 1px solid; padding:2px 4px 4px 4px;  margin:0 30px; cursor:pointer; background: url("../images/2_r24_c24.jpg");  HEIGHT: 22px;CURSOR: hand;
 			}
