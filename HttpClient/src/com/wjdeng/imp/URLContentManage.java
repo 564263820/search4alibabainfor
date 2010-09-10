@@ -29,9 +29,12 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.URLContent;
+import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
 public class URLContentManage implements URLContent {
+	
+	private HttpClient client = new DefaultHttpClient();
 	
 	public static String KEY_CONTENT="content";
 	
@@ -41,9 +44,7 @@ public class URLContentManage implements URLContent {
 		if(!get){
 			return this.getContentByURL(url);
 		}
-		//System.out.println(url);
 		Map<String, Object> map = new HashMap<String, Object>();
-		HttpClient client = new DefaultHttpClient();
 		HttpGet httget = new HttpGet(url);
 		HttpResponse response;
 		response = client.execute(httget);
@@ -52,12 +53,12 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CONTENT, EntityUtils.toString(entity));
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
+		LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取"+url+"内容成功！");
 		return map;
 	}
 	
 	
 	public Map<String, Object> getContentByURL(String url) throws ClientProtocolException, IOException{
-		//System.out.println(url);
 		Map<String, Object> map = new HashMap<String, Object>();
 		HttpClient client = new DefaultHttpClient();
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
@@ -71,6 +72,7 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CONTENT, EntityUtils.toString(entity));
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
+		LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
 		return map;
 	}
 	
@@ -86,6 +88,27 @@ public class URLContentManage implements URLContent {
 			
 		}
 		return sta[0];
+	}
+	
+	public static void main(String[] arg){
+		List<String> list = new ArrayList<String>();
+		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");
+		URLContentManage um = new URLContentManage();
+		for(String url :list){
+			try {
+				um.getContentByURL(url,true);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

@@ -38,6 +38,10 @@ import com.wjdeng.imp.URLContentManage;
  */
 public class AppContext  implements Runnable{
 	/**
+	 * 运行环境参数集合
+	 */
+	static ThreadLocal<ModeParament> parLoacl= new ThreadLocal<ModeParament>();
+	/**
 	 * 运行环境参数
 	 */
 	private final ModeParament par ; 
@@ -152,6 +156,7 @@ public class AppContext  implements Runnable{
 	@SuppressWarnings("unchecked")
 	public ModeParament getContent() throws ClientProtocolException, IOException {
 		ModeParament par = getModeParament();//解析模块运行时环境
+		parLoacl.set(par);
 		Document doc=AppContext.getHtmlDocByUrl(par.getEntranceUrl());
 		IPaser paser = getHtmlPaser(par);//获取解析器
 		DefaultPaserAdapter dpa = new DefaultPaserAdapter(doc,paser,par);//创建循环迭代 代理
@@ -192,8 +197,8 @@ public class AppContext  implements Runnable{
 	 * @throws ClientProtocolException 
 	 */
 	public static Document getHtmlDocByUrl(String url) {
-		URLContentManage um= new URLContentManage();
-		ModeParament par = ModelManager.getModeParamByUrlString(url);
+		ModeParament par = parLoacl.get();
+		URLContentManage um = par.getUrlConnectio();
 		Map<String,Object> map =null;
 		String str = "";
 		try {
@@ -229,7 +234,7 @@ public class AppContext  implements Runnable{
 			String url = "http://www.alibaba.com/products/christmas_items/CN----Zhejiang------------_1-CN,------------.html";
 			//ModeParament par = AppContext.getAppContext(url).getContent();
 			//String url ="http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search%2FProductSearchResults&ctryVal=China%20%28mainland%29&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
-			AppContext  app =AppContext.getAppContext(url,20);
+			AppContext  app =AppContext.getAppContext(url,18);
 			Thread th= new Thread(app);
 			th.start();
 			ModeParament par =app.getModeParament();
@@ -251,9 +256,9 @@ public class AppContext  implements Runnable{
 				public void execute(Event ev) {
 					//ev.getModeParament().getDatatemp();
 					//System.out.println("抓完");
+					ExcelUtils eu = new ExcelUtils();
+					eu.createExcelUtil(ev.getModeParament().getMlist());
 				}});
-			ExcelUtils eu = new ExcelUtils();
-			eu.createExcelUtil(par.getMlist());
 			//ev.getModeParament().getCurDoc().getUrl();
 		} catch (Exception e) {
 			e.printStackTrace();

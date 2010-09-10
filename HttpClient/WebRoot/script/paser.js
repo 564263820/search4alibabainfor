@@ -8,7 +8,9 @@ function request(obj){
 	server.operation = "retry";
 	server.submitRequest();
 	obj.value= "重新搜索";
+	obj.className='button'
 	obj.disabled= true;
+	$("#runningInfor").html("处理中...请稍后！");
 }
 
 function pauserun(){
@@ -90,7 +92,8 @@ dorequest.prototype.subServer = function ()
 	      			htmstr += "class=\"tbody_tr2\" onmouseover=\"this.className='tbody_tr_on'\" onmouseout=\"this.className='tbody_tr2'\" >";
 	      		}
 	      		for(var j=0 ; j<th.array.length;j++){
-	      			htmstr +="<td>"+row[th.array[j]]+"</td>";
+	      			var datastr = row[th.array[j]];
+	      			htmstr +="<td>"+(datastr?datastr:"")+"</td>";
 	      		}
 	      		htmstr += "</tr>";
 	      		$("#databody").append(htmstr);
@@ -100,22 +103,27 @@ dorequest.prototype.subServer = function ()
 	      		document.getElementById("pause").className="button";
 	      		document.getElementById("excel").className="button";
 	      	}
+      		server.operation = obj.state;
 	      	if(obj.url!=''){
   				$("#runningInfor").html("正在解析："+obj.url+"中的数据");
 	      	}else{
 	      		$("#runningInfor").html("");
 	      	}
-      		if(obj.state != 'end' && obj.state != 'error'){
-      			server.subServer();
-	      	}else if(obj.state != 'error'){
-	      		//alert(html);
-	      		if(obj.msg!="") $("#MSG").html(""+obj.msg);
-	      	}else if(obj.state != 'end'){
+	      	if(obj.state == 'error'){
+	      		if(obj.msg!="") {$("#MSG").html(obj.msg)};
+	      		$("#runningInfor").html("");
+	      		//return;
+	      	}
+	      	if(obj.state == 'end'){
 	      		//alert(html);
 	      		document.getElementById("retry").disabled= false;
 	      		document.getElementById("retry").className="button";
-	      		//$("#MSG").html("end");
-	      		$("#runningInfor").html("&nbsp;");
+	      		$("#MSG").html(obj.msg);
+	      		$("#runningInfor").html("");
+	      	}
+	      	if(obj.state =='running'){
+      			$("#MSG").html(obj.msg);
+      			server.subServer();
 	      	}
 	      },
 	      error: function(XMLHttpRequest, textStatus, errorThrown){
@@ -127,3 +135,23 @@ dorequest.prototype.subServer = function ()
 	   }
    );
 }
+
+
+
+/**
+*离开编辑页面解除当前用户锁定ci
+*/
+window.onbeforeunload = function(){
+	if(server.operation=="running"){
+			return "后台有搜索任务在运行，如果离开此页面。后台搜索任务将停止。";
+	}
+}
+
+/**
+*离开编辑页面解除当前用户锁定ci
+*/
+window.onunload = function(){
+		pauserun();
+}
+
+

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import net.htmlparser.jericho.Element;
 
 import com.wjdeng.client.model.Ipaser.IPaser;
+import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
 public class AlibabaPaser implements IPaser{
@@ -57,6 +58,11 @@ public class AlibabaPaser implements IPaser{
 				contentmap.put(key, content);
 			}
 			
+		}
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			LogUtil.getLogger(this.getClass().getSimpleName()).warn(e);
 		}
 		return contentmap;
 	}

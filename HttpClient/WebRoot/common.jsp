@@ -5,3 +5,4 @@
  	var MainPath = "<c:url value="/"/>";
 </script>
 <script type='text/javascript' src='<c:url value="/script/paser.js"/>'></script>
+<link href="<c:url value="/css/main.css"/>"  rel="stylesheet" type="text/css">

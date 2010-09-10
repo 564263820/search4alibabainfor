@@ -13,6 +13,7 @@ import java.util.Map;
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.ctronl.event.Event;
 import com.wjdeng.client.model.ctronl.event.Listener;
+import com.wjdeng.imp.URLContentManage;
 
 /**
  * 参数模块，记录解析模块的各种状态及待处理事件
@@ -20,7 +21,8 @@ import com.wjdeng.client.model.ctronl.event.Listener;
  *
  */
 public class ModeParament {
-
+	
+	URLContentManage urlConnectio = new URLContentManage();
 	/**
 	 * 模块名
 	 */
@@ -259,6 +261,10 @@ public class ModeParament {
 
 	void setEndTask(boolean endTask) {
 		this.endTask = endTask;
+	}
+
+	protected URLContentManage getUrlConnectio() {
+		return urlConnectio;
 	}
 }
 

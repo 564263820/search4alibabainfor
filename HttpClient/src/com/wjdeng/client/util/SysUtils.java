@@ -82,8 +82,7 @@ public class SysUtils {
 			myFile.println(strContent);
 			resultFile.close();
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			LogUtil.getLogger(SysUtils.class.getSimpleName()).error(e);
 		}
 
 	}
@@ -153,24 +152,23 @@ public class SysUtils {
 	 * @return
 	 */
 	public static String  getFilePath( String modeName){
-		String path  = SysUtils.class.getClassLoader().getResource("").getPath();
-		path =path.replaceAll("%20", " ");
-		String filePath =path+ File.separator+SysUtils.formatDateTime(System.currentTimeMillis())+"_";
-		String fileName = filePath + modeName;
-		File pathFile = new File(filePath);
-		if(!pathFile.exists()){//如果文件夹不存在，创建文件夹
-			//pathFile.mkdirs();
-		}else{//文件夹存在，则先删除该文件夹下原来的文件
-			try {
-				File file = new File(fileName);
-				if (file.exists()&& file.isFile()){
-					file.delete();
-				}
-			} catch (Exception e) {
-				return null;
+		try {
+			String path = SysUtils.class.getClassLoader().getResource("").getPath();
+			path = java.net.URLDecoder.decode(path, "utf-8");
+			String filePath = path + File.separator + SysUtils.formatDateTime(System.currentTimeMillis()) + "_";
+			String fileName = filePath + modeName;
+			File pathFile = new File(filePath);
+			if(!pathFile.exists()){
+				pathFile.mkdir();
 			}
+			File file = new File(fileName);
+			if (file.exists() && file.isFile()) {
+				file.delete();
+			}
+			return fileName;
+		} catch (Exception e) {
+			return null;
 		}
-		return fileName;
 	}
 	
 	/**

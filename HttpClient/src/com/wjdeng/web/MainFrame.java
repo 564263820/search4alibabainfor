@@ -50,7 +50,7 @@ public class MainFrame extends HttpServlet {
 		this.request = request;
 		String url  = request.getParameter("url");
 		String model  = request.getParameter("model");//解析模型参数
-		
+		System.out.println(request.getRequestedSessionId());
 		//model="alibabaContract";
 		if(url==null || "".equals(url)){
 			getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
