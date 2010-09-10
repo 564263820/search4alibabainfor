@@ -97,6 +97,8 @@ public class PaserCtroLServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
 		//this.getServletContext().getRequestDispatcher(path);
+		response.setHeader("Cache-Control", "no-cache");
+		response.setContentType("text/html;charset=UTF-8");  
 		String url = request.getParameter("url");
 		String operation = request.getParameter("operation");
 		ModeParament par =map.get(request.getRequestedSessionId());
@@ -112,7 +114,7 @@ public class PaserCtroLServlet extends HttpServlet {
 			par = null;
 		}else if("pause".equals(operation)){
 			AppContext.exeCommand(new PuaseCommand(), par);//暂停
-			response.getWriter().write(getStatusJson(AppStatus.end,"暂停"));
+			response.getWriter().write(getStatusJson(AppStatus.end,"暂停!"));
 			return;
 		}else if("continuerun".equals(operation)){
 			AppContext.exeCommand(new ContinueRunCommand(), par);//继续 回复运行
@@ -120,9 +122,6 @@ public class PaserCtroLServlet extends HttpServlet {
 			this.downloadExcel(response, par);
 			return;
 		}
-		
-		response.setHeader("Cache-Control", "no-cache");
-		response.setContentType("application/json;charset=UTF-8");  
 		StringBuffer sb = writContentMap.get(request.getRequestedSessionId());
 		if(sb==null){
 			sb = new StringBuffer();
@@ -145,7 +144,7 @@ public class PaserCtroLServlet extends HttpServlet {
 						content.append(nullKey);
 						return;
 					}else if(par.isEndTask()){
-						response.getWriter().write(getStatusJson(AppStatus.end,""));
+						response.getWriter().write(getStatusJson(AppStatus.end,"任务终止!"));
 						return;
 					}
 				}
@@ -192,7 +191,7 @@ public class PaserCtroLServlet extends HttpServlet {
 		sb.append(", url : ' ' ");
 		sb.append(", msg : '").append(msg).append("'");
 		sb.append("}");
-		System.out.println(sb.toString());;
+		System.out.println(sb);
 		return sb.toString();	
 	}
 	
@@ -223,10 +222,8 @@ public class PaserCtroLServlet extends HttpServlet {
 		@Override
 		public void execute(Event ev) {
 			synchronized(sb){
-				System.out.println("infor:"+sb);
 				if(!(sb.length()==3 && sb.indexOf(nullKey)==0))return;
 				sb.delete(0, sb.length());
-				System.out.println(sb.toString());
 				List<Map<String, String>> list= ev.getModeParament().getDatatemp();
 				creatJson(list,sb);
 				if(sb.length()>0){
@@ -236,7 +233,7 @@ public class PaserCtroLServlet extends HttpServlet {
 				sb.append("]");
 				sb.append(", state : 'running' ");
 				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append("}");
+				sb.append(",msg:'' }");
 			}
 		}
 	}
@@ -251,7 +248,6 @@ public class PaserCtroLServlet extends HttpServlet {
 		@Override
 		public void execute(Event ev) {
 			synchronized(sb){
-				System.out.println("nextpage:"+sb);
 				if(!(sb.length()==3 && sb.indexOf(nullKey)==0))return;
 				sb.delete(0, sb.length());
 				List<Map<String, String>> list= ev.getModeParament().getDatatemp();
@@ -263,7 +259,7 @@ public class PaserCtroLServlet extends HttpServlet {
 				sb.append("]");
 				sb.append(", state : 'running' ");
 				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append("}");
+				sb.append(", msg:'分页完成' }");
 			}
 			
 		}
@@ -280,7 +276,6 @@ public class PaserCtroLServlet extends HttpServlet {
 		@Override
 		public void execute(Event ev) {
 			synchronized(sb){
-				System.out.println("end:"+sb);
 				if(!(sb.length()==3 && sb.indexOf(nullKey)==0))return;
 				sb.delete(0, sb.length());
 				List<Map<String, String>> list= ev.getModeParament().getDatatemp();
@@ -292,7 +287,7 @@ public class PaserCtroLServlet extends HttpServlet {
 				sb.append("]");
 				sb.append(", state : 'end' ");
 				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append("}");
+				sb.append(",msg:'' }");
 			}
 			
 		}
