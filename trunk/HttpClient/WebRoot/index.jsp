@@ -11,7 +11,7 @@
 		<center>
 		<div class="ruanjian">
 				<div class="wrapper block1" align="center"
-					style="margin-top: 50px;width: 800px;">
+					style="margin-top: 50px;width: 1200px;overflow:hidden;">
 					<form action="<c:url value="/infor/getInfor"/>" id="urlFrom" method="post">
 						<input type="hidden" class="button" name="operation" value="downloadExcel" />
 						<textarea id="url" name="url" style="width: 700px; height: 50px;"
@@ -32,8 +32,8 @@
 				</div>
 				<div class="infor" >
 					<div id="reTitle" style="width:100px;overflow:hidden;HEIGHT:25px;width:120px;" ></div>
-					<div id="runningInfor" style="width:500px;overflow:hidden;HEIGHT:25px;">&nbsp;</div>
-					<div id="MSG" style='color:red;' style="width:100px;overflow:hidden;HEIGHT:25px;"></div>
+					<div id="runningInfor" style="width:700px;overflow:hidden;HEIGHT:25px;">&nbsp;</div>
+					<div id="MSG" style='color:red;' style="width:200px;overflow:hidden;HEIGHT:25px;"></div>
 				</div>
 				
 		</div>

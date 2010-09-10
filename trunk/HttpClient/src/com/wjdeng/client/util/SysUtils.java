@@ -199,6 +199,25 @@ public class SysUtils {
 	}
 	
 	
+	public static boolean IsUrl(String str)  
+    {  
+        String regex = "http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";  
+        return match(regex, str);  
+    } 
+	
+	 /**
+     * 
+     * 正则表达式校验字符串
+     * @param regex 正则表达式
+     * @param str 需要校验的字符
+     * @return
+     */
+    public static boolean match(String regex,String str){
+    	 java.util.regex.Pattern pattern=java.util.regex.Pattern.compile(regex); 
+         java.util.regex.Matcher match=pattern.matcher(str); 
+         return match.matches();
+    }
+	
 	
 
 }
