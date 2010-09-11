@@ -11,6 +11,14 @@ function request(obj){
 	obj.className='button'
 	obj.disabled= true;
 	$("#runningInfor").html("处理中...请稍后！");
+	$("#reTitle").html("");
+	$("#databody").html("");
+	$("#datahead").html("");
+	var dataDivEle = document.getElementById('datadiv');
+	var th = dataDivEle.th;
+	if(th){
+		delete dataDivEle.th;
+	}
 }
 
 function pauserun(){
@@ -46,7 +54,7 @@ dorequest.prototype.backFunc = function(){
 /**jqury  请求方法*/
 dorequest.prototype.subServer = function ()
 {
-   var paramUrl = encodeURI(this.paramUrl);
+   var paramUrl = encodeURIComponent(this.paramUrl);
    var operation = this.operation;
    var param ={
 	   	url :paramUrl,
@@ -112,6 +120,7 @@ dorequest.prototype.subServer = function ()
 	      	if(obj.state == 'error'){
 	      		if(obj.msg!="") {$("#MSG").html(obj.msg)};
 	      		$("#runningInfor").html("");
+	      		document.getElementById("retry").disabled= false;
 	      		//return;
 	      	}
 	      	if(obj.state == 'end'){
@@ -123,6 +132,7 @@ dorequest.prototype.subServer = function ()
 	      	}
 	      	if(obj.state =='running'){
       			$("#MSG").html(obj.msg);
+      			document.getElementById("retry").disabled= false;
       			server.subServer();
 	      	}
 	      },
@@ -152,6 +162,10 @@ window.onbeforeunload = function(){
 */
 window.onunload = function(){
 		pauserun();
+}
+
+function test(){
+
 }
 
 

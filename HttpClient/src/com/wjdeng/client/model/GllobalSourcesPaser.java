@@ -28,6 +28,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import com.wjdeng.client.model.Ipaser.IPaser;
 import com.wjdeng.client.model.ctronl.AppContext;
+import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.URLContentManage;
 
@@ -53,10 +54,14 @@ public class GllobalSourcesPaser implements IPaser{
 					if(null == strele.getContent().getFirstElement())continue;
 					String name = strele.getContent().getFirstElement().getName();
 					if("b".equals(name)){
-						contentStr = "Company Name:"+contentStr.trim();
+						String cname = strele.getContent().getFirstElement().getTextExtractor().toString();
+						contentmap.put("Company Name:", cname);
+						contentStr = contentStr.substring(contentStr.indexOf(cname)+cname.length());
+						contentStr=contentStr.replace("P.O. Box:", "");
+						contentStr = "Street Address:"+contentStr.trim();
 						this.setCotent(contentStr, contentmap);
-						}
-						contentmap.put("Websit:", doc.getUrl());
+					}
+					contentmap.put("Websit:", doc.getUrl());
 				}
 				if(contentStr.indexOf("Key Contact:")>-1){
 					String contactPerson=contentStr.substring(contentStr.indexOf("Key Contact:")+"Key Contact:".length());
@@ -75,7 +80,8 @@ public class GllobalSourcesPaser implements IPaser{
 			String[] carray = item.split(":");
 			if(carray.length>1){
 				lastKey = carray[0];
-				contentmap.put(lastKey,  carray[1]);
+				if("http".equals(StringUtils.trim2empty(lastKey)))continue;
+				contentmap.put(lastKey,carray[1]);
 			}else{
 				contentmap.put(lastKey,contentmap.get(lastKey)+item);
 			}

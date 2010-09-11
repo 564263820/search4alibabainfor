@@ -19,6 +19,14 @@
 				<param-value>true</param-value>
 			</init-param>
 		</filter>
+		
+		<filter>
+			<filter-name>validateFilter</filter-name>
+			<filter-class>
+				com.wjdeng.web.ValidateFilter
+			</filter-class>
+		</filter>
+		
 		<listener>
 			<listener-class>com.wjdeng.web.SessionListener</listener-class>
 		</listener>
@@ -42,6 +50,16 @@
     <servlet-name>PaserCtroLServlet</servlet-name>
     <servlet-class>com.wjdeng.web.PaserCtroLServlet</servlet-class>
   </servlet>
+  <filter-mapping>
+  	<filter-name>encodingFilter</filter-name><url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+  	<filter-name>validateFilter</filter-name>
+  	<url-pattern>/infor/*</url-pattern>
+  	<url-pattern>/index.jsp</url-pattern>
+  </filter-mapping>
+
+  
   
   <!-- Ajax: DWR 
 	<servlet>
@@ -81,13 +99,17 @@
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
-
-
   <servlet-mapping>
 		<servlet-name>dwr-invoker</servlet-name>
 		<url-pattern>/dwr/*</url-pattern>
 	</servlet-mapping>
 -->
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>Valide</servlet-name>
+    <servlet-class>com.wjdeng.web.License</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>MainFrame</servlet-name>
     <url-pattern>/MainFrame</url-pattern>
@@ -95,6 +117,10 @@
   <servlet-mapping>
     <servlet-name>PaserCtroLServlet</servlet-name>
     <url-pattern>/infor/getInfor</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Valide</servlet-name>
+    <url-pattern>/infor/Valide</url-pattern>
   </servlet-mapping>
   
   
