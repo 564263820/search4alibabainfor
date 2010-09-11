@@ -51,6 +51,10 @@ dorequest.prototype.backFunc = function(){
 	this.subServer();
 }
 
+window.onerror = function(){
+return true;
+}
+
 /**jqury  请求方法*/
 dorequest.prototype.subServer = function ()
 {
@@ -71,9 +75,16 @@ dorequest.prototype.subServer = function ()
 	      url : url,
 	      success : function(html)
 	      {
-	      	eval("function creatObject(){return "+html+";}document.getElementById('url').callbackObj = creatObject();");
-	      	var obj  = document.getElementById('url').callbackObj;
-	      	if(!obj)return;
+	     	var obj;
+	      	try{
+		      	eval("function creatObject(){return "+html+";}document.getElementById('url').callbackObj = creatObject();");
+		      	obj  = document.getElementById('url').callbackObj;
+	      	}catch(e){
+	      	}
+	      	if(!obj){
+	      		server.subServer();
+	      		return;
+	      	}
 	      	var data = obj.data;
 	      	var dataDivEle = document.getElementById('datadiv');
 	      	var th = dataDivEle.th;
