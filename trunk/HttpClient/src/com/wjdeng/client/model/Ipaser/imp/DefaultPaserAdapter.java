@@ -32,17 +32,20 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	
 	private ModeParament par ;
 	
+	private AppContext appContext;
+	
 	private Set<String> keySet = new HashSet<String>();
 
 	public DefaultPaserAdapter(String url) {
-		doc=AppContext.getHtmlDocByUrl(url);
+		doc=appContext.getHtmlDocByUrl(url);
 	}
 	
 	
-	public DefaultPaserAdapter(Document doc,IPaser paser,ModeParament par ){
+	public DefaultPaserAdapter(Document doc,IPaser paser,AppContext app ){
 		this.doc=doc;
 		this.paser = paser;
-		this.par = par;
+		this.appContext =app;
+		this.par = app.getModeParament();
 	}
 	
 	@Override
@@ -85,7 +88,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 
 	@Override
 	public Document nextUrl() throws ClientProtocolException, IOException {
-		this.doc=AppContext.getHtmlDocByUrl(nextUrl);
+		this.doc=appContext.getHtmlDocByUrl(nextUrl);
 		//System.out.println(doc.getFirstElement().getContent().toString());
 		return doc;
 	}

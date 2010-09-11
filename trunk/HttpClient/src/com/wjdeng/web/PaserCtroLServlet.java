@@ -9,6 +9,7 @@ package com.wjdeng.web;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.model.ctronl.PuaseCommand;
 import com.wjdeng.client.model.ctronl.event.Event;
 import com.wjdeng.client.model.ctronl.event.Listener;
+import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
@@ -97,6 +99,7 @@ public class PaserCtroLServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
 		//this.getServletContext().getRequestDispatcher(path);
+		System.out.print(request.getRequestedSessionId());
 		response.setHeader("Cache-Control", "no-cache");
 		response.setContentType("text/html;charset=UTF-8");  
 		String url = request.getParameter("url");
@@ -104,10 +107,10 @@ public class PaserCtroLServlet extends HttpServlet {
 		String operation = request.getParameter("operation");
 		ModeParament par =map.get(request.getRequestedSessionId());
 		if(par==null){
-			if(!SysUtils.IsUrl(url)){
+			/*if(!SysUtils.IsUrl(url)){
 				response.getWriter().write(getStatusJson(AppStatus.error,"填写的网址不正确！"));
 				return;
-			}
+			}*/
 			if(!this.testNet(url, request, response))return;
 		}
 		if("retry".equals(operation)){
@@ -156,6 +159,7 @@ public class PaserCtroLServlet extends HttpServlet {
 			}
 		} catch (Exception e) {
 			//e.printStackTrace();
+			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
 			PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
 			e.printStackTrace(p);
 			p.flush();
@@ -166,6 +170,7 @@ public class PaserCtroLServlet extends HttpServlet {
 	
 	private void runTask(StringBuffer sb,ModeParament par,HttpServletRequest request) throws Exception{
 		String url = request.getParameter("url");
+		url =java.net.URLDecoder.decode(url,"utf-8");
 		String deepStr = request.getParameter("deep");
 		Integer deep =-1;
 		if(StringUtils.trim2null(deepStr)!=null ){
@@ -206,7 +211,8 @@ public class PaserCtroLServlet extends HttpServlet {
 			Set<String> keys = map.keySet();
 			for(String key : keys){
 				if(StringUtils.trim2null(key)==null) continue;
-				temp.append("'").append(StringUtils.trim2empty(key)).append("':'").append(StringUtils.trim2empty(map.get(key))).append("',");
+				temp.append("'").append(StringUtils.string2Json(StringUtils.trim2empty(key))).append("':'");
+				temp.append(StringUtils.string2Json(StringUtils.trim2empty(map.get(key)))).append("',");
 			}
 			if(temp.length()>0){
 				temp.delete(temp.length()-1, temp.length());
@@ -309,10 +315,9 @@ public class PaserCtroLServlet extends HttpServlet {
 			HttpEntity entity = rp.getEntity();
 			EntityUtils.toString(entity);
 		} catch (Exception e) {
-			java.io.PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
-			e.printStackTrace(p);
-			p.flush();p.close();
-			response.getWriter().write(this.getStatusJson(AppStatus.error, e.getMessage()));
+			e.printStackTrace();
+			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
+			response.getWriter().write(this.getStatusJson(AppStatus.error, "访问该网站失败！"));
 			return false;
 		} 
 		return true;

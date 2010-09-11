@@ -1,0 +1,171 @@
+.login_body
+{
+	background:url(../images/bg.gif) repeat-x top center;
+	text-align:center;
+}
+
+#login_main
+{
+	position:relative;
+	margin:0 auto;
+	height:100%;
+	width:100%;
+}
+
+#login_bg_border
+{
+	position:relative;
+	top:179px;
+	height:337px;
+	width:100%;
+	margin:0 auto;
+}
+
+#login_bg
+{
+	height:317px;	
+	width:100%;
+	margin-left:80px;
+	background:url(../images/3.gif) repeat-x top center;
+}
+
+#login_touying
+{
+	position:absolute;
+	left:571px;
+	top:451px;
+	height:140px;
+	width:304px;
+	background:url(../images/tycenter.gif) repeat-x top center;
+}
+
+#login_logo
+{
+	background:url(../images/logo.gif) no-repeat top left;
+	width:370px;
+	height:80px;
+	margin-top:110px;
+	float:left;
+}
+
+#login_middle
+{
+	position:absolute;
+	width:320px;
+	height:275px;
+	left:562px;
+	text-align:center;
+	top:-1px;
+	background:url(../images/logincenter.gif) repeat-x center top;
+}
+
+#login_middle_title
+{
+	margin:0 auto;
+	width:200px;
+	height:40px;
+	margin-top:30px;
+	background:url(../images/title.gif) no-repeat top center;
+}
+
+.login_font{
+	color:#000000;
+	font-size:14px;
+	vertical-align:middle;
+}
+
+
+.login_span{
+	width:80px;
+}
+
+.login_content{
+	margin-top:10px;
+}
+
+input.login{
+	width:140px;
+	height:20px;
+	background-color:#bed6e6;
+	border:1px solid #90acbe;
+}
+
+input.login_hover{
+	width:140px;
+	height:20px;
+	background-color:#bed6e6;
+	border:1px solid #90acbe;
+}
+
+#login_info{
+	font-size:10px;
+	position:absolute;
+	color:#b2dced;
+	top:252px;
+	left:590px;
+	white-space:nowrap;
+}
+
+#login_message{
+	margin:0 auto;
+	width:200px;
+	height:20px;
+	margin-top:20px;
+	color:#FF0000;
+}
+
+.login_btn{
+	width:80px;
+	height:22px;
+	font:12px;
+	border:0;
+	margin:20px 10px 0 10px;
+	color:#012d6f;
+	background:url(../images/bottom1.gif) no-repeat top center;
+	vertical-align:middle;
+}
+
+.login_btn_hover
+{
+	width:80px;
+	height:22px;
+	border:0;
+	margin:20px 10px 0 10px;
+	font:12px;
+	color:#012d6f;
+	cursor:pointer;
+	background:url(../images/bottom2.gif) no-repeat top center;
+	vertical-align:middle;
+}
+
+#touying_left
+{
+	float:left;
+	height:110px;
+	width:12px;
+	background:url(../images/tyleft.gif) no-repeat top left;
+}
+
+#touying_right
+{
+	float:right;
+	height:110px;
+	width:12px;
+	background:url(../images/tyright.gif) no-repeat top right;
+}
+
+#login_middle_left
+{
+	float:left;
+	height:275px;
+	width:20px;
+	background:url(../images/loginleft.gif) no-repeat top left;
+}
+
+#login_middle_right
+{
+	float:right;
+	height:275px;
+	width:20px;
+	background:url(../images/loginright.gif) no-repeat top right;
+}

@@ -101,7 +101,7 @@ public class StringUtils {
 	 
 	 public static String string2Json(String s) { 
 		    StringBuilder sb = new StringBuilder(s.length()+20); 
-		    sb.append('\"'); 
+		    //sb.append('\"'); 
 		    for (int i=0; i<s.length(); i++) { 
 		        char c = s.charAt(i); 
 		        switch (c) { 
@@ -136,7 +136,7 @@ public class StringUtils {
 		            sb.append(c); 
 		        } 
 		    } 
-		    sb.append('\"'); 
+		    //sb.append('\"'); 
 		    return sb.toString(); 
 		}
 	

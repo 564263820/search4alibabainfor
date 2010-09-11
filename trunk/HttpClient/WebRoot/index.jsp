@@ -3,9 +3,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-		<%@include file="common.jsp"%>
-		<title>数据采集</title>
 		<meta http-equiv="pragma" content="no-cache">
+		<%@include file="common.jsp"%>
+		<title>客户数据搜索</title>
+		<link href="<c:url value="/css/main.css"/>"  rel="stylesheet" type="text/css">
+		<script type='text/javascript' src='<c:url value="/script/paser.js"/>'></script>
 	</head>
 	<body>
 		<center>
@@ -20,10 +22,10 @@
 						<div style="margin-top: 10px;">
 						<input type="button" 
 						onmouseover="this.className='button1'" onmouseout="this.className='button'"
-						class="button" id="retry"  onclick="request(this)" value="搜索" />
+						class="button" id="retry"  style="width:150px;" onclick="request(this)" value="搜索" />
 						<input type="button" 
 						onmouseover="this.className='button1'" onmouseout="this.className='button'"
-						class="button" id="pause" disabled="true" onclick="pauserun(this);" value="暂停" />
+						class="button" id="pause" style="width:150px;" disabled="true" onclick="pauserun(this);" value="暂停" />
 						<input type="submit" 
 						onmouseover="this.className='button1'" onmouseout="this.className='button'"
 						class="button" id="excel" style="width:150px;" disabled="true" value="下载搜索结果(excel)" />

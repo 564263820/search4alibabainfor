@@ -60,7 +60,7 @@ public class AlibabaPaser implements IPaser{
 			
 		}
 		try {
-			Thread.sleep(500);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			LogUtil.getLogger(this.getClass().getSimpleName()).warn(e);
 		}
