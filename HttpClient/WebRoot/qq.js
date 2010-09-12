@@ -538,7 +538,7 @@ function setCookie(C, E)
    var F = (5 < H) ? A[5] : null;
    document.cookie = C + "=" + escape(E) + ((B == null) ? " " : (";expires =" + B.toGMTString())) + ((G == null) ? "  " : (";path = " + G)) + ((D == null) ? " " : (";domain =" + D)) + ((F == true) ? ";secure" : " ")
 }
-var  = 1;
+var  d= 1;
 var b64pad = "";
 var chrsz = 8;
 var mode = 32;
