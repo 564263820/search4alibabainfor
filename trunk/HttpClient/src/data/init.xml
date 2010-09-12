@@ -1,3 +1,4 @@
+<root>
 <model>
 	<name>alibaba</name>
 	<class>com.wjdeng.client.model.AlibabaPaser</class>
@@ -14,4 +15,5 @@
 	<url>http://www.globalsources.com</url>
 	<method>get</method>
 </model>
+</root>
 
