@@ -99,7 +99,7 @@ public class PaserCtroLServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
 		//this.getServletContext().getRequestDispatcher(path);
-		System.out.print(request.getRequestedSessionId());
+		//System.out.print(request.getRequestedSessionId());
 		response.setHeader("Cache-Control", "no-cache");
 		response.setContentType("text/html;charset=UTF-8");  
 		String url = request.getParameter("url");
