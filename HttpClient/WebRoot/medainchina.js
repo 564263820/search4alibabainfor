@@ -4,7 +4,7 @@
 4}
 5
 6function hide(note) {
-7 document.getElementById(note).className = "hiden"
+7 document.getElementById(note).className = "hiden";
 8}
 9
 10function cmdSubmit(pForm, pAction, pCode, pPage, pOrder) {
