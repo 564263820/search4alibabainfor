@@ -20,7 +20,6 @@ import net.htmlparser.jericho.Source;
 
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.Ipaser.IPaser;
-import com.wjdeng.client.model.Ipaser.imp.DefaultPaserAdapter;
 import com.wjdeng.client.model.ctronl.event.Event;
 import com.wjdeng.client.model.ctronl.event.Listener;
 import com.wjdeng.client.util.LogUtil;
@@ -166,7 +165,7 @@ public class AppContext  implements Runnable{
 		par.setCurDoc(doct);
 		int deep = par.getDeep();
 		int tem=0;
-		while(dpa.hasNext()){
+		do{
 			Set<String> urlset= dpa.getPageListUrl(doct);
 			for(String purl :urlset){
 				if(par.isEndTask())return par;//任务结束
@@ -183,9 +182,7 @@ public class AppContext  implements Runnable{
 			par.setCurPage(tem);
 			if(tem== deep)break;
 			doct = dpa.nextUrl();//下一页
-			par.setCurDoc(doct);
-			par.setEntranceUrl(doct.getUrl());
-		}
+		}while(dpa.hasNext());
 		return par;
 	}
 	
@@ -203,6 +200,7 @@ public class AppContext  implements Runnable{
 		Map<String,Object> map =null;
 		String str = "";
 		try {
+			url=enrichUrl(url);
 			if("get".equals(par.getMethod())){
 					map = um.getContentByURL(url,true);
 			}else{
@@ -218,6 +216,15 @@ public class AppContext  implements Runnable{
 		return new Document(new Source(str),url);
 	}
 	
+	private String enrichUrl(String url){
+		if(url.indexOf("http:")==-1 && url.indexOf(".")==-1){
+			return par.getUrl()+url;
+		}else if(url.indexOf("http:")==-1 && url.indexOf(".")!=-1){
+			return "http://"+url;
+		}
+		return url;
+	}
+	
 	
 	
 	
@@ -228,10 +235,9 @@ public class AppContext  implements Runnable{
 			//List<Map<String,String>> mlist = AppContext.getAppContext().getContent("http://www.busytrade.com/selling-leads/3-185/Folk-Crafts.html");
 			//http://www.busytrade.com/selling-leads/2-2064/Toy-Agents.html
 			//String url ="http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&query=auto+part&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
-			//String url = "http://www.alibaba.com/products/christmas_items/CN----Zhejiang------------_1-CN,------------.html";
+			String url = "http://www.alibaba.com/LED-Bulbs-Tubes_sid390402?npp=390402--CN----Anhui";
 			//ModeParament par = AppContext.getAppContext(url).getContent();
-			String url =
-								  "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
+			//String url =  "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
 		    //boolean b= url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
 			//System.out.println(b);
 		    AppContext  app =AppContext.getAppContext(url,18);

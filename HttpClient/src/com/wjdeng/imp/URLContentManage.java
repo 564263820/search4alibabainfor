@@ -45,6 +45,7 @@ public class URLContentManage implements URLContent {
 			return this.getContentByURL(url);
 		}
 		Map<String, Object> map = new HashMap<String, Object>();
+		if(url==null)return map;
 		HttpGet httget = new HttpGet(url);
 		HttpResponse response;
 		response = client.execute(httget);
@@ -60,6 +61,7 @@ public class URLContentManage implements URLContent {
 	
 	public Map<String, Object> getContentByURL(String url) throws ClientProtocolException, IOException{
 		Map<String, Object> map = new HashMap<String, Object>();
+		if(url==null)return map;
 		HttpClient client = new DefaultHttpClient();
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 		String urltem = this.setPairByUrl(url, nvps);

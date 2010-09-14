@@ -48,9 +48,9 @@ public class ModeParament {
 	
 	
 	/**
-	 * 当前这在处理的页数
+	 * 当前正在处理的页数
 	 */
-	private Integer curPage;
+	private Integer curPage =0;
 	
 	/**
 	 * 当前主文档
@@ -167,6 +167,10 @@ public class ModeParament {
 		return datatemp;
 	}
 
+	/**
+	 * 当前正在处理的文档
+	 * @param curDoc
+	 */
 	protected void setCurDoc(Document curDoc) {
 		this.curDoc = curDoc;
 	}
