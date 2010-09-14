@@ -4,7 +4,7 @@
  * File Name       : DefaultPaserImp.java
  *
  ********************************************************************************/
-package com.wjdeng.client.model.Ipaser.imp;
+package com.wjdeng.client.model.ctronl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -17,8 +17,6 @@ import org.apache.http.client.ClientProtocolException;
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.Ipaser.IPaser;
 import com.wjdeng.client.model.Ipaser.IpaserAdapter;
-import com.wjdeng.client.model.ctronl.AppContext;
-import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.util.StringKeyMsg;
 import com.wjdeng.client.util.StringUtils;
 
@@ -67,6 +65,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	@Override
 	public String getNextPageUrl(Document doc) {
 		nextUrl = this.paser.getNextPageUrl(doc);
+		//this.par.setCurPage(par.getCurPage()+1);
 		return nextUrl;
 	}
 
@@ -77,7 +76,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 
 	@Override
 	public boolean hasNext() {
-		String url = this.paser.getNextPageUrl(this.doc);
+		String url = getNextPageUrl(this.doc);
 		if("".equals(url)){
 			return false;
 		}else{
@@ -88,7 +87,11 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 
 	@Override
 	public Document nextUrl() throws ClientProtocolException, IOException {
+		if(null == nextUrl)getNextPageUrl(doc);
+		if(null == nextUrl)return null;
 		this.doc=appContext.getHtmlDocByUrl(nextUrl);
+		par.setCurDoc(doc);
+		par.setEntranceUrl(doc.getUrl());
 		//System.out.println(doc.getFirstElement().getContent().toString());
 		return doc;
 	}
