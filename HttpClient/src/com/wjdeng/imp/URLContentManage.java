@@ -33,15 +33,16 @@ import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
 public class URLContentManage implements URLContent {
-	
-	private HttpClient client = new DefaultHttpClient();
-	
-	public static String KEY_CONTENT="content";
-	
-	public static String KEY_CHARSET="CharSet";
 
-	public Map<String, Object> getContentByURL(String url,boolean get) throws ClientProtocolException, IOException{
-		if(!get){
+	private HttpClient client = new DefaultHttpClient();
+
+	public static String KEY_CONTENT = "content";
+
+	public static String KEY_CHARSET = "CharSet";
+
+	public Map<String, Object> getContentByURL(String url, boolean get)
+			throws ClientProtocolException, IOException {
+		if (!get) {
 			return this.getContentByURL(url);
 		}
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -54,16 +55,17 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CONTENT, EntityUtils.toString(entity));
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
-		LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取"+url+"内容成功！");
+		LogUtil.getLogger(this.getClass().getSimpleName()).warn(
+				"获取" + url + "内容成功！");
 		return map;
 	}
-	
-	
-	public Map<String, Object> getContentByURL(String url) throws ClientProtocolException, IOException{
+
+	public Map<String, Object> getContentByURL(String url)
+			throws ClientProtocolException, IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(url==null)return map;
 		HttpClient client = new DefaultHttpClient();
-		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		String urltem = this.setPairByUrl(url, nvps);
 		HttpPost httpost = new HttpPost(urltem);
 		HttpResponse response;
@@ -77,22 +79,22 @@ public class URLContentManage implements URLContent {
 		LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
 		return map;
 	}
-	
-	
-	private String  setPairByUrl(String url,List <NameValuePair> list){
+
+	private String setPairByUrl(String url, List<NameValuePair> list) {
 		String[] sta = url.split("&");
-		for(int i=1;i<sta.length;i++){
+		for (int i = 1; i < sta.length; i++) {
 			String[] params = sta[i].split("=");
 			String name = params[0];
-			String value ="";
-			if(params.length>1)value= params[1];
+			String value = "";
+			if (params.length > 1)
+				value = params[1];
 			list.add(new BasicNameValuePair(name, value));
-			
+
 		}
 		return sta[0];
 	}
-	
-	public static void main(String[] arg){
+
+	public static void main(String[] arg) {
 		List<String> list = new ArrayList<String>();
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
@@ -102,9 +104,9 @@ public class URLContentManage implements URLContent {
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		URLContentManage um = new URLContentManage();
-		for(String url :list){
+		for (String url : list) {
 			try {
-				um.getContentByURL(url,true);
+				um.getContentByURL(url, true);
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

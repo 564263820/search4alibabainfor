@@ -1,12 +1,12 @@
 package com.wjdeng.web;
+
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-/******************************************************************************** 
- * Create Author   : Administrator
- * Create Date     : Aug 30, 2010
- * File Name       : SessionListener.java
- ********************************************************************************/
+/*******************************************************************************
+ * Create Author : Administrator Create Date : Aug 30, 2010 File Name :
+ * SessionListener.java
+ ******************************************************************************/
 
 public class SessionListener implements HttpSessionListener {
 
@@ -22,4 +22,3 @@ public class SessionListener implements HttpSessionListener {
 	}
 
 }
-

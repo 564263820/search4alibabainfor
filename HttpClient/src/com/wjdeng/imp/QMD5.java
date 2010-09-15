@@ -8,236 +8,168 @@ package com.wjdeng.imp;
 
 public class QMD5 {
 
-	
 	private static int hexcase = 1;
 	private static String b64pad = "";
-	private static int chrsz=8;
+	private static int chrsz = 8;
 	private static int mode = 32;
-	
-	
+
 	/**
-	function str2binl(D)
-	{
-	   var C = Array();
-	   var A = (1 << chrsz) - 1;
-	   for(var B = 0; B < D.length * chrsz; B += chrsz)
-	   {
-	      C[B >> 5] |= (D.charCodeAt(B / chrsz) & A) << (B % 32)
-	   }
-	   return C
-	}
+	 * function str2binl(D) { var C = Array(); var A = (1 << chrsz) - 1;
+	 * for(var B = 0; B < D.length * chrsz; B += chrsz) { C[B >> 5] |=
+	 * (D.charCodeAt(B / chrsz) & A) << (B % 32) } return C }
 	 */
-	public int[] str2binl(String D){
+	public int[] str2binl(String D) {
 		char[] d = String2CharA(D);
 		int[] c = new int[d.length];
-		int a = (1<<chrsz)-1;
-		for(int b = 0;b<d.length *chrsz;b+=chrsz){
-			c[b>>5] |= (d[b/chrsz] & a)<<(b%32);
+		int a = (1 << chrsz) - 1;
+		for (int b = 0; b < d.length * chrsz; b += chrsz) {
+			c[b >> 5] |= (d[b / chrsz] & a) << (b % 32);
 		}
 		this.printCharArr(c);
 		return c;
 	}
-	
+
 	/**
-	 	function binl2str(C)
-		{
-		   var D = "";
-		   var A = (1 << chrsz) - 1;
-		   for(var B = 0; B < C.length * 32; B += chrsz)
-		   {
-		      D += String.fromCharCode((C[B >> 5] >>> (B % 32)) & A)
-		   }
-		   return D
-		}
+	 * function binl2str(C) { var D = ""; var A = (1 << chrsz) - 1; for(var B =
+	 * 0; B < C.length * 32; B += chrsz) { D += String.fromCharCode((C[B >> 5]
+	 * >>> (B % 32)) & A) } return D }
 	 */
-	
-	
-	public char[] binl2str(int[] c){
-		String D ="";
-		//char[] d = new char[c.length*32/chrsz];
-		int a = (1<<chrsz)-1;
-		for(int b =0 ;b<c.length*32; b+=chrsz){
-			int t = (c[b>>5] >>> (b % 32))&a;
-			//char s = (char) t;
-			//d[b/chrsz] = s;
-			//System.out.print(s + "_");
-			if(t!=0)
-			D+=String.valueOf((char) t);
-			//System.out.println(b>>5);
+
+	public char[] binl2str(int[] c) {
+		String D = "";
+		// char[] d = new char[c.length*32/chrsz];
+		int a = (1 << chrsz) - 1;
+		for (int b = 0; b < c.length * 32; b += chrsz) {
+			int t = (c[b >> 5] >>> (b % 32)) & a;
+			// char s = (char) t;
+			// d[b/chrsz] = s;
+			// System.out.print(s + "_");
+			if (t != 0)
+				D += String.valueOf((char) t);
+			// System.out.println(b>>5);
 		}
 		System.out.print(D);
-		return  String2CharA(D);
+		return String2CharA(D);
 	}
-	
-	
-	/***
-	function binl2hex(C)
-	{
-	   var B = hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
-	   var D = "";
-	   for(var A = 0; A < C.length * 4; A ++ )
-	   {
-	      D += B.charAt((C[A >> 2] >> ((A % 4) * 8 + 4)) & 15) + B.charAt((C[A >> 2] >> ((A % 4) * 8)) & 15)
-	   }
-	   return D
-	}
+
+	/***************************************************************************
+	 * function binl2hex(C) { var B = hexcase ? "0123456789ABCDEF" :
+	 * "0123456789abcdef"; var D = ""; for(var A = 0; A < C.length * 4; A ++ ) {
+	 * D += B.charAt((C[A >> 2] >> ((A % 4) * 8 + 4)) & 15) + B.charAt((C[A >>
+	 * 2] >> ((A % 4) * 8)) & 15) } return D }
+	 * 
 	 * @param arra
 	 */
-	
-	public char[] binl2hex(int[] c){
-		//char[] c = String2CharA(C);
-		String b = hexcase==1 ?"0123456789ABCDEF" : "0123456789abcdef";
-		//char[] d = new char[c.length*4];
-		String D="";
-		for(int a = 0; a < c.length*4; a++){
-			int s = b.charAt((c[a>>2]>>((a%4)*8+4))&15) + b.charAt((c[a>>2]>>((a%4)*8))&15);
-			//d[a] = (char) s;
+
+	public char[] binl2hex(int[] c) {
+		// char[] c = String2CharA(C);
+		String b = hexcase == 1 ? "0123456789ABCDEF" : "0123456789abcdef";
+		// char[] d = new char[c.length*4];
+		String D = "";
+		for (int a = 0; a < c.length * 4; a++) {
+			int s = b.charAt((c[a >> 2] >> ((a % 4) * 8 + 4)) & 15)
+					+ b.charAt((c[a >> 2] >> ((a % 4) * 8)) & 15);
+			// d[a] = (char) s;
 			D += String.valueOf((char) s);
 		}
-		char[] d =String2CharA(D);
+		char[] d = String2CharA(D);
 		return d;
 	}
-	
-	
-	
+
 	/**
-		function binl2b64(D)
-		{
-		   var C = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-		   var F = "";
-		   for(var B = 0; B < D.length * 4; B += 3)
-		   {
-		      var E = (((D[B >> 2] >> 8 * (B % 4)) & 255) << 16) | (((D[B + 1 >> 2] >> 8 * ((B + 1) % 4)) & 255) << 8) | ((D[B + 2 >> 2] >> 8 * ((B + 2) % 4)) & 255);
-		      for(var A = 0; A < 4; A ++ )
-		      {
-		         if(B * 8 + A * 6 > D.length * 32)
-		         {
-		            F += b64pad
-		         }
-		         else
-		         {
-		            F += C.charAt((E >> 6 * (3 - A)) & 63)
-		         }
-		      }
-		   }
-		   return F
-		}
-	 * */
-	public char[] binl2b64(String d){
+	 * function binl2b64(D) { var C =
+	 * "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; var F =
+	 * ""; for(var B = 0; B < D.length * 4; B += 3) { var E = (((D[B >> 2] >> 8 *
+	 * (B % 4)) & 255) << 16) | (((D[B + 1 >> 2] >> 8 * ((B + 1) % 4)) & 255) <<
+	 * 8) | ((D[B + 2 >> 2] >> 8 * ((B + 2) % 4)) & 255); for(var A = 0; A < 4;
+	 * A ++ ) { if(B * 8 + A * 6 > D.length * 32) { F += b64pad } else { F +=
+	 * C.charAt((E >> 6 * (3 - A)) & 63) } } } return F }
+	 */
+	public char[] binl2b64(String d) {
 		char[] D = String2CharA(d);
 		String C = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 		String F = "";
-		//char[] C = this.String2CharA(c);
-		for(int B=0;B<D.length*4 ;B+=3){
-			int E=(((D[B >> 2] >> 8 * (B % 4)) & 255) << 16) | (((D[B + 1 >> 2] >> 8 * ((B + 1) % 4)) & 255) << 8) | ((D[B + 2 >> 2] >> 8 * ((B + 2) % 4)) & 255);
-			for(int A=0 ;A<4;A++){
-				if(B * 8 + A * 6 > D.length * 32){
-		            F += QMD5.b64pad;
-		         }
-		         else{
-		            F += C.charAt((E >> 6 * (3 - A)) & 63);
-		         }
+		// char[] C = this.String2CharA(c);
+		for (int B = 0; B < D.length * 4; B += 3) {
+			int E = (((D[B >> 2] >> 8 * (B % 4)) & 255) << 16)
+					| (((D[B + 1 >> 2] >> 8 * ((B + 1) % 4)) & 255) << 8)
+					| ((D[B + 2 >> 2] >> 8 * ((B + 2) % 4)) & 255);
+			for (int A = 0; A < 4; A++) {
+				if (B * 8 + A * 6 > D.length * 32) {
+					F += QMD5.b64pad;
+				} else {
+					F += C.charAt((E >> 6 * (3 - A)) & 63);
+				}
 			}
 		}
 		return this.String2CharA(F);
 	}
-	
-	
-	
-	/***
+
+	/***************************************************************************
 	 * 
-		function safe_add(A, D)
-		{
-		   var C = (A & 65535) + (D & 65535);
-		   var B = (A >> 16) + (D >> 16) + (C >> 16);
-		   return(B << 16) | (C & 65535)
-		}
+	 * function safe_add(A, D) { var C = (A & 65535) + (D & 65535); var B = (A >>
+	 * 16) + (D >> 16) + (C >> 16); return(B << 16) | (C & 65535) }
 	 */
-	private int safe_add(int A, int D)
-	{
-		   int C = (A & 65535) + (D & 65535);
-		   int B = (A >> 16) + (D >> 16) + (C >> 16);
-		   return(B << 16) | (C & 65535);
+	private int safe_add(int A, int D) {
+		int C = (A & 65535) + (D & 65535);
+		int B = (A >> 16) + (D >> 16) + (C >> 16);
+		return (B << 16) | (C & 65535);
 	}
-	
-	/***
+
+	/***************************************************************************
 	 * 
-		function bit_rol(A, B)
-		{
-		   return(A << B) | (A >>> (32 - B))
-		}
+	 * function bit_rol(A, B) { return(A << B) | (A >>> (32 - B)) }
 	 */
-	private int  bit_rol(int A, int B)
-	{
-	   return(A << B) | (A >>> (32 - B));
+	private int bit_rol(int A, int B) {
+		return (A << B) | (A >>> (32 - B));
 	}
-	
-	
+
 	/**
 	 * 
-		function md5_cmn(F, C, B, A, E, D)
-		{
-		   return safe_add(bit_rol(safe_add(safe_add(C, F), safe_add(A, D)), E), B)
-		}
+	 * function md5_cmn(F, C, B, A, E, D) { return
+	 * safe_add(bit_rol(safe_add(safe_add(C, F), safe_add(A, D)), E), B) }
 	 */
-	private int md5_cmn(int F, int C, int B, int A, int E, int D)
-	{
-	   return safe_add(bit_rol(safe_add(safe_add(C, F), safe_add(A, D)), E), B);
+	private int md5_cmn(int F, int C, int B, int A, int E, int D) {
+		return safe_add(bit_rol(safe_add(safe_add(C, F), safe_add(A, D)), E), B);
 	}
-	
+
 	/**
-		function md5_ff(C, B, G, F, A, E, D)
-		{
-		   return md5_cmn((B & G) | (( ~ B) & F), C, B, A, E, D)
-		}
-		function md5_gg(C, B, G, F, A, E, D)
-		{
-		   return md5_cmn((B & F) | (G & ( ~ F)), C, B, A, E, D)
-		}
-		function md5_hh(C, B, G, F, A, E, D)
-		{
-		   return md5_cmn(B ^ G ^ F, C, B, A, E, D)
-		}
-		function md5_ii(C, B, G, F, A, E, D)
-		{
-		   return md5_cmn(G ^ (B | ( ~ F)), C, B, A, E, D)
-		}
+	 * function md5_ff(C, B, G, F, A, E, D) { return md5_cmn((B & G) | (( ~ B) &
+	 * F), C, B, A, E, D) } function md5_gg(C, B, G, F, A, E, D) { return
+	 * md5_cmn((B & F) | (G & ( ~ F)), C, B, A, E, D) } function md5_hh(C, B, G,
+	 * F, A, E, D) { return md5_cmn(B ^ G ^ F, C, B, A, E, D) } function
+	 * md5_ii(C, B, G, F, A, E, D) { return md5_cmn(G ^ (B | ( ~ F)), C, B, A,
+	 * E, D) }
 	 */
-	private int md5_ff(int C, int B, int G, int F, int A, int E, int D)
-	{
-		   return md5_cmn((B & G) | (( ~ B) & F), C, B, A, E, D);
+	private int md5_ff(int C, int B, int G, int F, int A, int E, int D) {
+		return md5_cmn((B & G) | ((~B) & F), C, B, A, E, D);
 	}
-	
-	private int md5_gg(int C, int B, int G, int F, int A, int E, int D)
-	{
-		   return md5_cmn((B & G) | (( ~ B) & F), C, B, A, E, D);
+
+	private int md5_gg(int C, int B, int G, int F, int A, int E, int D) {
+		return md5_cmn((B & G) | ((~B) & F), C, B, A, E, D);
 	}
-	
-	private int md5_hh(int C, int B, int G, int F, int A, int E, int D)
-	{
-		   return md5_cmn(B ^ G ^ F, C, B, A, E, D);
+
+	private int md5_hh(int C, int B, int G, int F, int A, int E, int D) {
+		return md5_cmn(B ^ G ^ F, C, B, A, E, D);
 	}
-	
-	private int md5_ii(int C, int B, int G, int F, int A, int E, int D)
-	{
-		   return md5_cmn(G ^ (B | ( ~ F)), C, B, A, E, D);
+
+	private int md5_ii(int C, int B, int G, int F, int A, int E, int D) {
+		return md5_cmn(G ^ (B | (~F)), C, B, A, E, D);
 	}
-	
+
 	/**
-	function hex_md5(A)
-	{
-	   return binl2hex(core_md5(str2binl(A), A.length * chrsz))
-	}
+	 * function hex_md5(A) { return binl2hex(core_md5(str2binl(A), A.length *
+	 * chrsz)) }
 	 */
-	
-	private char[] hex_md5(String A){
-		//return binl2hex(core_md5(str2binl(A), A.length() * chrsz));
-		int[] at =this.str2binl(A);
-		int[] cm5 = this.core_md5(at, A.length()*chrsz);
+
+	private char[] hex_md5(String A) {
+		// return binl2hex(core_md5(str2binl(A), A.length() * chrsz));
+		int[] at = this.str2binl(A);
+		int[] cm5 = this.core_md5(at, A.length() * chrsz);
 		return this.binl2hex(cm5);
-		//this.binl2hex(this.co)
+		// this.binl2hex(this.co)
 	}
-	
+
 	private int[] core_md5(int[] K, int F) {
 		K[F >> 5] |= 128 << ((F) % 32);
 		K[(((F + 64) >>> 9) << 4) + 14] = F;
@@ -325,6 +257,7 @@ public class QMD5 {
 			return new int[] { J, I, H, G };
 		}
 	}
+
 	/**
 	 * function core_hmac_md5(C, F) { var E = str2binl(C); if(E.length > 16) { E =
 	 * core_md5(E, C.length * chrsz) } var A = Array(16), D = Array(16); for(var
@@ -337,55 +270,44 @@ public class QMD5 {
 	 * core_md5(A.concat(str2binl(F)), 512 + F.length * chrsz); return
 	 * core_md5(D.concat(G), 512 + 128); }
 	 */
-	
-	
-	
-	
-	
-	
-	
-	private char[] String2CharA(String D){
+
+	private char[] String2CharA(String D) {
 		char[] d = new char[D.length()];
-		for(int i=0 ; i<D.length();i++){
-			d[i]= D.charAt(i);
+		for (int i = 0; i < D.length(); i++) {
+			d[i] = D.charAt(i);
 		}
 		return d;
-		
+
 	}
-	
-	
-	
-	public void printCharArr(int[]  arra){
+
+	public void printCharArr(int[] arra) {
 		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<arra.length;i++){
+		for (int i = 0; i < arra.length; i++) {
 			sb.append(arra[i]).append(",");
 		}
 		System.out.println(sb.toString());
 	}
-	
-	public QMD5(){
-		
+
+	public QMD5() {
+
 	};
-	
-	
-	public static void main(String[] arg){
-		
-		
+
+	public static void main(String[] arg) {
+
 		int t = -256;
 		char s = (char) t;
 		System.out.println(String.valueOf(s));
-		
-		char ts='';
-		int is= ts;
+
+		char ts = '';
+		int is = ts;
 		char[] c = new char[2];
 		int i = c[0];
 		QMD5 ut = new QMD5();
-		char[] d = {'1','w'};
+		char[] d = { '1', 'w' };
 		int[] tem = ut.str2binl("1w");
 		ut.binl2str(tem);
 		ut.hex_md5("abc");
-		//return hex_md5("abc") == "900150983cd24fb0d6963f7d28e17f72"
-		
+		// return hex_md5("abc") == "900150983cd24fb0d6963f7d28e17f72"
+
 	}
 }
-

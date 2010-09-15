@@ -63,14 +63,14 @@ public class SysUtils {
 
 	public static void wirtfile(String str) {
 		try {
-			String filePath  = SysUtils.class.getClassLoader().getResource("").getPath();
-			filePath =filePath.replaceAll("%20", " ");
-			/*String filePath = "D:" + File.separator + "alibabhtml";
-			filePath = filePath.toString();
-			File myFilePath = new File(filePath);
-			if (!myFilePath.exists()) {
-				myFilePath.mkdir();
-			}*/
+			String filePath = SysUtils.class.getClassLoader().getResource("")
+					.getPath();
+			filePath = filePath.replaceAll("%20", " ");
+			/*
+			 * String filePath = "D:" + File.separator + "alibabhtml"; filePath =
+			 * filePath.toString(); File myFilePath = new File(filePath); if
+			 * (!myFilePath.exists()) { myFilePath.mkdir(); }
+			 */
 			filePath += File.separator + System.currentTimeMillis() + ".html";
 			File myFilePath = new File(filePath);
 			if (!myFilePath.exists()) {
@@ -118,7 +118,8 @@ public class SysUtils {
 	 */
 	public static String formatDateTime(long num) {
 		Date date = new Date(num);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh点mm分ss秒");
+		SimpleDateFormat formatter = new SimpleDateFormat(
+				"yyyy-MM-dd hh点mm分ss秒");
 		String formattedDate = formatter.format(date);
 		return formattedDate;
 	}
@@ -144,21 +145,24 @@ public class SysUtils {
 				.replaceAll("\t", "").replaceAll(" ", "");
 		return result;
 	}
-	
+
 	/**
 	 * 
 	 * 文件路径及全名
+	 * 
 	 * @param modeName
 	 * @return
 	 */
-	public static String  getFilePath( String modeName){
+	public static String getFilePath(String modeName) {
 		try {
-			String path = SysUtils.class.getClassLoader().getResource("").getPath();
+			String path = SysUtils.class.getClassLoader().getResource("")
+					.getPath();
 			path = java.net.URLDecoder.decode(path, "utf-8");
-			String filePath = path + File.separator + SysUtils.formatDateTime(System.currentTimeMillis()) + "_";
+			String filePath = path + File.separator
+					+ SysUtils.formatDateTime(System.currentTimeMillis()) + "_";
 			String fileName = filePath + modeName;
 			File pathFile = new File(filePath);
-			if(!pathFile.exists()){
+			if (!pathFile.exists()) {
 				pathFile.mkdir();
 			}
 			File file = new File(fileName);
@@ -170,25 +174,26 @@ public class SysUtils {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * 文件路径及全名
+	 * 
 	 * @param modeName
 	 * @return
 	 */
-	public static String  getFilePathStr( String modeName){
-		String path  = SysUtils.class.getClassLoader().getResource("").getPath();
-		path =path.replaceAll("%20", " ");
-		String filePath =path+ File.separator+"_";
+	public static String getFilePathStr(String modeName) {
+		String path = SysUtils.class.getClassLoader().getResource("").getPath();
+		path = path.replaceAll("%20", " ");
+		String filePath = path + File.separator + "_";
 		String fileName = filePath + modeName;
 		File pathFile = new File(filePath);
-		if(!pathFile.exists()){//如果文件夹不存在，创建文件夹
-			//pathFile.mkdirs();
-		}else{//文件夹存在，则先删除该文件夹下原来的文件
+		if (!pathFile.exists()) {// 如果文件夹不存在，创建文件夹
+			// pathFile.mkdirs();
+		} else {// 文件夹存在，则先删除该文件夹下原来的文件
 			try {
 				File file = new File(fileName);
-				if (file.exists()&& file.isFile()){
+				if (file.exists() && file.isFile()) {
 					file.delete();
 				}
 			} catch (Exception e) {
@@ -197,27 +202,27 @@ public class SysUtils {
 		}
 		return fileName;
 	}
-	
-	
-	public static boolean IsUrl(String str)  
-    {  
-        String regex = "http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";  
-        return match(regex, str);  
-    } 
-	
-	 /**
-     * 
-     * 正则表达式校验字符串
-     * @param regex 正则表达式
-     * @param str 需要校验的字符
-     * @return
-     */
-    public static boolean match(String regex,String str){
-    	 java.util.regex.Pattern pattern=java.util.regex.Pattern.compile(regex); 
-         java.util.regex.Matcher match=pattern.matcher(str); 
-         return match.matches();
-    }
-	
-	
+
+	public static boolean IsUrl(String str) {
+		String regex = "http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
+		return match(regex, str);
+	}
+
+	/**
+	 * 
+	 * 正则表达式校验字符串
+	 * 
+	 * @param regex
+	 *            正则表达式
+	 * @param str
+	 *            需要校验的字符
+	 * @return
+	 */
+	public static boolean match(String regex, String str) {
+		java.util.regex.Pattern pattern = java.util.regex.Pattern
+				.compile(regex);
+		java.util.regex.Matcher match = pattern.matcher(str);
+		return match.matches();
+	}
 
 }

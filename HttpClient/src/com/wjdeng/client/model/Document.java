@@ -10,10 +10,10 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 
 public class Document extends Segment {
-	
+
 	private final String url;
-	
-	public Document(Source source,String url) {
+
+	public Document(Source source, String url) {
 		super(source, source.getBegin(), source.getEnd());
 		this.url = url;
 	}
@@ -21,7 +21,5 @@ public class Document extends Segment {
 	public String getUrl() {
 		return url;
 	}
-	
 
 }
-

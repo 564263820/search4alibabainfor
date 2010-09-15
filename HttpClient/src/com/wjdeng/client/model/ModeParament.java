@@ -9,11 +9,11 @@ package com.wjdeng.client.model;
 public class ModeParament {
 
 	private String modeName;
-	
+
 	private String modeclass;
-	
+
 	private String url;
-	
+
 	private String method;
 
 	public String getModeName() {
@@ -48,4 +48,3 @@ public class ModeParament {
 		this.method = method;
 	}
 }
-

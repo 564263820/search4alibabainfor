@@ -52,51 +52,51 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientExecuteDirect {
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        HttpHost target = new HttpHost("www.apache.org", 80, "http");
+		HttpHost target = new HttpHost("www.apache.org", 80, "http");
 
-        // general setup
-        SchemeRegistry supportedSchemes = new SchemeRegistry();
+		// general setup
+		SchemeRegistry supportedSchemes = new SchemeRegistry();
 
-        // Register the "http" protocol scheme, it is required
-        // by the default operator to look up socket factories.
-        supportedSchemes.register(new Scheme("http", 
-                PlainSocketFactory.getSocketFactory(), 80));
+		// Register the "http" protocol scheme, it is required
+		// by the default operator to look up socket factories.
+		supportedSchemes.register(new Scheme("http", PlainSocketFactory
+				.getSocketFactory(), 80));
 
-        // prepare parameters
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(params, "UTF-8");
-        HttpProtocolParams.setUseExpectContinue(params, true);
+		// prepare parameters
+		HttpParams params = new BasicHttpParams();
+		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setContentCharset(params, "UTF-8");
+		HttpProtocolParams.setUseExpectContinue(params, true);
 
-        ClientConnectionManager connMgr = new ThreadSafeClientConnManager(params, 
-                supportedSchemes);
-        DefaultHttpClient httpclient = new DefaultHttpClient(connMgr, params);
+		ClientConnectionManager connMgr = new ThreadSafeClientConnManager(
+				params, supportedSchemes);
+		DefaultHttpClient httpclient = new DefaultHttpClient(connMgr, params);
 
-        HttpGet req = new HttpGet("/");
+		HttpGet req = new HttpGet("/");
 
-        System.out.println("executing request to " + target);
+		System.out.println("executing request to " + target);
 
-        HttpResponse rsp = httpclient.execute(target, req);
-        HttpEntity entity = rsp.getEntity();
+		HttpResponse rsp = httpclient.execute(target, req);
+		HttpEntity entity = rsp.getEntity();
 
-        System.out.println("----------------------------------------");
-        System.out.println(rsp.getStatusLine());
-        Header[] headers = rsp.getAllHeaders();
-        for (int i = 0; i < headers.length; i++) {
-            System.out.println(headers[i]);
-        }
-        System.out.println("----------------------------------------");
+		System.out.println("----------------------------------------");
+		System.out.println(rsp.getStatusLine());
+		Header[] headers = rsp.getAllHeaders();
+		for (int i = 0; i < headers.length; i++) {
+			System.out.println(headers[i]);
+		}
+		System.out.println("----------------------------------------");
 
-        if (entity != null) {
-            System.out.println(EntityUtils.toString(entity));
-        }
+		if (entity != null) {
+			System.out.println(EntityUtils.toString(entity));
+		}
 
-        // When HttpClient instance is no longer needed, 
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();        
-    }
+		// When HttpClient instance is no longer needed,
+		// shut down the connection manager to ensure
+		// immediate deallocation of all system resources
+		httpclient.getConnectionManager().shutdown();
+	}
 
 }

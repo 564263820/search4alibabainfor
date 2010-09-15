@@ -49,62 +49,63 @@ import org.apache.http.util.EntityUtils;
 
 /**
  * How to send a request via proxy using {@link HttpClient}.
- *
+ * 
  * @since 4.0
  */
 public class ClientExecuteProxy {
 
-    public static void main(String[] args)throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        // make sure to use a proxy that supports CONNECT
-        HttpHost target = new HttpHost("issues.apache.org", 443, "https");
-        HttpHost proxy = new HttpHost("127.0.0.1", 8080, "http");
+		// make sure to use a proxy that supports CONNECT
+		HttpHost target = new HttpHost("issues.apache.org", 443, "https");
+		HttpHost proxy = new HttpHost("127.0.0.1", 8080, "http");
 
-        // general setup
-        SchemeRegistry supportedSchemes = new SchemeRegistry();
+		// general setup
+		SchemeRegistry supportedSchemes = new SchemeRegistry();
 
-        // Register the "http" and "https" protocol schemes, they are
-        // required by the default operator to look up socket factories.
-        supportedSchemes.register(new Scheme("http", 
-                PlainSocketFactory.getSocketFactory(), 80));
-        supportedSchemes.register(new Scheme("https", 
-                SSLSocketFactory.getSocketFactory(), 443));
+		// Register the "http" and "https" protocol schemes, they are
+		// required by the default operator to look up socket factories.
+		supportedSchemes.register(new Scheme("http", PlainSocketFactory
+				.getSocketFactory(), 80));
+		supportedSchemes.register(new Scheme("https", SSLSocketFactory
+				.getSocketFactory(), 443));
 
-        // prepare parameters
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(params, "UTF-8");
-        HttpProtocolParams.setUseExpectContinue(params, true);
+		// prepare parameters
+		HttpParams params = new BasicHttpParams();
+		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setContentCharset(params, "UTF-8");
+		HttpProtocolParams.setUseExpectContinue(params, true);
 
-        ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, 
-                supportedSchemes);
+		ClientConnectionManager ccm = new ThreadSafeClientConnManager(params,
+				supportedSchemes);
 
-        DefaultHttpClient httpclient = new DefaultHttpClient(ccm, params);
+		DefaultHttpClient httpclient = new DefaultHttpClient(ccm, params);
 
-        httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+		httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+				proxy);
 
-        HttpGet req = new HttpGet("/");
+		HttpGet req = new HttpGet("/");
 
-        System.out.println("executing request to " + target + " via " + proxy);
-        HttpResponse rsp = httpclient.execute(target, req);
-        HttpEntity entity = rsp.getEntity();
+		System.out.println("executing request to " + target + " via " + proxy);
+		HttpResponse rsp = httpclient.execute(target, req);
+		HttpEntity entity = rsp.getEntity();
 
-        System.out.println("----------------------------------------");
-        System.out.println(rsp.getStatusLine());
-        Header[] headers = rsp.getAllHeaders();
-        for (int i = 0; i<headers.length; i++) {
-            System.out.println(headers[i]);
-        }
-        System.out.println("----------------------------------------");
+		System.out.println("----------------------------------------");
+		System.out.println(rsp.getStatusLine());
+		Header[] headers = rsp.getAllHeaders();
+		for (int i = 0; i < headers.length; i++) {
+			System.out.println(headers[i]);
+		}
+		System.out.println("----------------------------------------");
 
-        if (entity != null) {
-            System.out.println(EntityUtils.toString(entity));
-        }
+		if (entity != null) {
+			System.out.println(EntityUtils.toString(entity));
+		}
 
-        // When HttpClient instance is no longer needed, 
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();        
-    }
+		// When HttpClient instance is no longer needed,
+		// shut down the connection manager to ensure
+		// immediate deallocation of all system resources
+		httpclient.getConnectionManager().shutdown();
+	}
 
 }

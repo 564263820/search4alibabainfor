@@ -46,67 +46,66 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.BasicHttpContext;
 
-
 /**
  * How to open a direct connection using
- * {@link ClientConnectionOperator ClientConnectionOperator}.
- * This exemplifies the <i>opening</i> of the connection only.
- * The subsequent message exchange in this example should not
- * be used as a template.
- *
+ * {@link ClientConnectionOperator ClientConnectionOperator}. This exemplifies
+ * the <i>opening</i> of the connection only. The subsequent message exchange
+ * in this example should not be used as a template.
+ * 
  * @since 4.0
  */
 public class OperatorConnectDirect {
 
-    public static void main(String[] args) throws Exception {
-        HttpHost target = new HttpHost("jakarta.apache.org", 80, "http");
+	public static void main(String[] args) throws Exception {
+		HttpHost target = new HttpHost("jakarta.apache.org", 80, "http");
 
-        // some general setup
-        // Register the "http" protocol scheme, it is required
-        // by the default operator to look up socket factories.
-        SchemeRegistry supportedSchemes = new SchemeRegistry();
-        SocketFactory sf = PlainSocketFactory.getSocketFactory();
-        supportedSchemes.register(new Scheme("http", sf, 80));
+		// some general setup
+		// Register the "http" protocol scheme, it is required
+		// by the default operator to look up socket factories.
+		SchemeRegistry supportedSchemes = new SchemeRegistry();
+		SocketFactory sf = PlainSocketFactory.getSocketFactory();
+		supportedSchemes.register(new Scheme("http", sf, 80));
 
-        // Prepare parameters.
-        // Since this example doesn't use the full core framework,
-        // only few parameters are actually required.
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setUseExpectContinue(params, false);
+		// Prepare parameters.
+		// Since this example doesn't use the full core framework,
+		// only few parameters are actually required.
+		HttpParams params = new BasicHttpParams();
+		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setUseExpectContinue(params, false);
 
-        // one operator can be used for many connections
-        ClientConnectionOperator scop = new DefaultClientConnectionOperator(supportedSchemes);
+		// one operator can be used for many connections
+		ClientConnectionOperator scop = new DefaultClientConnectionOperator(
+				supportedSchemes);
 
-        HttpRequest req = new BasicHttpRequest("OPTIONS", "*", HttpVersion.HTTP_1_1);
-        req.addHeader("Host", target.getHostName());
-        
-        HttpContext ctx = new BasicHttpContext();
+		HttpRequest req = new BasicHttpRequest("OPTIONS", "*",
+				HttpVersion.HTTP_1_1);
+		req.addHeader("Host", target.getHostName());
 
-        OperatedClientConnection conn = scop.createConnection();
-        try {
-            System.out.println("opening connection to " + target);
-            scop.openConnection(conn, target, null, ctx, params);
-            System.out.println("sending request");
-            conn.sendRequestHeader(req);
-            // there is no request entity
-            conn.flush();
+		HttpContext ctx = new BasicHttpContext();
 
-            System.out.println("receiving response header");
-            HttpResponse rsp = conn.receiveResponseHeader();
+		OperatedClientConnection conn = scop.createConnection();
+		try {
+			System.out.println("opening connection to " + target);
+			scop.openConnection(conn, target, null, ctx, params);
+			System.out.println("sending request");
+			conn.sendRequestHeader(req);
+			// there is no request entity
+			conn.flush();
 
-            System.out.println("----------------------------------------");
-            System.out.println(rsp.getStatusLine());
-            Header[] headers = rsp.getAllHeaders();
-            for (int i = 0; i < headers.length; i++) {
-                System.out.println(headers[i]);
-            }
-            System.out.println("----------------------------------------");
-        } finally {
-            System.out.println("closing connection");
-            conn.close();
-        }
-    }
+			System.out.println("receiving response header");
+			HttpResponse rsp = conn.receiveResponseHeader();
+
+			System.out.println("----------------------------------------");
+			System.out.println(rsp.getStatusLine());
+			Header[] headers = rsp.getAllHeaders();
+			for (int i = 0; i < headers.length; i++) {
+				System.out.println(headers[i]);
+			}
+			System.out.println("----------------------------------------");
+		} finally {
+			System.out.println("closing connection");
+			conn.close();
+		}
+	}
 
 }
-

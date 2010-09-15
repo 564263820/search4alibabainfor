@@ -48,116 +48,116 @@ import org.apache.http.protocol.BasicHttpContext;
 
 /**
  * How to open a secure connection through a proxy using
- * {@link ClientConnectionOperator ClientConnectionOperator}.
- * This exemplifies the <i>opening</i> of the connection only.
- * The message exchange, both subsequently and for tunnelling,
- * should not be used as a template.
- *
+ * {@link ClientConnectionOperator ClientConnectionOperator}. This exemplifies
+ * the <i>opening</i> of the connection only. The message exchange, both
+ * subsequently and for tunnelling, should not be used as a template.
+ * 
  * @since 4.0
  */
 public class OperatorConnectProxy {
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        // make sure to use a proxy that supports CONNECT
-        HttpHost target = new HttpHost("issues.apache.org", 443, "https");
-        HttpHost proxy = new HttpHost("127.0.0.1", 8666, "http");
+		// make sure to use a proxy that supports CONNECT
+		HttpHost target = new HttpHost("issues.apache.org", 443, "https");
+		HttpHost proxy = new HttpHost("127.0.0.1", 8666, "http");
 
-        // some general setup
-        // Register the "http" and "https" protocol schemes, they are
-        // required by the default operator to look up socket factories.
-        SchemeRegistry supportedSchemes = new SchemeRegistry();
-        supportedSchemes.register(new Scheme("http", 
-                PlainSocketFactory.getSocketFactory(), 80));
-        supportedSchemes.register(new Scheme("https", 
-                SSLSocketFactory.getSocketFactory(), 443));
+		// some general setup
+		// Register the "http" and "https" protocol schemes, they are
+		// required by the default operator to look up socket factories.
+		SchemeRegistry supportedSchemes = new SchemeRegistry();
+		supportedSchemes.register(new Scheme("http", PlainSocketFactory
+				.getSocketFactory(), 80));
+		supportedSchemes.register(new Scheme("https", SSLSocketFactory
+				.getSocketFactory(), 443));
 
-        // Prepare parameters.
-        // Since this example doesn't use the full core framework,
-        // only few parameters are actually required.
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setUseExpectContinue(params, false);
+		// Prepare parameters.
+		// Since this example doesn't use the full core framework,
+		// only few parameters are actually required.
+		HttpParams params = new BasicHttpParams();
+		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setUseExpectContinue(params, false);
 
-        // one operator can be used for many connections
-        ClientConnectionOperator scop = new DefaultClientConnectionOperator(supportedSchemes);
+		// one operator can be used for many connections
+		ClientConnectionOperator scop = new DefaultClientConnectionOperator(
+				supportedSchemes);
 
-        HttpRequest req = new BasicHttpRequest("OPTIONS", "*", HttpVersion.HTTP_1_1);
-        // In a real application, request interceptors should be used
-        // to add the required headers.
-        req.addHeader("Host", target.getHostName());
-        
-        HttpContext ctx = new BasicHttpContext();
+		HttpRequest req = new BasicHttpRequest("OPTIONS", "*",
+				HttpVersion.HTTP_1_1);
+		// In a real application, request interceptors should be used
+		// to add the required headers.
+		req.addHeader("Host", target.getHostName());
 
-        OperatedClientConnection conn = scop.createConnection();
-        try {
-            System.out.println("opening connection to " + proxy);
-            scop.openConnection(conn, proxy, null, ctx, params);
+		HttpContext ctx = new BasicHttpContext();
 
-            // Creates a request to tunnel a connection.
-            // For details see RFC 2817, section 5.2
-            String authority = target.getHostName() + ":" + target.getPort();
-            HttpRequest connect = new BasicHttpRequest("CONNECT", authority, 
-                    HttpVersion.HTTP_1_1);
-            // In a real application, request interceptors should be used
-            // to add the required headers.
-            connect.addHeader("Host", authority);
+		OperatedClientConnection conn = scop.createConnection();
+		try {
+			System.out.println("opening connection to " + proxy);
+			scop.openConnection(conn, proxy, null, ctx, params);
 
-            System.out.println("opening tunnel to " + target);
-            conn.sendRequestHeader(connect);
-            // there is no request entity
-            conn.flush();
+			// Creates a request to tunnel a connection.
+			// For details see RFC 2817, section 5.2
+			String authority = target.getHostName() + ":" + target.getPort();
+			HttpRequest connect = new BasicHttpRequest("CONNECT", authority,
+					HttpVersion.HTTP_1_1);
+			// In a real application, request interceptors should be used
+			// to add the required headers.
+			connect.addHeader("Host", authority);
 
-            System.out.println("receiving confirmation for tunnel");
-            HttpResponse connected = conn.receiveResponseHeader();
-            System.out.println("----------------------------------------");
-            printResponseHeader(connected);
-            System.out.println("----------------------------------------");
-            int status = connected.getStatusLine().getStatusCode();
-            if ((status < 200) || (status > 299)) {
-                System.out.println("unexpected status code " + status);
-                System.exit(1);
-            }
-            System.out.println("receiving response body (ignored)");
-            conn.receiveResponseEntity(connected);
+			System.out.println("opening tunnel to " + target);
+			conn.sendRequestHeader(connect);
+			// there is no request entity
+			conn.flush();
 
-            // Now we have a tunnel to the target. As we will be creating a
-            // layered TLS/SSL socket immediately afterwards, updating the
-            // connection with the new target is optional - but good style.
-            // The scheme part of the target is already "https", though the
-            // connection is not yet switched to the TLS/SSL protocol.
-            conn.update(null, target, false, params);
+			System.out.println("receiving confirmation for tunnel");
+			HttpResponse connected = conn.receiveResponseHeader();
+			System.out.println("----------------------------------------");
+			printResponseHeader(connected);
+			System.out.println("----------------------------------------");
+			int status = connected.getStatusLine().getStatusCode();
+			if ((status < 200) || (status > 299)) {
+				System.out.println("unexpected status code " + status);
+				System.exit(1);
+			}
+			System.out.println("receiving response body (ignored)");
+			conn.receiveResponseEntity(connected);
 
-            System.out.println("layering secure connection");
-            scop.updateSecureConnection(conn, target, ctx, params);
+			// Now we have a tunnel to the target. As we will be creating a
+			// layered TLS/SSL socket immediately afterwards, updating the
+			// connection with the new target is optional - but good style.
+			// The scheme part of the target is already "https", though the
+			// connection is not yet switched to the TLS/SSL protocol.
+			conn.update(null, target, false, params);
 
-            // finally we have the secure connection and can send the request
+			System.out.println("layering secure connection");
+			scop.updateSecureConnection(conn, target, ctx, params);
 
-            System.out.println("sending request");
-            conn.sendRequestHeader(req);
-            // there is no request entity
-            conn.flush();
+			// finally we have the secure connection and can send the request
 
-            System.out.println("receiving response header");
-            HttpResponse rsp = conn.receiveResponseHeader();
+			System.out.println("sending request");
+			conn.sendRequestHeader(req);
+			// there is no request entity
+			conn.flush();
 
-            System.out.println("----------------------------------------");
-            printResponseHeader(rsp);
-            System.out.println("----------------------------------------");
+			System.out.println("receiving response header");
+			HttpResponse rsp = conn.receiveResponseHeader();
 
-        } finally {
-            System.out.println("closing connection");
-            conn.close();
-        }
-    }
+			System.out.println("----------------------------------------");
+			printResponseHeader(rsp);
+			System.out.println("----------------------------------------");
 
-    private final static void printResponseHeader(HttpResponse rsp) {
-        System.out.println(rsp.getStatusLine());
-        Header[] headers = rsp.getAllHeaders();
-        for (int i=0; i<headers.length; i++) {
-            System.out.println(headers[i]);
-        }
-    }
+		} finally {
+			System.out.println("closing connection");
+			conn.close();
+		}
+	}
+
+	private final static void printResponseHeader(HttpResponse rsp) {
+		System.out.println(rsp.getStatusLine());
+		Header[] headers = rsp.getAllHeaders();
+		for (int i = 0; i < headers.length; i++) {
+			System.out.println(headers[i]);
+		}
+	}
 
 }
-

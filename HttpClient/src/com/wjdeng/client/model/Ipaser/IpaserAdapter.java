@@ -13,12 +13,11 @@ import org.apache.http.client.ClientProtocolException;
 import com.wjdeng.client.model.Document;
 
 public interface IpaserAdapter {
-	
+
 	public void setIpaser(IPaser paser);
-	
+
 	public boolean hasNext();
-	
+
 	public Document nextUrl() throws ClientProtocolException, IOException;
 
 }
-

@@ -33,9 +33,9 @@ public class ValidateFilter implements Filter {
 		HttpServletResponse res = (HttpServletResponse) response;
 		Object obj = req.getSession().getAttribute(SysStaticKey.UserKey);
 		System.out.println();
-		if(null !=obj || "/login.jsp".equals(req.getRequestURI())){
+		if (null != obj || "/login.jsp".equals(req.getRequestURI())) {
 			filterChain.doFilter(request, response);
-		}else{
+		} else {
 			res.sendRedirect("/login.jsp");
 		}
 	}
