@@ -34,31 +34,31 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
- * This example demonstrates the use of the {@link ResponseHandler} to simplify 
- * the process of processing the HTTP response and releasing associated resources.
+ * This example demonstrates the use of the {@link ResponseHandler} to simplify
+ * the process of processing the HTTP response and releasing associated
+ * resources.
  */
 public class ClientWithResponseHandler {
 
-    public final static void main(String[] args) throws Exception {
-        
-        HttpClient httpclient = new DefaultHttpClient();
+	public final static void main(String[] args) throws Exception {
 
-        HttpGet httpget = new HttpGet("http://www.google.com/"); 
+		HttpClient httpclient = new DefaultHttpClient();
 
-        System.out.println("executing request " + httpget.getURI());
+		HttpGet httpget = new HttpGet("http://www.google.com/");
 
-        // Create a response handler
-        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        String responseBody = httpclient.execute(httpget, responseHandler);
-        System.out.println(responseBody);
-        
-        System.out.println("----------------------------------------");
+		System.out.println("executing request " + httpget.getURI());
 
-        // When HttpClient instance is no longer needed, 
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();        
-    }
-    
+		// Create a response handler
+		ResponseHandler<String> responseHandler = new BasicResponseHandler();
+		String responseBody = httpclient.execute(httpget, responseHandler);
+		System.out.println(responseBody);
+
+		System.out.println("----------------------------------------");
+
+		// When HttpClient instance is no longer needed,
+		// shut down the connection manager to ensure
+		// immediate deallocation of all system resources
+		httpclient.getConnectionManager().shutdown();
+	}
+
 }
-

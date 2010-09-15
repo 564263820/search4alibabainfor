@@ -13,12 +13,10 @@ package com.wjdeng.bo;
 
 import java.io.Serializable;
 
-public class RecordData implements Serializable{
+public class RecordData implements Serializable {
 
 	private String CompanyName;
-	
-	private String 	StreetAddress;
-	
-	
-}
 
+	private String StreetAddress;
+
+}

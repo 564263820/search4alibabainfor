@@ -8,17 +8,16 @@
 package com.wjdeng.client.model.Ipaser;
 
 public class CalculationRules {
-	
-	final private static String KEY="wjdeng.rule.";
-	
-	final private static String OR="|";
-	
-	final private static String AND="&";
-	
-	CalculationRules(){
-		
-	}
-	
-	//public static String 
-}
 
+	final private static String KEY = "wjdeng.rule.";
+
+	final private static String OR = "|";
+
+	final private static String AND = "&";
+
+	CalculationRules() {
+
+	}
+
+	// public static String
+}

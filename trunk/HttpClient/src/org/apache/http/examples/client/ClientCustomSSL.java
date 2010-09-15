@@ -43,41 +43,42 @@ import org.apache.http.impl.client.DefaultHttpClient;
  */
 public class ClientCustomSSL {
 
-    public final static void main(String[] args) throws Exception {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
+	public final static void main(String[] args) throws Exception {
+		DefaultHttpClient httpclient = new DefaultHttpClient();
 
-        KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());        
-        FileInputStream instream = new FileInputStream(new File("my.keystore")); 
-        try {
-            trustStore.load(instream, "nopassword".toCharArray());
-        } finally {
-            instream.close();
-        }
-        
-        SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
-        Scheme sch = new Scheme("https", socketFactory, 443);
-        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		FileInputStream instream = new FileInputStream(new File("my.keystore"));
+		try {
+			trustStore.load(instream, "nopassword".toCharArray());
+		} finally {
+			instream.close();
+		}
 
-        HttpGet httpget = new HttpGet("https://localhost/");
+		SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+		Scheme sch = new Scheme("https", socketFactory, 443);
+		httpclient.getConnectionManager().getSchemeRegistry().register(sch);
 
-        System.out.println("executing request" + httpget.getRequestLine());
-        
-        HttpResponse response = httpclient.execute(httpget);
-        HttpEntity entity = response.getEntity();
+		HttpGet httpget = new HttpGet("https://localhost/");
 
-        System.out.println("----------------------------------------");
-        System.out.println(response.getStatusLine());
-        if (entity != null) {
-            System.out.println("Response content length: " + entity.getContentLength());
-        }
-        if (entity != null) {
-            entity.consumeContent();
-        }
+		System.out.println("executing request" + httpget.getRequestLine());
 
-        // When HttpClient instance is no longer needed, 
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();        
-    }
+		HttpResponse response = httpclient.execute(httpget);
+		HttpEntity entity = response.getEntity();
+
+		System.out.println("----------------------------------------");
+		System.out.println(response.getStatusLine());
+		if (entity != null) {
+			System.out.println("Response content length: "
+					+ entity.getContentLength());
+		}
+		if (entity != null) {
+			entity.consumeContent();
+		}
+
+		// When HttpClient instance is no longer needed,
+		// shut down the connection manager to ensure
+		// immediate deallocation of all system resources
+		httpclient.getConnectionManager().shutdown();
+	}
 
 }

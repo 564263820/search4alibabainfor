@@ -38,64 +38,63 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
- * This example demonstrates the recommended way of using API to make sure 
- * the underlying connection gets released back to the connection manager.
+ * This example demonstrates the recommended way of using API to make sure the
+ * underlying connection gets released back to the connection manager.
  */
 public class ClientConnectionRelease {
 
-    public final static void main(String[] args) throws Exception {
-        HttpClient httpclient = new DefaultHttpClient();
+	public final static void main(String[] args) throws Exception {
+		HttpClient httpclient = new DefaultHttpClient();
 
-        HttpGet httpget = new HttpGet("http://www.apache.org/"); 
+		HttpGet httpget = new HttpGet("http://www.apache.org/");
 
-        // Execute HTTP request
-        System.out.println("executing request " + httpget.getURI());
-        HttpResponse response = httpclient.execute(httpget);
+		// Execute HTTP request
+		System.out.println("executing request " + httpget.getURI());
+		HttpResponse response = httpclient.execute(httpget);
 
-        System.out.println("----------------------------------------");
-        System.out.println(response.getStatusLine());
-        System.out.println("----------------------------------------");
+		System.out.println("----------------------------------------");
+		System.out.println(response.getStatusLine());
+		System.out.println("----------------------------------------");
 
-        // Get hold of the response entity
-        HttpEntity entity = response.getEntity();
-        
-        // If the response does not enclose an entity, there is no need
-        // to bother about connection release
-        if (entity != null) {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(entity.getContent()));
-            try {
-                
-                // do something useful with the response
-                System.out.println(reader.readLine());
-                
-            } catch (IOException ex) {
+		// Get hold of the response entity
+		HttpEntity entity = response.getEntity();
 
-                // In case of an IOException the connection will be released
-                // back to the connection manager automatically
-                throw ex;
-                
-            } catch (RuntimeException ex) {
+		// If the response does not enclose an entity, there is no need
+		// to bother about connection release
+		if (entity != null) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					entity.getContent()));
+			try {
 
-                // In case of an unexpected exception you may want to abort
-                // the HTTP request in order to shut down the underlying 
-                // connection and release it back to the connection manager.
-                httpget.abort();
-                throw ex;
-                
-            } finally {
+				// do something useful with the response
+				System.out.println(reader.readLine());
 
-                // Closing the input stream will trigger connection release
-                reader.close();
-                
-            }
-        }
+			} catch (IOException ex) {
 
-        // When HttpClient instance is no longer needed, 
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();        
-    }
+				// In case of an IOException the connection will be released
+				// back to the connection manager automatically
+				throw ex;
+
+			} catch (RuntimeException ex) {
+
+				// In case of an unexpected exception you may want to abort
+				// the HTTP request in order to shut down the underlying
+				// connection and release it back to the connection manager.
+				httpget.abort();
+				throw ex;
+
+			} finally {
+
+				// Closing the input stream will trigger connection release
+				reader.close();
+
+			}
+		}
+
+		// When HttpClient instance is no longer needed,
+		// shut down the connection manager to ensure
+		// immediate deallocation of all system resources
+		httpclient.getConnectionManager().shutdown();
+	}
 
 }
-

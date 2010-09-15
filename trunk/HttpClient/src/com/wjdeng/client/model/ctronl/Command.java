@@ -10,4 +10,3 @@ public interface Command {
 
 	public void executCommand(ModeParament par);
 }
-

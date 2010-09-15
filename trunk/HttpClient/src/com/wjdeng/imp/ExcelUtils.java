@@ -30,104 +30,107 @@ import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.util.SysUtils;
 
 public class ExcelUtils {
-	
-	public ExcelUtils(){
-		
+
+	public ExcelUtils() {
+
 	}
-	
-	public String createExcelUtil(ModeParament mp ,OutputStream out ) throws IOException,WriteException,Exception{
-		//创建一个可写入的excel文件对象
-        WritableWorkbook workbook;
-        String filename = SysUtils.getFilePath(mp.getModeName())+"_.xls";
-		List<Map<String,String>> maps = mp.getMlist();
-		if(out !=null){
+
+	public String createExcelUtil(ModeParament mp, OutputStream out)
+			throws IOException, WriteException, Exception {
+		// 创建一个可写入的excel文件对象
+		WritableWorkbook workbook;
+		String filename = SysUtils.getFilePath(mp.getModeName()) + "_.xls";
+		List<Map<String, String>> maps = mp.getMlist();
+		if (out != null) {
 			workbook = Workbook.createWorkbook(out);
-		}else{
+		} else {
 			workbook = Workbook.createWorkbook(new File(filename));
 		}
-        //使用第一张工作表
-        WritableSheet sheet = workbook.createSheet(mp.getModeName()+"客户资料", 0); 
-		Map<String,Integer> head = null;
-		for(int i=0 ;i<maps.size();i++){
-			Map<String,String> map = maps.get(i);
-			Set<String> set  = map.keySet();
-			head = this.writeReportHeader(sheet, set, head);//刷新title行
-			this.addDataToExcel(sheet, head, map ,i+1);//增加一行
+		// 使用第一张工作表
+		WritableSheet sheet = workbook
+				.createSheet(mp.getModeName() + "客户资料", 0);
+		Map<String, Integer> head = null;
+		for (int i = 0; i < maps.size(); i++) {
+			Map<String, String> map = maps.get(i);
+			Set<String> set = map.keySet();
+			head = this.writeReportHeader(sheet, set, head);// 刷新title行
+			this.addDataToExcel(sheet, head, map, i + 1);// 增加一行
 		}
-		 // 关闭对象，释放资源
+		// 关闭对象，释放资源
 		workbook.write();
 		workbook.close();
 		return filename;
 	}
-	
-	public void createExcelUtil(List<Map<String,String>> maps){
-		//创建一个可写入的excel文件对象
+
+	public void createExcelUtil(List<Map<String, String>> maps) {
+		// 创建一个可写入的excel文件对象
 		try {
-			ModeParament mp = new ModeParament("","","");
+			ModeParament mp = new ModeParament("", "", "");
 			mp.setMlist(maps);
-			this.createExcelUtil(mp,null);
-		}  catch (Exception e) {
+			this.createExcelUtil(mp, null);
+		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
-	
-	
-	
-	//生成Excel文件的表头
-	private Map<String,Integer> writeReportHeader(WritableSheet sheet ,Set<String> set,Map<String,Integer> haveHead){
-		if(null ==haveHead) haveHead = new HashMap<String,Integer>();
+
+	// 生成Excel文件的表头
+	private Map<String, Integer> writeReportHeader(WritableSheet sheet,
+			Set<String> set, Map<String, Integer> haveHead) {
+		if (null == haveHead)
+			haveHead = new HashMap<String, Integer>();
 		int col = haveHead.size();
-	      try{
-	    	  WritableFont wfc = new WritableFont(WritableFont.ARIAL, 11, WritableFont.BOLD, false,
-	    			  UnderlineStyle.NO_UNDERLINE, jxl.format.Colour.BLACK);
-	    	  WritableCellFormat wcfFC = new WritableCellFormat(wfc);
-	    	  for(String title:set){
-	    		  if(haveHead.containsKey(title))continue;
-	    		  Label assetNumLabel = new Label(col, 0, title, wcfFC);
-	    		  sheet.addCell(assetNumLabel);
-	    		  sheet.setColumnView(0,title.length() + 10);
-	    		  haveHead.put(title, col);
-	    		  col++;
-	    	  }
-	      }catch(Exception e){
-	    	  e.printStackTrace();
-	      }
-	      return haveHead;
+		try {
+			WritableFont wfc = new WritableFont(WritableFont.ARIAL, 11,
+					WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE,
+					jxl.format.Colour.BLACK);
+			WritableCellFormat wcfFC = new WritableCellFormat(wfc);
+			for (String title : set) {
+				if (haveHead.containsKey(title))
+					continue;
+				Label assetNumLabel = new Label(col, 0, title, wcfFC);
+				sheet.addCell(assetNumLabel);
+				sheet.setColumnView(0, title.length() + 10);
+				haveHead.put(title, col);
+				col++;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return haveHead;
 	}
-	
+
 	/**
 	 * 
 	 * 添加到Excel文件
+	 * 
 	 * @param sheet
 	 * @param asset
 	 * @param index
 	 * @throws Exception
 	 */
-	private void addDataToExcel(WritableSheet sheet,Map<String,Integer> head, Map<String,String> data,int row)throws Exception{
+	private void addDataToExcel(WritableSheet sheet, Map<String, Integer> head,
+			Map<String, String> data, int row) throws Exception {
 		Set<String> set = data.keySet();
-		for(String title :set){
-			String assetNum =SysUtils.HtmlToText(data.get(title));
-			int index  = head.get(title);
-			if("Website".equals(title)){
-				try{
-					WritableHyperlink  assetNumlink =  new WritableHyperlink(index,row,0,0,new URL(assetNum),assetNum);
+		for (String title : set) {
+			String assetNum = SysUtils.HtmlToText(data.get(title));
+			int index = head.get(title);
+			if ("Website".equals(title)) {
+				try {
+					WritableHyperlink assetNumlink = new WritableHyperlink(
+							index, row, 0, 0, new URL(assetNum), assetNum);
 					sheet.addHyperlink(assetNumlink);
-				}catch(MalformedURLException me){
-					Label assetNumLabel = new jxl.write.Label(index,row , assetNum);
+				} catch (MalformedURLException me) {
+					Label assetNumLabel = new jxl.write.Label(index, row,
+							assetNum);
 					sheet.addCell(assetNumLabel);
 				}
-			}else{
-				Label assetNumLabel = new jxl.write.Label(index,row , assetNum);
+			} else {
+				Label assetNumLabel = new jxl.write.Label(index, row, assetNum);
 				sheet.addCell(assetNumLabel);
 			}
 		}
-	    /*
-	    */
+		/*
+		 */
 	}
 
-	
-	
-	
 }
-

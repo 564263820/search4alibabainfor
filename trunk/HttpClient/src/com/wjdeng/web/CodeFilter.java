@@ -18,6 +18,7 @@ import javax.servlet.ServletResponse;
 public class CodeFilter implements Filter {
 
 	private String charset;
+
 	@Override
 	public void destroy() {
 
@@ -32,7 +33,7 @@ public class CodeFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig config) throws ServletException {
-		  this.charset=config.getInitParameter("charset");
+		this.charset = config.getInitParameter("charset");
 	}
 
 }

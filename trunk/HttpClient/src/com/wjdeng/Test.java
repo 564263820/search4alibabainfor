@@ -24,7 +24,8 @@ public class Test {
 		HttpClient client = new DefaultHttpClient();
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		nvps.add(new BasicNameValuePair("", ""));
-		HttpGet get = new HttpGet("http://www.alibaba.com/trade/search?SearchText=car&Country=&CatId=100001627&IndexArea=product_en&sq=y");
+		HttpGet get = new HttpGet(
+				"http://www.alibaba.com/trade/search?SearchText=car&Country=&CatId=100001627&IndexArea=product_en&sq=y");
 		HttpResponse response = client.execute(get);
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
@@ -36,15 +37,13 @@ public class Test {
 		return null;
 	}
 
-
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Test test = new Test();
 		try {
-			 
+
 			test.test();
 		} catch (Exception e) {
 			e.printStackTrace();

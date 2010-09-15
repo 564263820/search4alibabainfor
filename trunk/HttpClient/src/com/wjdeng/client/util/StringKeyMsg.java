@@ -14,23 +14,24 @@ import java.net.URLDecoder;
 import java.util.Properties;
 
 public class StringKeyMsg {
-	final public static String complanyKey="Sys_CompanyName";
+	final public static String complanyKey = "Sys_CompanyName";
 	private static StringKeyMsg keys = new StringKeyMsg();
 	private static Properties properties;
+
 	private StringKeyMsg() {
 		properties = new Properties();
 		try {
-			String path =this.getClass().getClassLoader().getResource("data/columKey.properties").getPath();
+			String path = this.getClass().getClassLoader().getResource(
+					"data/columKey.properties").getPath();
 			path = URLDecoder.decode(path, "utf-8");
 			properties.load(new FileInputStream(new File(path)));
 		} catch (Exception e) {
 			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
-		} 
+		}
 	}
-	
-	public static String getMsgByKey(String key){
+
+	public static String getMsgByKey(String key) {
 		return properties.getProperty(key);
 	}
 
 }
-

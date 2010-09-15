@@ -7,8 +7,5 @@
 package com.wjdeng.client.model.ctronl;
 
 public enum AppStatus {
-	running,  
-	end ,
-	error
+	running, end, error
 }
-

@@ -44,39 +44,50 @@ public class License extends HttpServlet {
 
 	/**
 	 * The doGet method of the servlet. <br>
-	 *
+	 * 
 	 * This method is called when a form has its tag value method equals to get.
 	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
+	 * @param request
+	 *            the request send by the client to the server
+	 * @param response
+	 *            the response send by the server to the client
+	 * @throws ServletException
+	 *             if an error occurred
+	 * @throws IOException
+	 *             if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String path =this.getClass().getClassLoader().getResource("data/user.properties").getPath();
+		String path = this.getClass().getClassLoader().getResource(
+				"data/user.properties").getPath();
 		path = URLDecoder.decode(path, "utf-8");
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(new File(path)));
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		if(StringUtils.trim2empty(properties.getProperty(username)).equals(password)){
+		if (StringUtils.trim2empty(properties.getProperty(username)).equals(
+				password)) {
 			request.getSession().setAttribute(SysStaticKey.UserKey, properties);
 			response.sendRedirect("/index.jsp");
-		}else{
+		} else {
 			response.sendRedirect("/login.jsp");
 		}
 	}
 
 	/**
 	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to post.
 	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
+	 * This method is called when a form has its tag value method equals to
+	 * post.
+	 * 
+	 * @param request
+	 *            the request send by the client to the server
+	 * @param response
+	 *            the response send by the server to the client
+	 * @throws ServletException
+	 *             if an error occurred
+	 * @throws IOException
+	 *             if an error occurred
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -84,18 +95,21 @@ public class License extends HttpServlet {
 		this.testNet(request, response);
 		this.doGet(request, response);
 	}
-	
-	private boolean  testNet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException{
-		try{
+
+	private boolean testNet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		try {
 			HttpClient client = new DefaultHttpClient();
-			HttpPost httget = new HttpPost("http://jiage110101.8643.jspkj.com/infor/Valide");
+			HttpPost httget = new HttpPost(
+					"http://jiage110101.8643.jspkj.com/infor/Valide");
 			HttpResponse rp;
 			rp = client.execute(httget);
 			HttpEntity entity = rp.getEntity();
 			String flag = EntityUtils.toString(entity);
-			if(StringUtils.trim2empty(flag).indexOf("wjdengFlag=Y")==1){
-				File file = new File(ModelManager.class.getClassLoader().getResource("data/init.xml").getPath());
-				if(file.exists()){
+			if (StringUtils.trim2empty(flag).indexOf("wjdengFlag=Y") == 1) {
+				File file = new File(ModelManager.class.getClassLoader()
+						.getResource("data/init.xml").getPath());
+				if (file.exists()) {
 					file.delete();
 				}
 				return false;
@@ -103,15 +117,17 @@ public class License extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
-			//response.getWriter().write(this.getStatusJson(AppStatus.error, "访问该网站失败！"));
-		} 
+			// response.getWriter().write(this.getStatusJson(AppStatus.error,
+			// "访问该网站失败！"));
+		}
 		return true;
 	}
 
 	/**
 	 * Initialization of the servlet. <br>
-	 *
-	 * @throws ServletException if an error occurs
+	 * 
+	 * @throws ServletException
+	 *             if an error occurs
 	 */
 	public void init() throws ServletException {
 		// Put your code here
