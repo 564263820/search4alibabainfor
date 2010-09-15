@@ -247,7 +247,8 @@ public class AppContext implements Runnable {
 			// String url =
 			// "http://www.alibaba.com/products/christmas_items/CN----Zhejiang------------_1-CN,------------.html";
 			// ModeParament par = AppContext.getAppContext(url).getContent();
-			String url = "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
+			//String url = "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
+			String url = "http://www.alibaba.com/LED-Bulbs-Tubes_sid390402?npp=390402--CN----Anhui";
 			// boolean b=
 			// url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
 			// System.out.println(b);
@@ -257,7 +258,6 @@ public class AppContext implements Runnable {
 			//List<Map<String,String>> mlist = AppContext.getAppContext().getContent("http://www.busytrade.com/selling-leads/3-185/Folk-Crafts.html");
 			//http://www.busytrade.com/selling-leads/2-2064/Toy-Agents.html
 			//String url ="http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&query=auto+part&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
-			//String url = "http://www.alibaba.com/LED-Bulbs-Tubes_sid390402?npp=390402--CN----Anhui";
 			//ModeParament par = AppContext.getAppContext(url).getContent();
 			//String url =  "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
 		    //boolean b= url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
@@ -285,7 +285,7 @@ public class AppContext implements Runnable {
 				@Override
 				public void execute(Event ev) {
 					// ev.getModeParament().getDatatemp();
-					// System.out.println("抓完");
+					 System.out.println("抓完");
 					ExcelUtils eu = new ExcelUtils();
 					eu.createExcelUtil(ev.getModeParament().getMlist());
 				}
