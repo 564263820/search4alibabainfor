@@ -6,6 +6,8 @@
  ********************************************************************************/
 package com.wjdeng.client.model;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +18,10 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.Invocable;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -46,10 +52,17 @@ public class MadeInChinaPaser implements IPaser {
 			sengine.getContext().getWriter().write(js.toString());
 			uparam = sengine.eval("cmdSubmit('I',' am ',' test ',' js ')")
 					.toString();
+			
+			Invocable inv = (Invocable) sengine;
+			inv.invokeFunction("", "","","","");
+			sengine.getContext().getAttribute("", ScriptContext.GLOBAL_SCOPE);
 		} catch (ScriptException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -62,12 +75,16 @@ public class MadeInChinaPaser implements IPaser {
 		 * js.append("}"); js.append("");
 		 */
 		/*
-		 * var form = document.getElementById("form2"); 12 if (pForm != null) 13
-		 * form = pForm; 14 if (pAction != "" && form.action) 15
-		 * form.action.value = pAction; 16 if (pPage != "" && form.page) 17
-		 * form.page.value = pPage; 18 if (pOrder != "" && form.order) 19
-		 * form.order.value = pOrder; 20 if (pCode != "" && form.code) 21
-		 * form.code.value = pCode; 22 form.submit()
+		 * var form = document.getElementById("form2");  
+		  if (pForm != null)  form = pForm;  
+		  if (pAction != "" && form.action) 
+		  form.action.value = pAction;  
+		  if (pPage != "" && form.page) 
+		  form.page.value = pPage;  
+		  if (pOrder != "" && form.order) 
+		  form.order.value = pOrder;  
+		  if (pCode != "" && form.code) 
+		  form.code.value = pCode;  form.submit()
 		 */
 		Element ele = doc.getSource().getElementById("form2");
 		FormFields form = ele.getFormFields();
@@ -189,23 +206,36 @@ public class MadeInChinaPaser implements IPaser {
 		ScriptEngine sengine = smanager.getEngineByName("javascript");
 		String uparam = "";
 		try {
-			Bindings binding = sengine.createBindings();
+			Compilable compilable = (Compilable) sengine;
+			CompiledScript comptScript = compilable.compile(new FileReader(MadeInChinaPaser.class.getClassLoader().getResource("data/test.js").getPath()));
+			//System.out.println(comptScript.eval());
+			System.out.println(comptScript.eval(sengine.getContext()));
+			Invocable inv = (Invocable) sengine;
+			System.out.println(inv.invokeFunction("hex_md5", "10864111wjdeng"));
+			//comptScript.eval("md5_vm_test()");
+			//comptScript.
+			//Bindings binding = sengine.createBindings();
 			// javax.script.CompiledScript cs =
 			// sengine.getFactory().getScriptEngine().
-			uparam = sengine.eval("cmdSubmit('I',' am ',' test ',' js ')")
-					.toString();
-			System.out.println(uparam);
+			//uparam = sengine.eval("cmdSubmit('I',' am ',' test ',' js ')").toString();
+			//System.out.println(uparam);
 		} catch (ScriptException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} /*
 			 * catch (IOException e) { // TODO Auto-generated catch block
 			 * e.printStackTrace(); }
-			 */
+			 */ catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		String str = "http://us.my.alibaba.com/userbehavior/contactPersonUpdate.htm?memberId=f%2B63TPzd45lTE0EYPTxtqblHad5z3Es60Nu%2Fg37wnsyBBpp%2Bh9FqSA%3D%3D";
 		String regEx = "userbehavior";
 		boolean result = Pattern.compile(regEx).matcher(str).find();
-		System.out.println(result);
+		//System.out.println(result);
 
 	}
 
