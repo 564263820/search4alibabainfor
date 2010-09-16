@@ -123,6 +123,10 @@ public class AlibabaPaser implements IPaser {
 		String regEx = "userbehavior";
 		boolean result = Pattern.compile(regEx).matcher(str).find();
 		System.out.println(result);
+		/**
+		 * http://cnjixin.en.alibaba.com/contactinfo.html
+		 * http://www.alibaba.com/trade/search?SearchText=Electric+Bicycle&Country=CN&CatId=0&IndexArea=product_en&fsb=y&viewAllCategory=
+		 */
 
 	}
 
