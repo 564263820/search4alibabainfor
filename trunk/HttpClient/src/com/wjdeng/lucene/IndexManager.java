@@ -13,8 +13,11 @@ import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
@@ -63,15 +66,16 @@ public class IndexManager {
 			}
 			this.ramIndexWrite.addDocument(doc);
 		} catch (CorruptIndexException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
 	
+	/**
+	 *将内存索引合并到磁盘索引中 
+	 */
 	public void  doFlush(){
 		try {
 			synchronized(ramIndexWrite){
@@ -85,6 +89,19 @@ public class IndexManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private IndexReader getIndexReader() throws IOException{
+		IndexReader ramd=  this.ramIndexWrite.getReader();
+		IndexReader diskd = this.diskIndexWrite.getReader();
+		MultiReader mReader = new MultiReader(new IndexReader[]{ramd,diskd});
+		return mReader;
+	}
+	
+	
+	public IndexSearcher getIndexSearcher() throws IOException{
+		IndexSearcher indexSearcher = new IndexSearcher(this.getIndexReader());
+		return indexSearcher;
 	}
 
 }

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
@@ -25,9 +26,20 @@ import com.wjdeng.client.util.StringUtils;
 
 final public class LuceneConfig {
 
+	/**
+	 * 索引文件路径
+	 */
 	private static String IndexFilePath;
 	
-	private static Properties FieldMap ;
+	/**
+	 * 配置映射
+	 */
+	private static Properties ConfigMap ;
+	
+	/**
+	 * 所有字段的名称
+	 */
+	private static Set<String> fieldNames;
 	
 	private static final class STORE{
 		private static Map<String, Store> store = new HashMap<String, Store>();
@@ -90,17 +102,17 @@ final public class LuceneConfig {
 	 * @return
 	 */
 	private static String getFieldName(String key){
-		if(FieldMap==null){
+		if(ConfigMap==null){
 			try {
 				Properties p = new Properties();
 				p.load(LuceneConfig.class.getClassLoader().getResource("data/indexfile/indexConfig.properties").openStream());
-				FieldMap=p;
+				ConfigMap=p;
 			}  catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		if(FieldMap!=null){
-			return FieldMap.getProperty(key);
+		if(ConfigMap!=null){
+			return ConfigMap.getProperty(key);
 			
 		}
 		return "";
@@ -116,12 +128,44 @@ final public class LuceneConfig {
 	public static Field getField(String key,String value){
 		key = StringUtils.trim2empty(key);
 		value = StringUtils.trim2empty(value);
-		String fieldName = FieldMap.getProperty(key);
+		String fieldName = getFieldName(key);
 		if(null != fieldName){
 			Field field = new Field(fieldName,value,LuceneConfig.STORE.getStore(key),LuceneConfig.INDEX.getIndex(key));
 			return field;
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public static Set<Field> getFields(Map<String,String> value){
+		Set<Field> set = new HashSet<Field>();
+		for(String key : value.keySet()){
+			Field field = getField(key,value.get(key));
+			if(null != field){
+				set.add(field);
+			}
+		}
+		return set;
+	}
+	
+	/**
+	 * 
+	 * 获取当前配置过的所有字段名称
+	 * @return
+	 */
+	public static Set<String> getAllFieldNames(){
+		if(fieldNames==null){
+			fieldNames = new HashSet<String>();
+			for(Object name : ConfigMap.keySet()){
+				fieldNames.add(name.toString());
+			}
+		}
+		return fieldNames;
 	}
 	
 }
