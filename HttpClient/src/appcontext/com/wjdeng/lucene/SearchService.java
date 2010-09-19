@@ -38,6 +38,9 @@ public class SearchService {
 	
 	private IndexManager index= IndexManager.Instance();
 	
+	public static SearchService Instance(){
+		return new SearchService();
+	}
 	
 	/**
 	 * 
@@ -106,8 +109,13 @@ public class SearchService {
 		if(map==null)throw new NullPointerException("数据不能为空");
 		Set<Field> fsets = LuceneConfig.getFields(map);
 		if(fsets.size()==0) throw new IllegalArgumentException("map中数据不正确!");
-		String[] querystrs = map.entrySet().toArray(new String[map.size()]);
-		String[] fields = map.keySet().toArray(new String[fsets.size()]);
+		String[] querystrs = new String[map.size()];
+		String[] fields = new String[map.size()];
+		int i=0;
+		for(String key : map.keySet()){
+			fields[i]=key;
+			querystrs[i]=map.get(key);
+		}
 		BooleanClause.Occur[] occur = this.getShuldOccur(fsets.size());
 		Query query = MultiFieldQueryParser.parse(Version.LUCENE_29, querystrs, fields,occur, AnalyzerService.getIKAnalyzerInstance());
 		return query;

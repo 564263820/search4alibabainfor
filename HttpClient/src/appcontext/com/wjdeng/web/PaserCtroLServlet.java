@@ -38,6 +38,7 @@ import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
+import com.wjdeng.lucene.IndexManager;
 
 public class PaserCtroLServlet extends HttpServlet {
 
@@ -269,6 +270,11 @@ public class PaserCtroLServlet extends HttpServlet {
 				sb.append(", url : '").append(
 						ev.getModeParament().getCurDoc().getUrl()).append("'");
 				sb.append(",msg:'' }");
+				List<Map<String, String>>  listt =ev.getModeParament().getDatatemp();
+				for(Map<String, String> map :listt){
+					IndexManager.Instance().writeIndex(map);
+				}
+				//IndexManager.Instance().commit();
 			}
 		}
 	}
@@ -299,6 +305,7 @@ public class PaserCtroLServlet extends HttpServlet {
 						ev.getModeParament().getCurDoc().getUrl()).append("'");
 				sb.append(", msg:'分页完成!当前第：").append(
 						ev.getModeParament().getCurPage() + 1).append("页。' }");
+				IndexManager.Instance();
 			}
 
 		}

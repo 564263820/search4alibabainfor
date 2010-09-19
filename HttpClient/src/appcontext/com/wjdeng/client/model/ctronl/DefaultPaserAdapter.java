@@ -7,12 +7,12 @@
 package com.wjdeng.client.model.ctronl;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
-
 
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.Ipaser.IPaser;
@@ -49,17 +49,18 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	@Override
 	public Map<String, String> execuPaseInforPage(Document doc) {
 		Map<String, String> dmap = this.paser.execuPaseInforPage(doc);
-		for(String key :dmap.keySet()){
-			String tem  = StringKeyMsg.getMsgByKey(key);
-			if(StringUtils.trim2null(tem)!=null){
-				dmap.put(tem,dmap.remove(key));
-			}
-		}
-		String key = dmap.get(StringKeyMsg.getMsgByKey(StringKeyMsg.complanyKey+par.getModeName()));
-		if(keySet.contains(key)){
+		Map<String, String> rmap = new HashMap<String, String>();
+		String cn = dmap.get(StringKeyMsg.getMsgByKey(StringKeyMsg.complanyKey+par.getModeName()));
+		if(keySet.contains(StringUtils.trim2empty(cn))){
 			return null;
+		}else{
+			keySet.add(cn);
 		}
-		return dmap;
+		for(String key: dmap.keySet()){
+			String tem  = StringKeyMsg.getMsgByKey(par.getModeName()+"."+key);
+			rmap.put(tem, dmap.get(key));
+		}
+		return rmap;
 	}
 
 	@Override
