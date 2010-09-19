@@ -48,8 +48,22 @@ final public class LuceneConfig {
 	 */
 	private static Set<String> fieldNames;
 	
+	private static Properties getConfigMap(){
+		if(ConfigMap==null){
+			try {
+				Properties p = new Properties();
+				p.load(LuceneConfig.class.getClassLoader().getResource("data/indexfile/indexConfig.properties").openStream());
+				ConfigMap=p;
+			}  catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return ConfigMap;
+	}
+	
 	private static final class STORE{
 		private static Map<String, Store> store = new HashMap<String, Store>();
+		
 		static{
 			store.put("YES", Field.Store.YES);
 			store.put("NO", Field.Store.NO);
@@ -57,7 +71,7 @@ final public class LuceneConfig {
 		}
 		public static Store getStore(String key){
 			key = StringUtils.trim2empty(key)+".Store";
-			return store.get(key);
+			return store.get(getConfigMap().get(key));
 		}
 	}
 	
@@ -81,7 +95,7 @@ final public class LuceneConfig {
 		}
 		public static Index getIndex(String key){
 			key = StringUtils.trim2empty(key)+".Index";
-			return index.get(key);
+			return index.get(getConfigMap().get(key));
 		}
 	}
 	
@@ -109,18 +123,9 @@ final public class LuceneConfig {
 	 * @return
 	 */
 	private static String getFieldName(String key){
-		if(ConfigMap==null){
-			try {
-				Properties p = new Properties();
-				p.load(LuceneConfig.class.getClassLoader().getResource("data/indexfile/indexConfig.properties").openStream());
-				ConfigMap=p;
-			}  catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		ConfigMap=getConfigMap();
 		if(ConfigMap!=null){
 			return ConfigMap.getProperty(key);
-			
 		}
 		return "";
 	}
@@ -136,6 +141,7 @@ final public class LuceneConfig {
 		key = StringUtils.trim2empty(key);
 		value = StringUtils.trim2empty(value);
 		String fieldName = getFieldName(key);
+		if(key.indexOf(".Store")>-1 || key.indexOf(".Index")>-1)return null;
 		if(null != fieldName){
 			Field field = new Field(fieldName,value,LuceneConfig.STORE.getStore(key),LuceneConfig.INDEX.getIndex(key));
 			return field;
@@ -168,7 +174,8 @@ final public class LuceneConfig {
 	public static Set<String> getAllFieldNames(){
 		if(fieldNames==null){
 			fieldNames = new HashSet<String>();
-			for(Object name : ConfigMap.keySet()){
+			for(Object name : getConfigMap().keySet()){
+				if(name.toString().indexOf(".Store")>-1 || name.toString().indexOf(".Index")>-1)continue;
 				fieldNames.add(name.toString());
 			}
 		}

@@ -34,7 +34,7 @@ public class IndexManager {
 	
 	private IndexManager(){
 		try {
-			FSDirectory diskDir  = FSDirectory.open(new File(LuceneConfig.getIndexFilePath()));
+			FSDirectory diskDir  = FSDirectory.open((new File(LuceneConfig.getIndexFilePath())).getParentFile());
 			diskIndexWrite = new IndexWriter(diskDir,AnalyzerService.getIKAnalyzerInstance(), MaxFieldLength.UNLIMITED);
 			
 			RAMDirectory ramDir = new RAMDirectory();
@@ -52,6 +52,15 @@ public class IndexManager {
 		return index;
 	}
 	
+	public void commit(){
+		try {
+			this.ramIndexWrite.commit();
+		} catch (CorruptIndexException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void writeIndex(Map<String,String> val){
 		try {
