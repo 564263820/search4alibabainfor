@@ -1,11 +1,9 @@
-#Sat Sep 11 09:37:26 CST 2010
+#Sun Sep 19 11:05:42 CST 2010
 eclipse.preferences.version=1
 encoding//WebRoot/common.jsp=UTF-8
 encoding//WebRoot/index.jsp=UTF-8
 encoding//WebRoot/input.jsp=UTF-8
 encoding//WebRoot/login.jsp=UTF-8
 encoding//WebRoot/qq.js=UTF-8
-encoding//src/data/columKey.properties=UTF-8
-encoding//src/data/user.properties=UTF-8
-encoding//src/log4j.properties=UTF-8
+encoding//src/config/log4j.properties=UTF-8
 encoding/<project>=UTF-8
