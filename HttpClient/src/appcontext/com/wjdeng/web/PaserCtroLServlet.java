@@ -262,9 +262,9 @@ public class PaserCtroLServlet extends HttpServlet {
 	class getPageInfor implements Listener {
 		private StringBuffer sb;
 		
-		private ConcurrentSkipListSet<Map<String, String>> cls;
+		final private ConcurrentSkipListSet<Map<String, String>> cls;
 
-		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+		final protected ConcurrentSkipListSet<Map<String, String>> getCls() {
 			return cls;
 		}
 
@@ -291,10 +291,10 @@ public class PaserCtroLServlet extends HttpServlet {
 				sb.append(", url : '").append(
 						ev.getModeParament().getCurDoc().getUrl()).append("'");
 				sb.append(",msg:'' }");
-				List<Map<String, String>>  listt =ev.getModeParament().getDatatemp();
+				/*List<Map<String, String>>  listt =ev.getModeParament().getDatatemp();
 				for(Map<String, String> map :listt){
 					IndexManager.Instance().writeIndex(map);
-				}
+				}*/
 				//IndexManager.Instance().commit();
 			}
 		}
@@ -309,9 +309,9 @@ public class PaserCtroLServlet extends HttpServlet {
 	 * @since Apex OssWorks 5.5
 	 */
 	class nextPage implements Listener {
-		private StringBuffer sb;
+		final private StringBuffer sb;
 		
-		ConcurrentSkipListSet<Map<String, String>> cls;
+		final  ConcurrentSkipListSet<Map<String, String>> cls;
 
 		public nextPage(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
 			this.sb = sb;
@@ -337,7 +337,7 @@ public class PaserCtroLServlet extends HttpServlet {
 						ev.getModeParament().getCurDoc().getUrl()).append("'");
 				sb.append(", msg:'分页完成!当前第：").append(
 						ev.getModeParament().getCurPage() + 1).append("页。' }");
-				IndexManager.Instance();
+				//IndexManager.Instance();
 			}
 
 		}
@@ -357,9 +357,9 @@ public class PaserCtroLServlet extends HttpServlet {
 	 * @since Apex OssWorks 5.5
 	 */
 	class endtask implements Listener {
-		private StringBuffer sb;
+		final private StringBuffer sb;
 		
-		private ConcurrentSkipListSet<Map<String, String>> cls;
+		final private ConcurrentSkipListSet<Map<String, String>> cls;
 
 		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
 			return cls;
