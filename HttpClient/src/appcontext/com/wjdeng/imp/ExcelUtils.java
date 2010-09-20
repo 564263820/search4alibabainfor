@@ -62,11 +62,11 @@ public class ExcelUtils {
 		return filename;
 	}
 
-	public void createExcelUtil(List<Map<String, String>> maps) {
+	public void createExcelUtil(ModeParament mp) {
 		// 创建一个可写入的excel文件对象
 		try {
-			ModeParament mp = new ModeParament("", "", "");
-			mp.setMlist(maps);
+			//ModeParament mp = new ModeParament("", "", "");
+			//mp.setMlist(maps);
 			this.createExcelUtil(mp, null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -85,6 +85,7 @@ public class ExcelUtils {
 					jxl.format.Colour.BLACK);
 			WritableCellFormat wcfFC = new WritableCellFormat(wfc);
 			for (String title : set) {
+				if(null ==title)continue;
 				if (haveHead.containsKey(title))
 					continue;
 				Label assetNumLabel = new Label(col, 0, title, wcfFC);
@@ -112,6 +113,7 @@ public class ExcelUtils {
 			Map<String, String> data, int row) throws Exception {
 		Set<String> set = data.keySet();
 		for (String title : set) {
+			if(null == title)continue;
 			String assetNum = SysUtils.HtmlToText(data.get(title));
 			int index = head.get(title);
 			if ("Website".equals(title)) {

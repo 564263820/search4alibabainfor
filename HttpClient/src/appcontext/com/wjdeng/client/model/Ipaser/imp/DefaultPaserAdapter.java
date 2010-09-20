@@ -14,9 +14,9 @@ import java.util.Set;
 import org.apache.http.client.ClientProtocolException;
 
 import com.wjdeng.client.model.Document;
-import com.wjdeng.client.model.Ipaser.IPaser;
-import com.wjdeng.client.model.Ipaser.IpaserAdapter;
-import com.wjdeng.client.model.ctronl.AppContext;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
+import com.wjdeng.client.model.ctronl.IpaserAdapter;
 import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.util.StringKeyMsg;
 import com.wjdeng.client.util.StringUtils;
@@ -47,8 +47,8 @@ public class DefaultPaserAdapter implements IPaser, IpaserAdapter {
 	}
 
 	@Override
-	public Map<String, String> execuPaseInforPage(Document doc) {
-		Map<String, String> dmap = this.paser.execuPaseInforPage(doc);
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
+		Map<String, String> dmap = this.paser.execuPaseInforPage(doc,appContext);
 		for (String key : dmap.keySet()) {
 			String tem = StringKeyMsg.getMsgByKey(key);
 			if (StringUtils.trim2null(tem) != null) {
@@ -64,19 +64,19 @@ public class DefaultPaserAdapter implements IPaser, IpaserAdapter {
 	}
 
 	@Override
-	public String getNextPageUrl(Document doc) {
-		nextUrl = this.paser.getNextPageUrl(doc);
+	public String getNextPageUrl(Document doc,AppContext appContext) {
+		nextUrl = this.paser.getNextPageUrl(doc,appContext);
 		return nextUrl;
 	}
 
 	@Override
-	public Set<String> getPageListUrl(Document doc) {
-		return this.paser.getPageListUrl(doc);
+	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
+		return this.paser.getPageListUrl(doc,appContext);
 	}
 
 	@Override
 	public boolean hasNext() {
-		String url = this.paser.getNextPageUrl(this.doc);
+		String url = this.paser.getNextPageUrl(this.doc,appContext);
 		if ("".equals(url)) {
 			return false;
 		} else {

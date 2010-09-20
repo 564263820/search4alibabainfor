@@ -5,7 +5,7 @@
  *
  *规则计算（用于计算是否重复的key）
  ********************************************************************************/
-package com.wjdeng.client.model.Ipaser;
+package com.wjdeng.client.util;
 
 public class CalculationRules {
 
