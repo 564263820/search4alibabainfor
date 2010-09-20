@@ -16,14 +16,17 @@ import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.Element;
 
-import com.wjdeng.client.model.Ipaser.IPaser;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
+import com.wjdeng.client.model.ctronl.Command;
+import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
 public class AlibabaPaser implements IPaser {
 
 	@Override
-	public Map<String, String> execuPaseInforPage(Document doc) {
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> contentmap = new HashMap<String, String>();
 		List<Element> list = doc.getAllElementsByClass("tables data");
 		// List<Element> list =doc.getAllElementsByClass("mainNavigat");
@@ -76,7 +79,7 @@ public class AlibabaPaser implements IPaser {
 	}
 
 	@Override
-	public String getNextPageUrl(Document doc) {
+	public String getNextPageUrl(Document doc,AppContext appContext) {
 		Element ele = doc.getFirstElementByClass("nextPage");
 		if (null != ele) {
 			String next = ele.getAttributeValue("href");
@@ -87,7 +90,7 @@ public class AlibabaPaser implements IPaser {
 	}
 
 	@Override
-	public Set<String> getPageListUrl(Document doc) {
+	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
 		Pattern pa = Pattern.compile("itemBox *");
 		Set<String> vurl = new HashSet<String>();
 		Iterator<Element> it = doc.getAllElementsByClass("itemBox").iterator();// doc.getAllElements("class",

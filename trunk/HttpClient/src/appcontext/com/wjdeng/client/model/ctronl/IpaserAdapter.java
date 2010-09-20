@@ -4,13 +4,14 @@
  * File Name       : IpaserAdapter.java
  *
  ********************************************************************************/
-package com.wjdeng.client.model.Ipaser;
+package com.wjdeng.client.model.ctronl;
 
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 
 import com.wjdeng.client.model.Document;
+import com.wjdeng.client.model.api.IPaser;
 
 public interface IpaserAdapter {
 

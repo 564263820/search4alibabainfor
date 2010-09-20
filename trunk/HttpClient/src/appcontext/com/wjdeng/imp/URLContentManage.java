@@ -9,7 +9,6 @@
 package com.wjdeng.imp;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,6 @@ import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.URLContent;
 import com.wjdeng.client.util.LogUtil;
-import com.wjdeng.client.util.SysUtils;
 
 public class URLContentManage implements URLContent {
 

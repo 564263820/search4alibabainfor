@@ -15,8 +15,8 @@ import java.util.Set;
 import org.apache.http.client.ClientProtocolException;
 
 import com.wjdeng.client.model.Document;
-import com.wjdeng.client.model.Ipaser.IPaser;
-import com.wjdeng.client.model.Ipaser.IpaserAdapter;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.util.StringKeyMsg;
 import com.wjdeng.client.util.StringUtils;
 
@@ -47,8 +47,8 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	}
 	
 	@Override
-	public Map<String, String> execuPaseInforPage(Document doc) {
-		Map<String, String> dmap = this.paser.execuPaseInforPage(doc);
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
+		Map<String, String> dmap = this.paser.execuPaseInforPage(doc,appContext);
 		Map<String, String> rmap = new HashMap<String, String>();
 		String cn = dmap.get(StringKeyMsg.getMsgByKey(StringKeyMsg.complanyKey+par.getModeName()));
 		if(keySet.contains(StringUtils.trim2empty(cn))){
@@ -64,20 +64,20 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	}
 
 	@Override
-	public String getNextPageUrl(Document doc) {
-		nextUrl = this.paser.getNextPageUrl(doc);
+	public String getNextPageUrl(Document doc,AppContext appContext) {
+		nextUrl = this.paser.getNextPageUrl(doc,appContext);
 		//this.par.setCurPage(par.getCurPage()+1);
 		return nextUrl;
 	}
 
 	@Override
-	public Set<String> getPageListUrl(Document doc) {
-		return this.paser.getPageListUrl(doc);
+	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
+		return this.paser.getPageListUrl(doc,appContext);
 	}
 
 	@Override
 	public boolean hasNext() {
-		String url = getNextPageUrl(this.doc);
+		String url = getNextPageUrl(this.doc,appContext);
 		if("".equals(url)){
 			par.setCurPage(par.getDeep());
 			return false;
@@ -89,7 +89,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 
 	@Override
 	public Document nextUrl() throws ClientProtocolException, IOException {
-		if(null == nextUrl)getNextPageUrl(doc);
+		if(null == nextUrl)nextUrl = getNextPageUrl(doc,appContext);
 		if(null == nextUrl)return null;
 		this.doc=appContext.getHtmlDocByUrl(nextUrl);
 		par.setCurDoc(doc);

@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,9 +30,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.wjdeng.client.model.ctronl.AppContext;
+import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.ctronl.AppStatus;
 import com.wjdeng.client.model.ctronl.ContinueRunCommand;
+import com.wjdeng.client.model.ctronl.DefaultAppContext;
 import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.model.ctronl.PuaseCommand;
 import com.wjdeng.client.model.ctronl.event.Event;
@@ -47,6 +51,11 @@ public class PaserCtroLServlet extends HttpServlet {
 	static public Map<String, ModeParament> map = new HashMap<String, ModeParament>();
 
 	static public Map<String, StringBuffer> writContentMap = new HashMap<String, StringBuffer>();
+	
+	/**
+	 * 当前session抓取到的临时数据
+	 */
+	static public Map<String, ConcurrentSkipListSet<Map<String, String>>> pageInfoMap = new HashMap<String, ConcurrentSkipListSet<Map<String, String>>>();
 
 	/**
 	 */
@@ -109,8 +118,6 @@ public class PaserCtroLServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws ServletException,
 			IOException {
-		// this.getServletContext().getRequestDispatcher(path);
-		// System.out.print(request.getRequestedSessionId());
 		response.setHeader("Cache-Control", "no-cache");
 		response.setContentType("text/html;charset=UTF-8");
 		String url = request.getParameter("url");
@@ -130,28 +137,32 @@ public class PaserCtroLServlet extends HttpServlet {
 			writContentMap.remove(request.getRequestedSessionId());
 			map.remove(request.getRequestedSessionId());
 			if (null != par) {
-				AppContext.exeCommand(new PuaseCommand(), par);// 停止
+				DefaultAppContext.exeCommand(new PuaseCommand(), par);// 停止
 			}
 			par = null;
 		} else if ("pause".equals(operation)) {
-			AppContext.exeCommand(new PuaseCommand(), par);// 暂停
+			DefaultAppContext.exeCommand(new PuaseCommand(), par);// 暂停
 			response.getWriter().write(getStatusJson(AppStatus.end, "暂停!"));
 			return;
 		} else if ("continuerun".equals(operation)) {
-			AppContext.exeCommand(new ContinueRunCommand(), par);// 继续 回复运行
+			DefaultAppContext.exeCommand(new ContinueRunCommand(), par);// 继续 回复运行
 		} else if ("downloadExcel".equals(operation)) {
 			this.downloadExcel(response, par);
 			return;
 		}
+		
+		ConcurrentSkipListSet<Map<String, String>> cls = pageInfoMap.get(request.getRequestedSessionId());
 		StringBuffer sb = writContentMap.get(request.getRequestedSessionId());
 		if (sb == null) {
 			sb = new StringBuffer();
 			sb.append(nullKey);
-			writContentMap.put(request.getRequestedSessionId(), sb);
+			writContentMap.put(request.getRequestedSessionId(), sb);//记录当前运行状态
+			cls = new ConcurrentSkipListSet<Map<String,String>>();
+			pageInfoMap.put(request.getRequestedSessionId(),cls);;
 		}
 		try {
 			if (!"running".equals(StringUtils.trim2null(operation))) {// 任务没有在运行中
-				this.runTask(sb, par, request);// 执行任务
+				runTask(sb, par,cls, request);// 执行任务
 			}
 			par = map.get(request.getRequestedSessionId());
 
@@ -174,17 +185,12 @@ public class PaserCtroLServlet extends HttpServlet {
 			}
 		} catch (Exception e) {
 			// e.printStackTrace();
-			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
-			PrintWriter p = new PrintWriter(SysUtils.getFilePath("log"));
-			e.printStackTrace(p);
-			p.flush();
-			p.close();
-			response.getWriter().write(
-					getStatusJson(AppStatus.error, e.getMessage()));
+			LogUtil.getLogger(getClass().getSimpleName()).error(e);
+			response.getWriter().write(getStatusJson(AppStatus.error, e.getMessage()));
 		}
 	}
 
-	private void runTask(StringBuffer sb, ModeParament par,
+	private void runTask(StringBuffer sb, ModeParament par,ConcurrentSkipListSet<Map<String,String>> cls,
 			HttpServletRequest request) throws Exception {
 		String url = request.getParameter("url");
 		url = java.net.URLDecoder.decode(url, "utf-8");
@@ -196,17 +202,17 @@ public class PaserCtroLServlet extends HttpServlet {
 		// String operation = request.getParameter("operation");
 		AppContext app;
 		if (par == null) {
-			app = AppContext.getAppContext(url, deep);
+			app = DefaultAppContext.Instance(url, deep);
 		} else {
-			app = AppContext.getAppContext(par);
+			app = DefaultAppContext.Instance(par);
 		}
 		par = app.getModeParament();
 		map.put(request.getRequestedSessionId(), par);
 		final Thread th = new Thread(app);
 		th.start();
-		app.addListener4AfterNextPage(new nextPage(sb));
-		app.addListener4AfterPaserInfor(new getPageInfor(sb));
-		app.addListener4End(new endtask(sb));
+		app.addListener4AfterNextPage(new nextPage(sb,cls));
+		app.addListener4AfterPaserInfor(new getPageInfor(sb,cls));
+		app.addListener4End(new endtask(sb,cls));
 	}
 
 	private String getStatusJson(AppStatus satu, String msg) {
@@ -245,11 +251,26 @@ public class PaserCtroLServlet extends HttpServlet {
 		list.clear();
 	}
 
+	/**
+	 * 
+	 * 完成一个信息页面的解析
+	 *
+	 * @author Administrator
+	 * @version 1.0
+	 * @since Apex OssWorks 5.5
+	 */
 	class getPageInfor implements Listener {
 		private StringBuffer sb;
+		
+		private ConcurrentSkipListSet<Map<String, String>> cls;
 
-		public getPageInfor(StringBuffer sb) {
+		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+			return cls;
+		}
+
+		public getPageInfor(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
 			this.sb = sb;
+			this.cls=cls;
 		}
 
 		@Override
@@ -279,11 +300,22 @@ public class PaserCtroLServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * 
+	 * 分页完成
+	 *
+	 * @author Administrator
+	 * @version 1.0
+	 * @since Apex OssWorks 5.5
+	 */
 	class nextPage implements Listener {
 		private StringBuffer sb;
+		
+		ConcurrentSkipListSet<Map<String, String>> cls;
 
-		public nextPage(StringBuffer sb) {
+		public nextPage(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
 			this.sb = sb;
+			this.cls=cls;
 		}
 
 		@Override
@@ -310,13 +342,32 @@ public class PaserCtroLServlet extends HttpServlet {
 
 		}
 
+		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+			return cls;
+		}
+
 	}
 
+	/**
+	 * 
+	 * 任务结束
+	 *
+	 * @author Administrator
+	 * @version 1.0
+	 * @since Apex OssWorks 5.5
+	 */
 	class endtask implements Listener {
 		private StringBuffer sb;
+		
+		private ConcurrentSkipListSet<Map<String, String>> cls;
 
-		public endtask(StringBuffer sb) {
+		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+			return cls;
+		}
+
+		public endtask(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
 			this.sb = sb;
+			this.cls=cls;
 		}
 
 		@Override
@@ -343,6 +394,16 @@ public class PaserCtroLServlet extends HttpServlet {
 
 	}
 
+	/**
+	 * 
+	 * 测试网络
+	 * @param url
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	private boolean testNet(String url, HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		try {

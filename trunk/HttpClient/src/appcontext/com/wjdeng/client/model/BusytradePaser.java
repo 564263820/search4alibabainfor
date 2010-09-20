@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.Element;
 
-import com.wjdeng.client.model.Ipaser.IPaser;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.util.SysUtils;
 
 public class BusytradePaser implements IPaser {
@@ -24,7 +25,7 @@ public class BusytradePaser implements IPaser {
 	private String path = "http://www.busytrade.com";
 
 	@Override
-	public Map<String, String> execuPaseInforPage(Document doc) {
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> contentmap = new HashMap<String, String>();
 		List<Element> list = doc.getAllElementsByClass("table_info");
 		for (Element el : list) {
@@ -61,7 +62,7 @@ public class BusytradePaser implements IPaser {
 	}
 
 	@Override
-	public String getNextPageUrl(Document doc) {
+	public String getNextPageUrl(Document doc,AppContext appContext) {
 		Iterator<Element> it = doc.getAllElementsByClass("width_page")
 				.iterator();
 		while (it.hasNext()) {
@@ -77,7 +78,7 @@ public class BusytradePaser implements IPaser {
 	}
 
 	@Override
-	public Set<String> getPageListUrl(Document doc) {
+	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
 		Iterator<Element> navit = doc.getAllElementsByClass("navbg").iterator();
 		Set<String> vurl = new HashSet<String>();
 		if (navit.hasNext()) {

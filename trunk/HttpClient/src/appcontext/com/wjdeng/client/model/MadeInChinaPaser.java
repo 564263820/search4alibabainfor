@@ -29,7 +29,8 @@ import javax.script.ScriptException;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.FormFields;
 
-import com.wjdeng.client.model.Ipaser.IPaser;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.util.SysUtils;
 
 public class MadeInChinaPaser implements IPaser {
@@ -108,7 +109,7 @@ public class MadeInChinaPaser implements IPaser {
 	}
 
 	@Override
-	public Map<String, String> execuPaseInforPage(Document doc) {
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> contentmap = new HashMap<String, String>();
 		List<Element> list = doc.getAllElementsByClass("table_info");
 		for (Element el : list) {
@@ -145,7 +146,7 @@ public class MadeInChinaPaser implements IPaser {
 	}
 
 	@Override
-	public String getNextPageUrl(Document doc) {
+	public String getNextPageUrl(Document doc,AppContext appContext) {
 
 		Iterator<Element> it = doc.getAllElementsByClass("Go to Next Page")
 				.iterator();
@@ -162,7 +163,7 @@ public class MadeInChinaPaser implements IPaser {
 	}
 
 	@Override
-	public Set<String> getPageListUrl(Document doc) {
+	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
 		Iterator<Element> navit = doc.getAllElementsByClass("navbg").iterator();
 		Set<String> vurl = new HashSet<String>();
 		if (navit.hasNext()) {

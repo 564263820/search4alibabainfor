@@ -4,7 +4,7 @@
  * File Name       : Paser.java
  *
  ********************************************************************************/
-package com.wjdeng.client.model.Ipaser;
+package com.wjdeng.client.model.api;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +21,7 @@ public interface IPaser {
 	 *            html解析源
 	 * @return
 	 */
-	public Map<String, String> execuPaseInforPage(Document doc);
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext);
 
 	/**
 	 * 
@@ -30,7 +30,7 @@ public interface IPaser {
 	 * @param doc
 	 * @return
 	 */
-	public String getNextPageUrl(Document doc);
+	public String getNextPageUrl(Document doc,AppContext appContext);
 
 	/**
 	 * 
@@ -39,6 +39,6 @@ public interface IPaser {
 	 * @param doc
 	 * @return
 	 */
-	public Set<String> getPageListUrl(Document doc);
+	public Set<String> getPageListUrl(Document doc,AppContext appContext);
 
 }

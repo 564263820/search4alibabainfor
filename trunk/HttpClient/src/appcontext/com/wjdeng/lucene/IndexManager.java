@@ -52,6 +52,7 @@ public class IndexManager {
 		return index;
 	}
 	
+	
 	public void commit(){
 		try {
 			this.ramIndexWrite.commit();
@@ -62,6 +63,11 @@ public class IndexManager {
 		}
 	}
 	
+	/**
+	 * 
+	 * 写一条索引
+	 * @param val
+	 */
 	public void writeIndex(Map<String,String> val){
 		try {
 			Document doc = new Document();

@@ -10,9 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,18 +24,16 @@ import net.htmlparser.jericho.Source;
 
 import org.apache.http.client.ClientProtocolException;
 
-import com.wjdeng.client.model.Ipaser.IPaser;
-import com.wjdeng.client.model.ctronl.AppContext;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.util.StringUtils;
-import com.wjdeng.client.util.SysUtils;
-import com.wjdeng.imp.URLContentManage;
 
 public class GllobalSourcesPaser implements IPaser {
 
 	private String path = "http://www.globalsources.com";
 
 	@Override
-	public Map<String, String> execuPaseInforPage(Document doc) {
+	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> contentmap = new HashMap<String, String>();
 
 		List<Element> list = doc.getAllElements("name", "ContactDetails", true);
@@ -100,7 +96,7 @@ public class GllobalSourcesPaser implements IPaser {
 	}
 
 	@Override
-	public String getNextPageUrl(Document doc) {
+	public String getNextPageUrl(Document doc,AppContext appContext) {
 		Iterator<Element> it = doc.getAllElementsByClass("prodlist-pgs")
 				.iterator();
 		while (it.hasNext()) {
@@ -122,7 +118,7 @@ public class GllobalSourcesPaser implements IPaser {
 	}
 
 	@Override
-	public Set<String> getPageListUrl(Document doc) {
+	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
 		Element tele = doc.getAllElementsByClass("lsttabon").get(0)
 				.getAllElements("span").get(0);
 		String titletab = tele.getContent().toString();
@@ -183,7 +179,7 @@ public class GllobalSourcesPaser implements IPaser {
 			GllobalSourcesPaser paser = new GllobalSourcesPaser();
 			paser
 					.execuPaseInforPage(new Document(new Source(sb.toString()),
-							""));
+							""),null);
 			// paser.execuPaseInforPage(doc);
 
 		} catch (ClientProtocolException e) {

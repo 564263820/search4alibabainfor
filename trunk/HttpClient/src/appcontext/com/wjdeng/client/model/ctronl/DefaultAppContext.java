@@ -6,21 +6,18 @@
  ********************************************************************************/
 package com.wjdeng.client.model.ctronl;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.client.ClientProtocolException;
-
 import net.htmlparser.jericho.Source;
 
+import org.apache.http.client.ClientProtocolException;
+
 import com.wjdeng.client.model.Document;
-import com.wjdeng.client.model.Ipaser.IPaser;
+import com.wjdeng.client.model.api.AppContext;
+import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.model.ctronl.event.Event;
 import com.wjdeng.client.model.ctronl.event.Listener;
 import com.wjdeng.client.util.LogUtil;
@@ -28,8 +25,6 @@ import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
 import com.wjdeng.imp.URLContentManage;
-import com.wjdeng.lucene.IndexManager;
-import com.wjdeng.lucene.SearchService;
 
 /**
  * 
@@ -39,7 +34,7 @@ import com.wjdeng.lucene.SearchService;
  * @version 1.0
  * @since
  */
-public class AppContext implements Runnable {
+public class DefaultAppContext implements AppContext {
 	/**
 	 * 运行环境参数集合
 	 */
@@ -53,11 +48,19 @@ public class AppContext implements Runnable {
 		return this.par;
 	}
 
-	private AppContext(ModeParament par) {
+	private DefaultAppContext(ModeParament par) {
 		this.par = par;
 	}
+	
+	public void setAttribute(String key,Object value){
+		par.setAttribute(key, value);
+	}
+	
+	public Object getAttribute(String key){
+		return par.getAttribute(key);
+	}
 
-	public static AppContext getAppContext(String url, Integer deep)
+	public static AppContext Instance(String url, Integer deep)
 			throws Exception {
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
 		if (par == null) {
@@ -65,52 +68,26 @@ public class AppContext implements Runnable {
 		}
 		par.setDeep(deep);
 		par.setEntranceUrl(url);
-		return new AppContext(par);
+		return new DefaultAppContext(par);
 	}
 
-	public static AppContext getAppContext(String url) throws Exception {
+	public static AppContext Instance(String url) throws Exception {
 		ModeParament par = ModelManager.getModeParamByUrlString(url);
 		if (par == null) {
 			throw new Exception("暂不支持该：" + url + "网站？");
 		}
 		par.setEntranceUrl(url);
-		return new AppContext(par);
+		return new DefaultAppContext(par);
 	}
 
-	public static AppContext getAppContext(ModeParament par) throws Exception {
+	public static AppContext Instance(ModeParament par) throws Exception {
 		if (par == null) {
 			return null;
 		}
-		return new AppContext(par);
+		return new DefaultAppContext(par);
 	}
 
-	public static IPaser getHtmlPaser(ModeParament par) {
-		if (par == null)
-			return null;
-		if (!"".equals(SysUtils.trim2empty(par.getModeclass()))) {
-			try {
-				IPaser paser = (IPaser) Class.forName(par.getModeclass())
-						.newInstance();
-				return paser;
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
-	}
-
-	public static ModeParament getModeParamentByUrl(String url)
-			throws Exception {
-		ModeParament par = ModelManager.getModeParamByUrlString(url);
-		if (par == null) {
-			throw new Exception(url + "未找到解析器，请检查配置。" + url + "是否是目前能够解析的网站？");
-		}
-		return par;
-	}
+	
 
 	/**
 	 * 增加一个解析后的事件
@@ -165,7 +142,7 @@ public class AppContext implements Runnable {
 		ModeParament par = getModeParament();// 解析模块运行时环境
 		parLoacl.set(par);
 		Document doc = getHtmlDocByUrl(par.getEntranceUrl());
-		IPaser paser = getHtmlPaser(par);// 获取解析器
+		IPaser paser = ModelManager.getHtmlPaser(par);// 获取解析器
 		DefaultPaserAdapter dpa = new DefaultPaserAdapter(doc, paser, this);// 创建循环迭代
 																			// 代理
 		Set<String> pages = new HashSet<String>();// 已经解析过资料的url地址 过滤重复地址
@@ -174,14 +151,14 @@ public class AppContext implements Runnable {
 		int deep = par.getDeep();
 		int tem=0;
 		do{
-			Set<String> urlset= dpa.getPageListUrl(doct);
+			Set<String> urlset= dpa.getPageListUrl(doct,this);
 			for(String purl :urlset){
 				if(par.isEndTask())return par;//任务结束
 				if(tem== deep)return par;
 				if(pages.contains(purl))continue;// 过滤重复地址
 				pages.add(purl);
 				Document temDoc = this.getHtmlDocByUrl(purl);
-				Map<String, String> datatemp = dpa.execuPaseInforPage(temDoc);
+				Map<String, String> datatemp = dpa.execuPaseInforPage(temDoc,this);
 				par.setCurDoc(temDoc);
 				par.addDatatemp(datatemp);// 获取的当前客户数据存入参数对象中并触发解析一个客户数据成功事件
 				par.getMlist().add(datatemp);
@@ -251,12 +228,17 @@ public class AppContext implements Runnable {
 			// String url =
 			// "http://www.alibaba.com/products/christmas_items/CN----Zhejiang------------_1-CN,------------.html";
 			// ModeParament par = AppContext.getAppContext(url).getContent();
-			String url1 = "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
-			//String url = "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Zhejiang--------------------";
+			//String url1 = "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
+			String url1 = "http://www.alibaba.com/Inflatable-Toys_sid2620?npp=2620--CN----Zhejiang--------------------";
 			// boolean b=
 			// url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
 			// System.out.println(b);
-			String url = "http://www.alibaba.com/Inflatable-Toys_sid2620?npp=2620--CN----Zhejiang";
+			String url = "http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Shanghai--------------------";
+			//String url3= "http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Zhejiang--------------------";
+			String url4="http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Jiangsu--------------------";
+			String url5="http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Anhui--------------------";
+			
+			String url2="http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Zhejiang--------------------";
 			//	String url = "AppContext app = AppContext.getAppContext(url, 18)";
 			//List<Map<String,String>> mlist = AppContext.getAppContext().getContent("http://www.alibaba.com/trade/search?SearchText=zhejiang&Country=&CatId=43&IndexArea=product_en&fsb=y");
 			//List<Map<String,String>> mlist = AppContext.getAppContext().getContent("http://www.busytrade.com/selling-leads/3-185/Folk-Crafts.html");
@@ -266,27 +248,45 @@ public class AppContext implements Runnable {
 			//String url =  "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
 		    //boolean b= url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
 			//System.out.println(b);
-		    AppContext  app =AppContext.getAppContext(url,1);
+			String url6= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Zhejiang--------------------";
+			String url7= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Shanghai--------------------";
+			String url8= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Jiangsu--------------------";
+			String url9= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Anhui--------------------";
+			String url0= "http://www.alibaba.com/products/Garment_Accessories/CN--3--Zhejiang/4.html";
+		    AppContext  app =DefaultAppContext.Instance(url0,40);
 			Thread th = new Thread(app);
 			//Thread th= new Thread(app);
 			th.start();
 			
-			 //AppContext  app2 =AppContext.getAppContext(url1,1);
-				//Thread th2 = new Thread(app2);
-				//Thread th= new Thread(app);
-				//th2.start();
+			/*AppContext  app2 =AppContext.getAppContext(url1,40);
+			Thread th2 = new Thread(app2);
+			th2.start();
+			
+			AppContext  app3 =AppContext.getAppContext(url3,40);
+			Thread th3 = new Thread(app3);
+			th3.start();
+			
+			AppContext  app4 =AppContext.getAppContext(url4,40);
+			Thread th4 = new Thread(app4);
+			th4.start();
+			
+			
+			AppContext  app5 =AppContext.getAppContext(url5,40);
+			Thread th5 = new Thread(app5);
+			th5.start();*/
 			
 			ModeParament par = app.getModeParament();
 			par.addListener4AfterNextPage(new Listener() {
 				@Override
 				public void execute(Event ev) {
-					// System.out.println("分页了哈");
+					 System.out.println("分页了哈");
 
 				}
 			});
 			par.addListener4AfterPaserInfor(new Listener() {
 				@Override
 				public void execute(Event ev) {
+					System.out.println(ev.getModeParament().getUrl());
 				}
 			});
 			par.addListener4End(new Listener() {
@@ -294,25 +294,25 @@ public class AppContext implements Runnable {
 				public void execute(Event ev) {
 					// ev.getModeParament().getDatatemp();
 					System.out.println(System.currentTimeMillis());
-					List<Map<String, String>>  list =ev.getModeParament().getDatatemp();
+					/*List<Map<String, String>>  list =ev.getModeParament().getDatatemp();
 					for(Map<String, String> map :list){
 						IndexManager.Instance().writeIndex(map);
 					}
 					System.out.println(System.currentTimeMillis());
-					IndexManager.Instance().doFlush();
+					IndexManager.Instance().doFlush();*/
 					 System.out.println("抓完");
 					ExcelUtils eu = new ExcelUtils();
-					eu.createExcelUtil(ev.getModeParament().getMlist());
-					Map<String, String> rmap = new HashMap<String, String>();
-					rmap.put("CompanyName", "Industrial");
-					List<Map<String, String>> re=SearchService.Instance().searchAll(rmap);
+					eu.createExcelUtil(ev.getModeParament());
+					//Map<String, String> rmap = new HashMap<String, String>();
+					//rmap.put("CompanyName", "Industrial");
+					/*List<Map<String, String>> re=SearchService.Instance().searchAll(rmap);
 					for(Map<String, String> rm: re){
 						StringBuilder sb = new StringBuilder();
 						for(String key:rm.keySet()){
 							sb.append(key+":"+rm.get(key) +" |  ");
 						}
 						System.out.println(sb.toString());
-					}
+					}*/
 				}
 			});
 			// ev.getModeParament().getCurDoc().getUrl();

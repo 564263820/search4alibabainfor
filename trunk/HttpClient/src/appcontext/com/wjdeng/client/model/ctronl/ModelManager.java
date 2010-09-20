@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.wjdeng.client.model.api.IPaser;
+import com.wjdeng.client.util.SysUtils;
+
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 
@@ -61,6 +64,34 @@ public class ModelManager {
 			}
 		}
 		return null;
+	}
+	
+	public static IPaser getHtmlPaser(ModeParament par) {
+		if (par == null)
+			return null;
+		if (!"".equals(SysUtils.trim2empty(par.getModeclass()))) {
+			try {
+				IPaser paser = (IPaser) Class.forName(par.getModeclass())
+						.newInstance();
+				return paser;
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public static ModeParament getModeParamentByUrl(String url)
+			throws Exception {
+		ModeParament par = ModelManager.getModeParamByUrlString(url);
+		if (par == null) {
+			throw new Exception(url + "未找到解析器，请检查配置。" + url + "是否是目前能够解析的网站？");
+		}
+		return par;
 	}
 
 }

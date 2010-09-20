@@ -9,6 +9,8 @@ package com.wjdeng.client.model.ctronl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.ctronl.event.Event;
@@ -23,6 +25,9 @@ import com.wjdeng.imp.URLContentManage;
  */
 public class ModeParament {
 
+	/**
+	 * url链接管理器
+	 */
 	URLContentManage urlConnectio = new URLContentManage();
 	/**
 	 * 模块名
@@ -45,6 +50,9 @@ public class ModeParament {
 	 */
 	private Integer deep = -1;
 
+	/**
+	 * http请求(get or post)
+	 */
 	private String method;
 
 	/**
@@ -57,6 +65,9 @@ public class ModeParament {
 	 */
 	private Document curDoc;
 
+	/**
+	 * 结束标记
+	 */
 	private boolean endTask = false;
 
 	/**
@@ -83,7 +94,19 @@ public class ModeParament {
 	 * 抓取结束事件列表
 	 */
 	private List<Listener> endListenerList = new ArrayList<Listener>();
+	
+	private ConcurrentMap<String, Object> attribute = new ConcurrentHashMap<String, Object>();
 
+    void setAttribute(String key,Object value){
+    	if(key==null || value==null)return;
+		attribute.put(key, value);
+	}
+	
+	Object getAttribute(String key){
+		return attribute.get(key);
+	}
+	
+	
 	/**
 	 * 增加一个解析后的事件
 	 * 
@@ -149,7 +172,7 @@ public class ModeParament {
 		return mlist;
 	}
 
-	public void setMlist(List<Map<String, String>> mlist) {
+	void setMlist(List<Map<String, String>> mlist) {
 		this.mlist = mlist;
 	}
 
