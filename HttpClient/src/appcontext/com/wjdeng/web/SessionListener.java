@@ -19,6 +19,7 @@ public class SessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent arg0) {
 		PaserCtroLServlet.map.remove(arg0.getSession().getId());
 		PaserCtroLServlet.writContentMap.remove(arg0.getSession().getId());
+		PaserCtroLServlet.pageInfoMap.remove(arg0.getSession().getId());
 	}
 
 }

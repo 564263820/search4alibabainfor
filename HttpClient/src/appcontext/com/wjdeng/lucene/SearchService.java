@@ -42,6 +42,39 @@ public class SearchService {
 		return new SearchService();
 	}
 	
+	
+	/**
+	 * 
+	 * 根据条件获取全部记录
+	 * @param map
+	 * @return
+	 */
+	public boolean isExist(Map<String,String> map){
+		try {
+			return this.search(map, new ConverDoc(){
+
+				@Override
+				public List<Map<String, String>> convertDoc(
+						IndexSearcher indexSearcher, ScoreDoc[] scoreDocs,
+						int totalHits) throws CorruptIndexException, IOException,
+						InvalidTokenOffsetsException {
+					List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+					if(totalHits>0){
+						Map<String ,String> map = new HashMap<String, String>();
+						list.add(map);
+					}
+					return list;
+				}}).size()>0?true:false;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidTokenOffsetsException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	/**
 	 * 
 	 * 根据条件获取全部记录
@@ -115,6 +148,7 @@ public class SearchService {
 		for(String key : map.keySet()){
 			fields[i]=key;
 			querystrs[i]=map.get(key);
+			i++;
 		}
 		BooleanClause.Occur[] occur = this.getShuldOccur(fsets.size());
 		Query query = MultiFieldQueryParser.parse(Version.LUCENE_29, querystrs, fields,occur, AnalyzerService.getIKAnalyzerInstance());

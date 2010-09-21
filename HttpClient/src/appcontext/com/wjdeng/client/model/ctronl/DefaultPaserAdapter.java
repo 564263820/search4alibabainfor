@@ -19,6 +19,8 @@ import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.util.StringKeyMsg;
 import com.wjdeng.client.util.StringUtils;
+import com.wjdeng.lucene.IndexManager;
+import com.wjdeng.lucene.SearchService;
 
 public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	
@@ -49,7 +51,9 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 	@Override
 	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> dmap = this.paser.execuPaseInforPage(doc,appContext);
+		if(dmap.size()==0)return dmap;
 		Map<String, String> rmap = new HashMap<String, String>();
+		Map<String, String> smap = new HashMap<String, String>();
 		String cn = dmap.get(StringKeyMsg.getMsgByKey(StringKeyMsg.complanyKey+par.getModeName()));
 		if(keySet.contains(StringUtils.trim2empty(cn))){
 			return null;
@@ -58,9 +62,18 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 		}
 		for(String key: dmap.keySet()){
 			String tem  = StringKeyMsg.getMsgByKey(par.getModeName()+"."+key);
-			rmap.put(tem, dmap.get(key));
+			String val  = dmap.get(key);
+			if("Tel".equals(tem)||"Mobile".equals(tem)){
+				smap.put(tem, val);
+			}
+			rmap.put(tem, val);
 		}
-		return rmap;
+		if(smap.size()==0)return dmap;
+		if(!SearchService.Instance().isExist(smap)){
+			IndexManager.Instance().writeIndex(rmap);
+			return rmap;
+		}
+		return new HashMap<String, String>();
 	}
 
 	@Override

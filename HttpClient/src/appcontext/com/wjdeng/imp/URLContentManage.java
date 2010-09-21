@@ -39,7 +39,7 @@ public class URLContentManage implements URLContent {
 	public static String KEY_CHARSET = "CharSet";
 
 	public Map<String, Object> getContentByURL(String url, boolean get)
-			throws ClientProtocolException, IOException {
+			throws ClientProtocolException, IOException ,Exception{
 		if (!get) {
 			return this.getContentByURL(url);
 		}
@@ -59,7 +59,7 @@ public class URLContentManage implements URLContent {
 	}
 
 	public Map<String, Object> getContentByURL(String url)
-			throws ClientProtocolException, IOException {
+			throws ClientProtocolException, IOException,Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(url==null)return map;
 		HttpClient client = new DefaultHttpClient();
@@ -94,13 +94,14 @@ public class URLContentManage implements URLContent {
 
 	public static void main(String[] arg) {
 		List<String> list = new ArrayList<String>();
+		list.add("http://www.alibaba.com/products/shanghai/6.html?tracelog=24581_list_turnpage");
+		/*
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
-		list.add("http://192.168.0.126:8080/MainFrame");
-		list.add("http://192.168.0.126:8080/MainFrame");
+		list.add("http://192.168.0.126:8080/MainFrame");*/
 		URLContentManage um = new URLContentManage();
 		for (String url : list) {
 			try {
@@ -108,6 +109,9 @@ public class URLContentManage implements URLContent {
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
