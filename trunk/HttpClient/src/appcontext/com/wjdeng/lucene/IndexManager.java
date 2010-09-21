@@ -32,6 +32,8 @@ public class IndexManager {
 	
 	private IndexWriter ramIndexWrite;
 	
+	private FlushService flushService;
+	
 	private IndexManager(){
 		try {
 			FSDirectory diskDir  = FSDirectory.open((new File(LuceneConfig.getIndexFilePath())).getParentFile());
@@ -40,6 +42,7 @@ public class IndexManager {
 			RAMDirectory ramDir = new RAMDirectory();
 			ramIndexWrite = new IndexWriter(ramDir,AnalyzerService.getIKAnalyzerInstance(), MaxFieldLength.UNLIMITED);
 			
+			flushService();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -117,6 +120,33 @@ public class IndexManager {
 	public IndexSearcher getIndexSearcher() throws IOException{
 		IndexSearcher indexSearcher = new IndexSearcher(this.getIndexReader());
 		return indexSearcher;
+	}
+	
+	
+	void flushService(){
+		if(flushService==null){
+			flushService= new FlushService();
+			Thread th = new Thread(flushService);
+			th.start();
+		}
+	}
+	
+	class FlushService implements Runnable{
+		
+		@Override
+		public void run() {
+			while(true){
+				if(ramIndexWrite.maxDoc()>99){
+					doFlush();
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					
+				}
+			}
+		}
+		
 	}
 
 }

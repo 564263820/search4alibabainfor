@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +57,7 @@ public class PaserCtroLServlet extends HttpServlet {
 	/**
 	 * 当前session抓取到的临时数据
 	 */
-	static public Map<String, ConcurrentSkipListSet<Map<String, String>>> pageInfoMap = new HashMap<String, ConcurrentSkipListSet<Map<String, String>>>();
+	static public Map<String, List<Map<String, String>>> pageInfoMap = new HashMap<String, List<Map<String, String>>>();
 
 	/**
 	 */
@@ -148,16 +150,16 @@ public class PaserCtroLServlet extends HttpServlet {
 			DefaultAppContext.exeCommand(new ContinueRunCommand(), par);// 继续 回复运行
 		} else if ("downloadExcel".equals(operation)) {
 			this.downloadExcel(response, par);
+			 map.remove(request.getRequestedSessionId());
 			return;
 		}
 		
-		ConcurrentSkipListSet<Map<String, String>> cls = pageInfoMap.get(request.getRequestedSessionId());
+		List<Map<String, String>> cls = pageInfoMap.get(request.getRequestedSessionId());
 		StringBuffer sb = writContentMap.get(request.getRequestedSessionId());
 		if (sb == null) {
 			sb = new StringBuffer();
-			sb.append(nullKey);
 			writContentMap.put(request.getRequestedSessionId(), sb);//记录当前运行状态
-			cls = new ConcurrentSkipListSet<Map<String,String>>();
+			cls = new ArrayList<Map<String,String>>();
 			pageInfoMap.put(request.getRequestedSessionId(),cls);;
 		}
 		try {
@@ -168,29 +170,29 @@ public class PaserCtroLServlet extends HttpServlet {
 
 			while (true) {
 				Thread.sleep(50);
-				StringBuffer content = writContentMap.get(request
-						.getRequestedSessionId());
+				StringBuffer content = sb;
 				synchronized (content) {
-					if (!(content.length() == 3 && content.indexOf(nullKey) == 0)) {
+					if (cls.size()>0||sb.length()>0) {
+						sb.insert(0, "{ ");
+						sb.append(" , data:[");
+						this.creatJson(cls, sb);
+						sb.append("] }");
 						response.getWriter().write(content.toString());
-						content.delete(0, content.length());
-						content.append(nullKey);
+						sb.delete(0, sb.length());
 						return;
 					} else if (par.isEndTask()) {
-						response.getWriter().write(
-								getStatusJson(AppStatus.end, "任务终止!"));
+						response.getWriter().write( getStatusJson(AppStatus.end, "任务终止!"));
 						return;
 					}
 				}
 			}
 		} catch (Exception e) {
-			// e.printStackTrace();
 			LogUtil.getLogger(getClass().getSimpleName()).error(e);
 			response.getWriter().write(getStatusJson(AppStatus.error, e.getMessage()));
 		}
 	}
 
-	private void runTask(StringBuffer sb, ModeParament par,ConcurrentSkipListSet<Map<String,String>> cls,
+	private void runTask(StringBuffer sb, ModeParament par,List<Map<String,String>> cls,
 			HttpServletRequest request) throws Exception {
 		String url = request.getParameter("url");
 		url = java.net.URLDecoder.decode(url, "utf-8");
@@ -227,7 +229,7 @@ public class PaserCtroLServlet extends HttpServlet {
 		return sb.toString();
 	}
 
-	private void creatJson(List<Map<String, String>> list, StringBuffer sb) {
+	private void creatJson(Collection<Map<String, String>> list, StringBuffer sb) {
 		for (Map<String, String> map : list) {
 			StringBuffer temp = new StringBuffer();
 			Set<String> keys = map.keySet();
@@ -262,13 +264,13 @@ public class PaserCtroLServlet extends HttpServlet {
 	class getPageInfor implements Listener {
 		private StringBuffer sb;
 		
-		final private ConcurrentSkipListSet<Map<String, String>> cls;
+		final private List<Map<String, String>> cls;
 
-		final protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+		final protected List<Map<String, String>> getCls() {
 			return cls;
 		}
 
-		public getPageInfor(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
+		public getPageInfor(StringBuffer sb,List<Map<String, String>> cls) {
 			this.sb = sb;
 			this.cls=cls;
 		}
@@ -276,21 +278,14 @@ public class PaserCtroLServlet extends HttpServlet {
 		@Override
 		public void execute(Event ev) {
 			synchronized (sb) {
-				if (!(sb.length() == 3 && sb.indexOf(nullKey) == 0))
-					return;
 				sb.delete(0, sb.length());
-				List<Map<String, String>> list = ev.getModeParament()
-						.getDatatemp();
-				creatJson(list, sb);
-				if (sb.length() > 0) {
-					sb.delete(sb.length() - 1, sb.length());
-				}
-				sb.insert(0, "{ data:[");
-				sb.append("]");
-				sb.append(", state : 'running' ");
+				sb.append(" state : 'running' ");
 				sb.append(", url : '").append(
 						ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append(",msg:'' }");
+				sb.append(",msg:'' ");
+				List<Map<String, String>> list = ev.getModeParament().getDatatemp();
+				cls.addAll(list);
+				list.clear();
 				/*List<Map<String, String>>  listt =ev.getModeParament().getDatatemp();
 				for(Map<String, String> map :listt){
 					IndexManager.Instance().writeIndex(map);
@@ -311,9 +306,9 @@ public class PaserCtroLServlet extends HttpServlet {
 	class nextPage implements Listener {
 		final private StringBuffer sb;
 		
-		final  ConcurrentSkipListSet<Map<String, String>> cls;
+		final  List<Map<String, String>> cls;
 
-		public nextPage(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
+		public nextPage(StringBuffer sb,List<Map<String, String>> cls) {
 			this.sb = sb;
 			this.cls=cls;
 		}
@@ -321,28 +316,20 @@ public class PaserCtroLServlet extends HttpServlet {
 		@Override
 		public void execute(Event ev) {
 			synchronized (sb) {
-				if (!(sb.length() == 3 && sb.indexOf(nullKey) == 0))
-					return;
 				sb.delete(0, sb.length());
-				List<Map<String, String>> list = ev.getModeParament()
-						.getDatatemp();
-				creatJson(list, sb);
-				if (sb.length() > 0) {
-					sb.delete(sb.length() - 1, sb.length());
-				}
-				sb.insert(0, "{ data:[");
-				sb.append("]");
-				sb.append(", state : 'running' ");
+				sb.append(" state : 'running' ");
 				sb.append(", url : '").append(
 						ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append(", msg:'分页完成!当前第：").append(
-						ev.getModeParament().getCurPage() + 1).append("页。' }");
+				sb.append(", msg:'分页完成!当前第：").append(ev.getModeParament().getCurPage() + 1).append("页。' ");
+				List<Map<String, String>> list = ev.getModeParament().getDatatemp();
+				cls.addAll(list);
+				list.clear();
 				//IndexManager.Instance();
 			}
 
 		}
 
-		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+		protected List<Map<String, String>> getCls() {
 			return cls;
 		}
 
@@ -359,13 +346,13 @@ public class PaserCtroLServlet extends HttpServlet {
 	class endtask implements Listener {
 		final private StringBuffer sb;
 		
-		final private ConcurrentSkipListSet<Map<String, String>> cls;
+		final private List<Map<String, String>> cls;
 
-		protected ConcurrentSkipListSet<Map<String, String>> getCls() {
+		protected List<Map<String, String>> getCls() {
 			return cls;
 		}
 
-		public endtask(StringBuffer sb,ConcurrentSkipListSet<Map<String, String>> cls) {
+		public endtask(StringBuffer sb,List<Map<String, String>> cls) {
 			this.sb = sb;
 			this.cls=cls;
 		}
@@ -373,21 +360,13 @@ public class PaserCtroLServlet extends HttpServlet {
 		@Override
 		public void execute(Event ev) {
 			synchronized (sb) {
-				if (!(sb.length() == 3 && sb.indexOf(nullKey) == 0))
-					return;
 				sb.delete(0, sb.length());
-				List<Map<String, String>> list = ev.getModeParament()
-						.getDatatemp();
-				creatJson(list, sb);
-				if (sb.length() > 0) {
-					sb.delete(sb.length() - 1, sb.length());
-				}
-				sb.insert(0, "{ data:[");
-				sb.append("]");
-				sb.append(", state : 'end' ");
-				sb.append(", url : '").append(
-						ev.getModeParament().getCurDoc().getUrl()).append("'");
-				sb.append(",msg:'' }");
+				sb.append(" state : 'end' ");
+				sb.append(", url : '").append(ev.getModeParament().getCurDoc().getUrl()).append("'");
+				sb.append(", msg:'' ");
+				List<Map<String, String>> list = ev.getModeParament().getDatatemp();
+				cls.addAll(list);
+				list.clear();
 			}
 
 		}

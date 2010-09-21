@@ -68,28 +68,34 @@ public class MainFrame extends HttpServlet {
 		url = url.trim();
 		URLContentManage um = new URLContentManage();
 		System.out.println(url);
-		Map<String, Object> map = um.getContentByURL(url);
-		String str = (String) map.get(URLContentManage.KEY_CONTENT);// 抓取到的页面html
-		String charset = (String) map.get(URLContentManage.KEY_CHARSET);// 页面字符集
-		response.setContentType("text/html");
-		response.setCharacterEncoding(charset);
-		PrintWriter out = response.getWriter();
-		// str =str.replaceFirst("<base href=\"http://www.alibaba.com\">", "");
-		// str =str.replaceFirst("<base", "<x");
-		str = str.substring(str.indexOf("<body"));
-		str = str.substring(str.indexOf(">") + 1);
-		// str=str.replaceAll("script", "x");
-		// str=str.replaceAll("text/javascript", "x");
-		// str=str.replaceAll("text/Javascript", "x");
-		// str=str.replaceAll("iframe", "x");
-		// System.out.println(str);
-		out.append(creatPageFlag(url));// 放置页面标记
-		RequestDispatcher dis = getServletContext().getRequestDispatcher(
-				"/" + model + "input.jsp");
-		dis.include(request, response);
-		out.println(str);
-		out.flush();
-		out.close();
+		Map<String, Object> map;
+		try {
+			map = um.getContentByURL(url);
+			String str = (String) map.get(URLContentManage.KEY_CONTENT);// 抓取到的页面html
+			String charset = (String) map.get(URLContentManage.KEY_CHARSET);// 页面字符集
+			response.setCharacterEncoding(charset);
+			PrintWriter out = response.getWriter();
+			// str =str.replaceFirst("<base href=\"http://www.alibaba.com\">", "");
+			// str =str.replaceFirst("<base", "<x");
+			str = str.substring(str.indexOf("<body"));
+			str = str.substring(str.indexOf(">") + 1);
+			response.setContentType("text/html");
+			// str=str.replaceAll("script", "x");
+			// str=str.replaceAll("text/javascript", "x");
+			// str=str.replaceAll("text/Javascript", "x");
+			// str=str.replaceAll("iframe", "x");
+			// System.out.println(str);
+			out.append(creatPageFlag(url));// 放置页面标记
+			RequestDispatcher dis = getServletContext().getRequestDispatcher(
+					"/" + model + "input.jsp");
+			dis.include(request, response);
+			out.println(str);
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
