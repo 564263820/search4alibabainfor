@@ -80,6 +80,18 @@ public class AlibabaPaser implements IPaser {
 
 	@Override
 	public String getNextPageUrl(Document doc,AppContext appContext) {
+		String IndexKeyWord = (String) appContext.getAttribute("IndexKeyWord");
+		if(IndexKeyWord==null){
+			Iterator<Element>  it = doc.getAllElementsByClass("steel pipe").iterator();
+			if(it.hasNext()){
+				Element ele = it.next();
+				IndexKeyWord+=ele.getContent().toString();
+			}
+			appContext.setAttribute("IndexKeyWord", IndexKeyWord);
+			
+			doc.getAllElementsByClass("pTitle");
+			doc.getAllElementsByClass("sIcon");
+		}
 		Element ele = doc.getFirstElementByClass("nextPage");
 		if (null != ele) {
 			String next = ele.getAttributeValue("href");
