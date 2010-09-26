@@ -18,8 +18,6 @@ import net.htmlparser.jericho.Element;
 
 import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.api.IPaser;
-import com.wjdeng.client.model.ctronl.Command;
-import com.wjdeng.client.model.ctronl.ModeParament;
 import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
@@ -29,10 +27,8 @@ public class AlibabaPaser implements IPaser {
 	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> contentmap = new HashMap<String, String>();
 		List<Element> list = doc.getAllElementsByClass("tables data");
-		// List<Element> list =doc.getAllElementsByClass("mainNavigat");
 		for (Element el : list) {
 			List<Element> trs = el.getAllElements("tr");
-			// listtem.get(5).getAttributeValue("href");
 			for (Element tr : trs) {
 				List<Element> ths = tr.getAllElements("th");
 				if (ths.isEmpty())
@@ -44,8 +40,8 @@ public class AlibabaPaser implements IPaser {
 				try {
 					if ("Contact Person:".equals(key)) {
 						// tr.getAllElements("td").get(1).getAllElementsByClass("contactName").get("0");Website:
-						String reg = "(http://)?+([\\w-]+\\.)+[\\w-]+(userbehavior/contactPersonUpdate.htm)+(/[\\w-]*)?";
-						Pattern pa = Pattern.compile(reg);
+						//String reg = "(http://)?+([\\w-]+\\.)+[\\w-]+(userbehavior/contactPersonUpdate.htm)+(/[\\w-]*)?";
+						//Pattern pa = Pattern.compile(reg);
 						content = tr.getAllElementsByClass("contactName")
 								.get(0).getAllElements("a").get(0).getContent()
 								.toString();
@@ -66,6 +62,8 @@ public class AlibabaPaser implements IPaser {
 					// e.printStackTrace();
 					continue;
 				}
+				Map<String ,String> map =(Map<String, String>) appContext.getAttribute("searcheKeyWord");
+				if(null !=map)contentmap.putAll(map);
 				contentmap.put(key, content);
 			}
 
@@ -80,17 +78,21 @@ public class AlibabaPaser implements IPaser {
 
 	@Override
 	public String getNextPageUrl(Document doc,AppContext appContext) {
-		String IndexKeyWord = (String) appContext.getAttribute("IndexKeyWord");
-		if(IndexKeyWord==null){
+		Map<String ,String> map = new HashMap<String, String>();
+		String searcheKeyWord = (String) appContext.getAttribute("searcheKeyWord");
+		if(searcheKeyWord==null){
 			Iterator<Element>  it = doc.getAllElementsByClass("steel pipe").iterator();
 			if(it.hasNext()){
 				Element ele = it.next();
-				IndexKeyWord+=ele.getContent().toString();
+				map.put("IndexKeyWord", ele.getContent().toString());
 			}
-			appContext.setAttribute("IndexKeyWord", IndexKeyWord);
-			
-			doc.getAllElementsByClass("pTitle");
-			doc.getAllElementsByClass("sIcon");
+			appContext.setAttribute("searcheKeyWord", map);
+			Iterator<Element>  ithis =doc.getAllElementsByClass("historyItem").iterator();
+			for(Element elet =null;ithis.hasNext(); elet= ithis.next()){
+				String key = elet.getAllElementsByClass("pTitle").get(0).getContent().toString();
+				String content = elet.getAllElementsByClass("sIcon").get(0).getContent().toString();
+				map.put(key, content);
+			}
 		}
 		Element ele = doc.getFirstElementByClass("nextPage");
 		if (null != ele) {

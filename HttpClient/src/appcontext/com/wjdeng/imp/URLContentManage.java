@@ -4,7 +4,6 @@
  * File Name       : URLContentUtils.java
  *
  *
- * Copyright 1999 - 2009 Tekview Technology Co.,Ltd. All right reserved.
  ********************************************************************************/
 package com.wjdeng.imp;
 
@@ -13,6 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.Source;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.URLContent;
 import com.wjdeng.client.util.LogUtil;
+import com.wjdeng.client.util.SysUtils;
 
 public class URLContentManage implements URLContent {
 
@@ -94,7 +97,7 @@ public class URLContentManage implements URLContent {
 
 	public static void main(String[] arg) {
 		List<String> list = new ArrayList<String>();
-		list.add("http://www.alibaba.com/products/shanghai/6.html?tracelog=24581_list_turnpage");
+		list.add("http://www.alibaba.com/");
 		/*
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
@@ -105,7 +108,10 @@ public class URLContentManage implements URLContent {
 		URLContentManage um = new URLContentManage();
 		for (String url : list) {
 			try {
-				um.getContentByURL(url, true);
+				Map<String, Object> map = um.getContentByURL(url, true);
+				Source s = new Source(map.get(KEY_CONTENT).toString());
+				Element el =s.getFirstElement("body").getFirstElementByClass("homeL");
+				SysUtils.wirtfile(el.getTextExtractor().toString());
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
