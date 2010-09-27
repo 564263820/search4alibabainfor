@@ -28,6 +28,7 @@ import javax.script.ScriptException;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.FormFields;
+import net.htmlparser.jericho.Source;
 
 import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.api.IPaser;
@@ -207,12 +208,20 @@ public class MadeInChinaPaser implements IPaser {
 		ScriptEngine sengine = smanager.getEngineByName("javascript");
 		String uparam = "";
 		try {
+			Document doc = new Document(new Source(""),"abc");
+			sengine.put("document", doc);
+			sengine.put("window", doc);
 			Compilable compilable = (Compilable) sengine;
 			CompiledScript comptScript = compilable.compile(new FileReader(MadeInChinaPaser.class.getClassLoader().getResource("data/test.js").getPath()));
 			//System.out.println(comptScript.eval());
-			System.out.println(comptScript.eval(sengine.getContext()));
+			//System.out.println(comptScript.eval(sengine.getContext()));
+			CompiledScript comptScript2 = compilable.compile("var wode={s:'s1'};eval('var b = new Object(); b._s=8')");
+			comptScript.eval(sengine.getContext());
+			comptScript2.eval(sengine.getContext());
 			Invocable inv = (Invocable) sengine;
 			System.out.println(inv.invokeFunction("hex_md5", "10864111wjdeng"));
+			System.out.println(sengine.eval("b._s"));
+			
 			//comptScript.eval("md5_vm_test()");
 			//comptScript.
 			//Bindings binding = sengine.createBindings();
@@ -237,6 +246,8 @@ public class MadeInChinaPaser implements IPaser {
 		String regEx = "userbehavior";
 		boolean result = Pattern.compile(regEx).matcher(str).find();
 		//System.out.println(result);
+		
+		// ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
 	}
 

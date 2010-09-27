@@ -78,22 +78,7 @@ public class AlibabaPaser implements IPaser {
 
 	@Override
 	public String getNextPageUrl(Document doc,AppContext appContext) {
-		Map<String ,String> map = new HashMap<String, String>();
-		String searcheKeyWord = (String) appContext.getAttribute("searcheKeyWord");
-		if(searcheKeyWord==null){
-			Iterator<Element>  it = doc.getAllElementsByClass("steel pipe").iterator();
-			if(it.hasNext()){
-				Element ele = it.next();
-				map.put("IndexKeyWord", ele.getContent().toString());
-			}
-			appContext.setAttribute("searcheKeyWord", map);
-			Iterator<Element>  ithis =doc.getAllElementsByClass("historyItem").iterator();
-			for(Element elet =null;ithis.hasNext(); elet= ithis.next()){
-				String key = elet.getAllElementsByClass("pTitle").get(0).getContent().toString();
-				String content = elet.getAllElementsByClass("sIcon").get(0).getContent().toString();
-				map.put(key, content);
-			}
-		}
+		
 		Element ele = doc.getFirstElementByClass("nextPage");
 		if (null != ele) {
 			String next = ele.getAttributeValue("href");
@@ -105,6 +90,23 @@ public class AlibabaPaser implements IPaser {
 
 	@Override
 	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
+		Map<String ,String> map = new HashMap<String, String>();
+		Map<String ,String> searcheKeyWord = (Map<String ,String>) appContext.getAttribute("searcheKeyWord");
+		if(searcheKeyWord==null){
+			Element ele = doc.getFirstElementByClass("keywords");
+			if(ele!=null){
+				map.put("IndexKeyWord", ele.getContent().toString());
+			}
+			List<Element> lele = doc.getAllElementsByClass("historyItem");
+			for(Element hise : lele){
+				String key = hise.getFirstElementByClass("pTitle").getContent().toString();
+				String content = hise.getFirstElementByClass("sIcon").getContent().toString();
+				map.put(key, content);
+			}
+			if(map.size()>0)
+			appContext.setAttribute("searcheKeyWord", map);
+		}
+		
 		Pattern pa = Pattern.compile("itemBox *");
 		Set<String> vurl = new HashSet<String>();
 		Iterator<Element> it = doc.getAllElementsByClass("itemBox").iterator();// doc.getAllElements("class",
