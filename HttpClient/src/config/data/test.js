@@ -1,3 +1,4 @@
+/**web qq 登录密码加密 js算法 此文件用来测试了一下java执行JavaScript脚本 ^_^ */
 var hexcase= 1;
 var b64pad = "";
 var chrsz = 8;
