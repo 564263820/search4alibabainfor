@@ -27,7 +27,7 @@ public class Document extends Segment {
 	
 	/**
 	 * 
-	 * 获取id节点的json字符串<br>
+	 * javascript引擎调用 ,获取id节点的json字符串<br>
 	 * 要获取Element调用 getSource().getElementById(id);
 	 * @param id
 	 * @return
