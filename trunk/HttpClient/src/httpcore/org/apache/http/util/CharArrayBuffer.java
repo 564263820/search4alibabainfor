@@ -58,8 +58,6 @@ public final class CharArrayBuffer implements Serializable {
     }
 
     private void expand(int newlen) {
-    	System.out.println(this.buffer.length );
-    	System.out.println(Math.max(this.buffer.length << 1, newlen));
         char newbuffer[] = new char[Math.max(this.buffer.length << 1, newlen)];
         System.arraycopy(this.buffer, 0, newbuffer, 0, this.len);
         this.buffer = newbuffer;
