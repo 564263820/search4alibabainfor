@@ -150,7 +150,7 @@ public class PaserCtroLServlet extends HttpServlet {
 			DefaultAppContext.exeCommand(new ContinueRunCommand(), par);// 继续 回复运行
 		} else if ("downloadExcel".equals(operation)) {
 			this.downloadExcel(response, par);
-			 map.remove(request.getRequestedSessionId());
+			map.remove(request.getRequestedSessionId());
 			return;
 		}
 		
