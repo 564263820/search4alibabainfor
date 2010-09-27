@@ -33,8 +33,8 @@
 					</form>
 				</div>
 				<div class="infor" >
-					<div id="reTitle" style="width:100px;overflow:hidden;HEIGHT:25px;width:120px;" ></div>
-					<div id="runningInfor" style="width:700px;overflow:hidden;HEIGHT:25px;">&nbsp;</div>
+					<div id="reTitle" style="overflow:hidden;HEIGHT:25px;width:120px;" ></div>
+					<div id="runningInfor" style="width:800px;overflow:hidden;HEIGHT:25px;">&nbsp;</div>
 					<div id="MSG" style='color:red;' style="width:200px;overflow:hidden;HEIGHT:25px;"></div>
 				</div>
 				

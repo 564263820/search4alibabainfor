@@ -7,6 +7,9 @@ var server  = new dorequest();
 function request(obj){
 	server.operation = "retry";
 	server.submitRequest();
+	var pause= document.getElementById("pause");
+	pause.value="暂停";
+	pause.onclick = pauserun;
 	obj.value= "重新搜索";
 	obj.className='button'
 	obj.disabled= true;
