@@ -6,14 +6,12 @@
  ********************************************************************************/
 package com.wjdeng.web;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.xml.DOMConfigurator;
 
 import com.wjdeng.client.util.LogUtil;
 

@@ -1,6 +1,7 @@
 package com.wjdeng.lucene;
 
 import org.apache.lucene.analysis.Analyzer;
+
 import com.chenlb.mmseg4j.analysis.MaxWordAnalyzer;
 
 /**

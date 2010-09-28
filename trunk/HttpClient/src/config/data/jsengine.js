@@ -4,6 +4,8 @@
  * 
  * ***/
  
+ /**java 与javascript通信的临时编译变量 用来存储java方法返回的js对象*/
+ 
  function alert(str){
  	Jdocument.println(str);
  }
@@ -11,7 +13,6 @@
  function Element(obj){
 	if(obj){
 		 for(var par in obj){
-		 	alert(par+'  '+obj);
 		 	this[par] = obj[par];	
 		 }
 		 this.elements= obj;
@@ -31,11 +32,18 @@
 	all : new Array()
  });
  
+  /**模拟浏览器的window对象**/
+ var window = new Element({
+	document:document,
+	location:{}
+ });
+ 
  /**模拟浏览器的getElementById()方法**/
  Element.prototype.getElementById = function(id){
  	var objScr = Jdocument.getElementById(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
- 		var obj = new Element(eval(objScr));
+ 		//由于
+ 		var obj = new Element(DocCompVar);
  		document.all[this.all.length]=obj;
  		return obj;
  	}
@@ -45,7 +53,7 @@
  Element.prototype.getElementsByTagName = function(name){
  	var objScr = Jdocument.getElementsByTagName(name);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
- 		var obj =  new Element(eval(objScr));
+ 		var obj =  new Element(DocCompVar);
  		document.all[this.all.length]=obj;
  		return obj;
  	}
@@ -54,6 +62,17 @@
  
  /**submit方法在并不提交url请求 它在这里只组装好url参数并返回这个又参数构成的字符串**/
  Element.prototype.submit = function(){
+ 	if(this.action){
+ 		var str = this.action+"?";
+ 		for(var par in this){
+ 			if(par== 'id') continue;
+ 			if( typeof(this[par]) == 'object'){
+ 				str += par + "=" + this[par].value + "&";
+ 			}
+ 		}
+ 		window.location.href = str;
+ 		return str;
+ 	}
  	return "test";//哈哈
  	/*for(var par in this){
  		

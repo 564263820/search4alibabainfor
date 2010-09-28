@@ -7,21 +7,15 @@
 package com.wjdeng.client.model;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
-import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import com.wjdeng.client.model.api.IDocument;
-import com.wjdeng.client.util.LogUtil;
-import com.wjdeng.client.util.StringUtils;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
@@ -32,6 +26,10 @@ import net.htmlparser.jericho.FormFields;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
+
+import com.wjdeng.client.model.api.IDocument;
+import com.wjdeng.client.util.LogUtil;
+import com.wjdeng.client.util.StringUtils;
 
 public class Document extends Segment implements IDocument {
 	/**脚本解析引擎*/
@@ -121,14 +119,15 @@ public class Document extends Segment implements IDocument {
 		for(Attribute att : atts){
 			sb.append(", \n" ).append(att.getName()).append(":'").append(att.getValue()).append("'  ");
 		}
-		sb.append("}");
+		sb.append("} ;");
+		eval(" var DocCompVar = "+sb.toString());
 		return sb.toString();
 	}
 
 	@Override
 	public Object eval(String script) {
 		try {
-			getScriptEngine().eval(script);
+			return getScriptEngine().eval(script);
 		} catch (ScriptException e) {
 			e.printStackTrace();
 			LogUtil.getLogger(getClass().getSimpleName()).error("js脚本错误");

@@ -3,7 +3,6 @@ package com.wjdeng.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Properties;
 
@@ -15,12 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.wjdeng.client.model.ctronl.AppStatus;
 import com.wjdeng.client.model.ctronl.ModelManager;
 import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
