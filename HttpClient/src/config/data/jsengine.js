@@ -4,24 +4,58 @@
  * 
  * ***/
  
+ function alert(str){
+ 	Jdocument.println(str);
+ }
+ 
+ function Element(obj){
+	if(obj){
+		 for(var par in obj){
+		 	alert(par+'  '+obj);
+		 	this[par] = obj[par];	
+		 }
+		 this.elements= obj;
+	}
+ }
  
  
  /**模拟浏览器的document对象**/
- var document = {};
+ var document= new Element({
+	body:Jdocument,
+	cookie:Jdocument.cookie,
+	domain	:Jdocument.domain,//当前文档域名
+	lastModified:'',//暂不提供
+	referrer:Jdocument.referrer,//当前文档url
+	title:'',//暂不提供
+	URL:Jdocument.url,//当前文档url
+	all : new Array()
+ });
  
  /**模拟浏览器的getElementById()方法**/
- document.prototype.getElementById = function(id){
- 	var objScr = Jdocument.getElementById(id);//Jdocument 引用引擎中注册过的java com.wjdeng.client.Doment.java对象
+ Element.prototype.getElementById = function(id){
+ 	var objScr = Jdocument.getElementById(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
- 		return eval(objScr);
+ 		var obj = new Element(eval(objScr));
+ 		document.all[this.all.length]=obj;
+ 		return obj;
  	}
  	return null;
  }
  
- document.prototype.getElementsByTagName = function(name){
- 	var objScr = Jdocument.getElementsByTagName(name);//Jdocument 引用引擎中注册过的java com.wjdeng.client.Doment.java对象
+ Element.prototype.getElementsByTagName = function(name){
+ 	var objScr = Jdocument.getElementsByTagName(name);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
- 		return eval(objScr);
+ 		var obj =  new Element(eval(objScr));
+ 		document.all[this.all.length]=obj;
+ 		return obj;
  	}
  	return null;
+ }
+ 
+ /**submit方法在并不提交url请求 它在这里只组装好url参数并返回这个又参数构成的字符串**/
+ Element.prototype.submit = function(){
+ 	return "test";//哈哈
+ 	/*for(var par in this){
+ 		
+ 	}*/
  }

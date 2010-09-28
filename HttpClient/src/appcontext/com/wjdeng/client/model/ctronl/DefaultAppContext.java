@@ -181,6 +181,19 @@ public class DefaultAppContext implements AppContext {
 	 * @throws ClientProtocolException
 	 */
 	public Document getHtmlDocByUrl(String url) {
+		String str = this.getContentByUrl(url);
+		return new Document(new Source(str), url);
+	}
+	
+	/**
+	 * 
+	 * 获取指定地址的内容
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
+	public String getContentByUrl(String url) {
 		ModeParament par = parLoacl.get();
 		URLContentManage um = par.getUrlConnectio();
 		Map<String, Object> map = null;
@@ -198,9 +211,8 @@ public class DefaultAppContext implements AppContext {
 					" 抓取" + url + "失败");
 			e.printStackTrace();
 		}
-		// System.out.println(str);
 		StringUtils.wirtfile(str);
-		return new Document(new Source(str), url);
+		return str;
 	}
 	
 	private String enrichUrl(String url){
@@ -252,7 +264,7 @@ public class DefaultAppContext implements AppContext {
 			String url7= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Shanghai--------------------";
 			String url8= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Jiangsu--------------------";
 			String url9= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Anhui--------------------";
-			String url0= "http://www.alibaba.com/products/Garment_Accessories/CN--3--Zhejiang/4.html";
+			String url0= "http://www.made-in-china.com/productdirectory.do?action=hunt&code=2300000000&order=0&style=b&page=1&memberLevel=&asFlag=&comProvince=nolimit&propertyValues=&from=hunt&word=scooter&mode=and&comName=&comCode=&subCode=&size=30&viewType=1&toTradeMarkets=&sizeHasChanged=0&viewMoreOrLessClass=viewMore";
 		    AppContext  app =DefaultAppContext.Instance(url0,40);
 			Thread th = new Thread(app);
 			//Thread th= new Thread(app);
