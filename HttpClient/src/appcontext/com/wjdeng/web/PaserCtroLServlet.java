@@ -6,19 +6,13 @@
  ********************************************************************************/
 package com.wjdeng.web;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -44,7 +38,6 @@ import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
-import com.wjdeng.lucene.IndexManager;
 
 public class PaserCtroLServlet extends HttpServlet {
 

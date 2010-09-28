@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.Invocable;
@@ -25,8 +24,6 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import org.apache.http.client.ClientProtocolException;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.FormFields;
@@ -171,6 +168,7 @@ public class MadeInChinaPaser implements IPaser {
 						String javaScript = appContext.getContentByUrl(path+"/script/pd_top.js");
 						doc.includeJavascript(javaScript);
 						doc.eval(url);
+						System.out.println(doc.eval("window.location.href;"));
 					}
 					return this.path + url;
 				}
