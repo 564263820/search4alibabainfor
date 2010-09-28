@@ -56,6 +56,8 @@ public interface AppContext extends Runnable{
 	 * @throws ClientProtocolException
 	 */
 	public Document getHtmlDocByUrl(String url) ;
+	
+	public String getContentByUrl(String url) ;
 
 }
 

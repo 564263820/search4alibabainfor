@@ -26,6 +26,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.http.client.ClientProtocolException;
+
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.FormFields;
 import net.htmlparser.jericho.Source;
@@ -33,12 +35,21 @@ import net.htmlparser.jericho.Source;
 import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.api.IPaser;
 import com.wjdeng.client.util.SysUtils;
+import com.wjdeng.imp.URLContentManage;
 
 public class MadeInChinaPaser implements IPaser {
 
-	private String path = "http://www.busytrade.com";
+	private String path = "http://www.made-in-china.com/";
 
 	private String cmdSubmit(Document doc, String url) {
+		//this.getClass().getClassLoader().getResource("").getPath();
+		URLContentManage um = new URLContentManage();
+		try {
+			um.getContentByURL(this.path+"/script/pd_top.js");
+		}  catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (null == url)
 			return "";
 		if (url.indexOf("javascript:") == -1)
@@ -148,15 +159,20 @@ public class MadeInChinaPaser implements IPaser {
 
 	@Override
 	public String getNextPageUrl(Document doc,AppContext appContext) {
-
-		Iterator<Element> it = doc.getAllElementsByClass("Go to Next Page")
+		Iterator<Element> it = doc.getAllElementsByClass("pageNum")
 				.iterator();
 		while (it.hasNext()) {
 			Iterator<Element> ait = it.next().getAllElements("a").iterator();
 			while (ait.hasNext()) {
 				Element ele = ait.next();
 				if ("Next".equals(ele.getContent().toString())) {
-					return this.path + ele.getAttributeValue("href");
+					String url =  ele.getAttributeValue("href");
+					if(url.startsWith("java")){
+						String javaScript = appContext.getContentByUrl(path+"/script/pd_top.js");
+						doc.includeJavascript(javaScript);
+						doc.eval(url);
+					}
+					return this.path + url;
 				}
 			}
 		}

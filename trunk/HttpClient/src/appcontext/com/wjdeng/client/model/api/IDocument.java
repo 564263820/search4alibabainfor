@@ -14,10 +14,13 @@ package com.wjdeng.client.model.api;
 public interface IDocument {
 	
 	
-	public String getElementById();
+	public String getElementById(String id);
 	
-	public String getElementsByTagName();
+	public String getElementsByTagName(String tagName);
 	
-
+	public Object eval(String script);
+	
+	public void includeJavascript(String scriptStr);
+	
 }
 

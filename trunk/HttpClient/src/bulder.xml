@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="httpClient" basedir=".">
+	<target name="I18N">
+		<echo message="Deleting Old Resource Files....">
+		</echo>
+		<delete failonerror="false" includeemptydirs="true">
+			<fileset dir="../../itsm/src/res/">
+				<include name="*.properties" />
+			</fileset>
+		</delete>
+		<echo message="Create New Resource Files....">
+		</echo>
+		<native2ascii encoding="UTF-8" src="../../itsm/src/res/source/" dest="../../itsm/src/res/" />
+	</target>
+</project>
