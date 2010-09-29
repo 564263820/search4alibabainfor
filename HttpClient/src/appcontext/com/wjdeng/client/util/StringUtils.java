@@ -41,7 +41,7 @@ public class StringUtils {
 		if (Pattern.compile(str).matcher(url).matches()) {
 			return url;
 		}
-		;
+		
 		String[] tem = url.split("//");
 		String surl = "";
 		if (tem.length > 1) {
@@ -49,7 +49,9 @@ public class StringUtils {
 		} else {
 			surl = tem[0];
 		}
-		surl = surl.substring(0, surl.indexOf("/"));
+		if(surl.indexOf("/")>-1){
+			surl = surl.substring(0, surl.indexOf("/"));
+		}
 		if (StringUtils.trim2empty(surl).length() < 3)
 			return "";
 		if (StringUtils.trim2empty(surl).indexOf(".") == -1)

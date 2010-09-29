@@ -263,8 +263,9 @@ public class DefaultAppContext implements AppContext {
 			String url7= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Shanghai--------------------";
 			String url8= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Jiangsu--------------------";
 			String url9= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Anhui--------------------";
-			String url0= "http://www.made-in-china.com/productdirectory.do?action=hunt&code=2300000000&order=0&style=b&page=1&memberLevel=&asFlag=&comProvince=nolimit&propertyValues=&from=hunt&word=scooter&mode=and&comName=&comCode=&subCode=&size=30&viewType=1&toTradeMarkets=&sizeHasChanged=0&viewMoreOrLessClass=viewMore";
-		    AppContext  app =DefaultAppContext.Instance(url0,40);
+			String url0= "http://www.made-in-china.com/productdirectory.do?action=hunt&code=mOpYSQEPznJx&order=0&style=b&page=2&memberLevel=&asFlag=&comProvince=nolimit&propertyValues=2902070000_79674&from=hunt&word=auto+parts&mode=and&comName=&comCode=&subCode=&size=30&viewType=1&toTradeMarkets=&sizeHasChanged=0&viewMoreOrLessClass=viewLess";
+			String ssss= "http://www.made-in-china.com/productdirectory.do?comname=&propertyvalues=2902070000_79674&word=auto+parts&style=b&order=0&from=hunt&memberlevel=&size=30&viewtype=1&asflag=&mode=and&viewmoreorlessclass=viewLess&comprovince=nolimit&elements=undefined&subcode=&totrademarkets=&page=3&sizehaschanged=0&code=mOpYSQEPznJx&comcode=&";
+		    AppContext  app =DefaultAppContext.Instance(url0);
 			Thread th = new Thread(app);
 			//Thread th= new Thread(app);
 			th.start();

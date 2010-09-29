@@ -30,6 +30,7 @@ import net.htmlparser.jericho.Source;
 import com.wjdeng.client.model.api.IDocument;
 import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
+import com.wjdeng.client.util.SysUtils;
 
 public class Document extends Segment implements IDocument {
 	/**脚本解析引擎*/
@@ -76,12 +77,20 @@ public class Document extends Segment implements IDocument {
 	 */
 	public String getElementById(String id){
 		Element  ele= this.getSource().getElementById(id);
-		return this.createJsonByElement(ele);
+		String js = createJsonByElement(ele);
+		eval(" var DocCompVar = "+js+" ;");
+		return js;
 	}
 	
 	private String createJsonByElement(Element  ele){
 		StringBuilder sb  = new StringBuilder();
 		sb.append("{ local:'").append(ele.getBegin()).append("' ");//位置
+		sb.append(" ,\n attribute:{ elementName:'").append(ele.getName()).append("'");//节点基本属性
+		Attributes  atts = ele.getAttributes();
+		for(Attribute att : atts){
+			sb.append(", \n" ).append(att.getName()).append(":'").append(att.getValue()).append("'  ");
+		}
+		sb.append("}");
 		if(HTMLElementName.FORM.equals(ele.getName())){//form节点
 			FormFields  formfields = ele.getFormFields();
 			for(FormField field: formfields){
@@ -115,12 +124,8 @@ public class Document extends Segment implements IDocument {
 				} 
 			}
 		}
-		Attributes  atts = ele.getAttributes();
-		for(Attribute att : atts){
-			sb.append(", \n" ).append(att.getName()).append(":'").append(att.getValue()).append("'  ");
-		}
-		sb.append("} ;");
-		eval(" var DocCompVar = "+sb.toString());
+		
+		sb.append("}");
 		return sb.toString();
 	}
 
@@ -164,7 +169,7 @@ public class Document extends Segment implements IDocument {
 	}
 	
 	private String loadJsEngineStr() throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(MadeInChinaPaser.class.getClassLoader().getResource("data/jsengine.js").getPath()));
+		BufferedReader br = new BufferedReader(new FileReader(SysUtils.getRutimePath("data/jsengine.js")));
 		StringBuilder sb = new StringBuilder();
 		while(br.ready()){
 			sb.append(br.readLine()).append("\n");

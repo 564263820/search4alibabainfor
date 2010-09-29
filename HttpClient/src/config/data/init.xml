@@ -20,6 +20,7 @@
 	<name>made-in-china</name>
 	<class>com.wjdeng.client.model.MadeInChinaPaser</class>
 	<url>http://www.made-in-china.com/</url>
+	<method>get</method>
 </model>
 
 </root>
