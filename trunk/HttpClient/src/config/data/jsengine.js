@@ -12,10 +12,18 @@
  
  function Element(obj){
 	if(obj){
-		 for(var par in obj){
+		 if(obj.attribute){//所有属性
+		 	for(var attpar in obj.attribute){
+		 		this[attpar] = obj.attribute[par];	
+		 		this.attribute = obj.attribute;
+		 	}
+		 }
+		 this.elements = new Object();
+		 for(var par in obj){//所有表单元素节点(from对象才会初始化表单元素节点)
+		 	this.elements[par]= obj[par];
+		 	if(par == 'attribute' ) continue;
 		 	this[par] = obj[par];	
 		 }
-		 this.elements= obj;
 	}
  }
  
@@ -43,7 +51,7 @@
  	var objScr = Jdocument.getElementById(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
  		//由于
- 		var obj = new Element(DocCompVar);
+ 		var obj = new Element(DocCompVar);//DocCompVar javaScript引擎将getElementById的js对象存入到一个临时的全局变量DocCompVar中
  		document.all[this.all.length]=obj;
  		return obj;
  	}
@@ -63,14 +71,15 @@
  /**submit方法在并不提交url请求 它在这里只组装好url参数并返回这个又参数构成的字符串**/
  Element.prototype.submit = function(){
  	if(this.action){
- 		var str = this.action+"?";
+ 		var str = this.attribute.action+"?1=1";
  		for(var par in this){
- 			if(par== 'id') continue;
- 			if( typeof(this[par]) == 'object'){
- 				str += par + "=" + this[par].value + "&";
+ 			if(par== 'elements') continue;
+ 			if(typeof(this[par]) == 'object'){
+ 				str += "&"+par + "=" + this[par].value ;
  			}
  		}
  		window.location.href = str;
+ 		alert(str);
  		return str;
  	}
  	return "test";//哈哈

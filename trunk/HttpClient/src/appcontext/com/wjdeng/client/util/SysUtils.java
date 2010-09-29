@@ -174,6 +174,23 @@ public class SysUtils {
 			return null;
 		}
 	}
+	
+	/**
+	 * 
+	 * 获得运行时环境路径
+	 * 
+	 * @param modeName
+	 * @return
+	 */
+	public static String getRutimePath(String modeName) {
+		try {
+			String path = SysUtils.class.getClassLoader().getResource(modeName).getPath();
+			path = java.net.URLDecoder.decode(path, "utf-8");
+			return path;
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 	/**
 	 * 
