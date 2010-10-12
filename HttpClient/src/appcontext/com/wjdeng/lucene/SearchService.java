@@ -40,7 +40,7 @@ public class SearchService {
 	
 	/**
 	 * 
-	 * 根据条件获取全部记录
+	 * 判断该条记录是否存在
 	 * @param map
 	 * @return
 	 */

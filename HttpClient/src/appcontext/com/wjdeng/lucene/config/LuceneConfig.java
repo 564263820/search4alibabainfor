@@ -24,6 +24,7 @@ import com.wjdeng.client.util.StringUtils;
  * 
  * 配置文件位置:src/data/indexfile/indexConfig.properties 
  *
+ *此类在初始化时从indexConfig.properties文件中 加载lucene字段的配置
  * @author Administrator
  * @version 1.0
  * @since Apex OssWorks 5.5
