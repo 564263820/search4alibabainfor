@@ -210,7 +210,7 @@ public class DefaultAppContext implements AppContext {
 					" 抓取" + url + "失败");
 			e.printStackTrace();
 		}
-		StringUtils.wirtfile(str);
+		//StringUtils.wirtfile(str);
 		return str;
 	}
 	
