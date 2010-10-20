@@ -141,6 +141,7 @@ final public class LuceneConfig {
 		String fieldName = getFieldName(key);
 		if(key.indexOf(".Store")>-1 || key.indexOf(".Index")>-1)return null;
 		if(null != fieldName){
+			//org.apache.lucene.document.NumericField
 			Field field = new Field(fieldName,value,LuceneConfig.STORE.getStore(key),LuceneConfig.INDEX.getIndex(key));
 			return field;
 		}
