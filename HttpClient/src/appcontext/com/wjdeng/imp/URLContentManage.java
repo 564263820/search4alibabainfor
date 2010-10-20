@@ -10,6 +10,7 @@ package com.wjdeng.imp;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +25,15 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.URLContent;
-import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
 public class URLContentManage implements URLContent {
@@ -56,9 +59,38 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CONTENT, EntityUtils.toString(entity));
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
-		LogUtil.getLogger(this.getClass().getSimpleName()).warn(
-				"获取" + url + "内容成功！");
+		this.clearMuCookie();
+		//LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取" + url + "内容成功！");
 		return map;
+	}
+	
+	/**
+	 * 
+	 * 清理混淆cooke
+	 */
+	private void clearMuCookie(){
+		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
+		Iterator<Cookie> it  =((AbstractHttpClient) client).getCookieStore().getCookies().iterator();
+		StringBuilder sb  = new StringBuilder();
+		String sid = "";
+		String name  ="";
+		BasicCookieStore bcook = new BasicCookieStore();
+		((AbstractHttpClient) client).setCookieStore(bcook);
+		for(int i=0 ;i<list.size();i++){
+			Cookie  cook = list.get(i);
+			name  = cook.getName();
+			if("JSESSIONID".equals(name)){
+				if("".equals(sid)){
+					//list.remove(i);
+					sid = cook.getValue();
+				}else{
+					continue;
+				}
+			}
+			bcook.addCookie(cook);
+			sb.append(cook.getName()).append("=").append(cook.getValue()).append(";");
+		}
+		System.out.println(sb.toString());
 	}
 
 	public Map<String, Object> getContentByURL(String url)
@@ -77,7 +109,8 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CONTENT, EntityUtils.toString(entity));
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
-		LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
+		clearMuCookie();
+		//LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
 		return map;
 	}
 
