@@ -50,12 +50,19 @@ public class MadeInChinaPaser implements IPaser {
 				if(null != title ){
 					String content  = "";
 					if("Homepage:".equals(title)){
-						content  = StringUtils.trim2null(tr.getFirstElement("a").getAttributeValue("href"));
+						Element e = tr.getFirstElement("a");
+						if(null != e){
+							content  = StringUtils.trim2null(e.getAttributeValue("href"));
+						}
+						
 					}
 					if(tr.getFirstElement("td")!=null){
-						content  = StringUtils.trim2null(tr.getFirstElement("td").getTextExtractor().toString());
-						contentmap.put(title, content);
+						Element e = tr.getFirstElement("td");
+						if(null != e){
+							content  = StringUtils.trim2null(e.getTextExtractor().toString());
+						}	
 					}
+					contentmap.put(title, content);
 				}
 			}
 		}
