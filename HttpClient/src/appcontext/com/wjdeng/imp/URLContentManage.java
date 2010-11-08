@@ -34,6 +34,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.URLContent;
+import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
 public class URLContentManage implements URLContent {
@@ -60,7 +61,7 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		this.clearMuCookie();
-		//LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取" + url + "内容成功！");
+		LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取" + url + "内容成功！");
 		return map;
 	}
 	
@@ -70,7 +71,6 @@ public class URLContentManage implements URLContent {
 	 */
 	private void clearMuCookie(){
 		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
-		Iterator<Cookie> it  =((AbstractHttpClient) client).getCookieStore().getCookies().iterator();
 		StringBuilder sb  = new StringBuilder();
 		String sid = "";
 		String name  ="";
@@ -81,7 +81,6 @@ public class URLContentManage implements URLContent {
 			name  = cook.getName();
 			if("JSESSIONID".equals(name)){
 				if("".equals(sid)){
-					//list.remove(i);
 					sid = cook.getValue();
 				}else{
 					continue;
