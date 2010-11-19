@@ -82,6 +82,19 @@ public class Document extends Segment implements IDocument {
 		return js;
 	}
 	
+	/**
+	 * 
+	 * 将获取的Element元素转化回json对象的形式 <br>
+	 * {   <br>
+	 * 		local: //位置 <br>
+	 * 		attribute:{ <br>
+	 * 			elementName:  //标签名称 <br>
+	 * 			
+	 * 		} <br>
+	 * } <br>
+	 * @param ele
+	 * @return
+	 */
 	private String createJsonByElement(Element  ele){
 		StringBuilder sb  = new StringBuilder();
 		sb.append("{ local:'").append(ele.getBegin()).append("' ");//位置
