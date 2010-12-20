@@ -6,7 +6,7 @@
  
  /**java 与javascript通信的临时编译变量 用来存储java方法返回的js对象*/
  
- function alert(str){
+ function alert(str){//模拟浏览器alert方法, 在控制台将消息输出
  	Jdocument.println(str);
  }
  
@@ -26,12 +26,13 @@
 		 }
 	}
  }
+
  
  
  /**模拟浏览器的document对象**/
  var document= new Element({
 	body:Jdocument,
-	cookie:Jdocument.cookie,
+	cookie:Jdocument.cookie,//coookie
 	domain	:Jdocument.domain,//当前文档域名
 	lastModified:'',//暂不提供
 	referrer:Jdocument.referrer,//当前文档url
@@ -43,8 +44,30 @@
   /**模拟浏览器的window对象**/
  var window = new Element({
 	document:document,
-	location:{}
+	location:{
+		href:{},
+		port:{}
+	},
+	history:{
+		current:{},
+		next:{},
+		previous:{},
+		back :function(){},
+		forward :function(){}
+	}
  });
+ 
+ /*String.
+ window.history.current;
+ window.location.host;
+ window.location.port;
+ window.history.next;
+ window.history.previous;
+ window.history.back();
+ window.history.forward();
+ window.history.
+ */
+ 
  
  /**模拟浏览器的getElementById()方法**/
  Element.prototype.getElementById = function(id){
@@ -69,7 +92,7 @@
  }
  
  /**submit方法在并不提交url请求 它在这里只组装好url参数并返回这个又参数构成的字符串**/
- Element.prototype.submit = function(){
+ Element.prototype.submit = function(){//模拟submit方法 在这里实际只返回生成的地址
  	if(this.action){
  		var str = this.attribute.action+"?1=1";
  		for(var par in this){
@@ -82,7 +105,7 @@
  		alert(str);
  		return str;
  	}
- 	return "test";//哈哈
+ 	return "";//
  	/*for(var par in this){
  		
  	}*/
