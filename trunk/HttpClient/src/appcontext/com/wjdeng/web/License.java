@@ -95,7 +95,7 @@ public class License extends HttpServlet {
 
 	private boolean testNet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		try {
+		/*try {
 			HttpClient client = new DefaultHttpClient();
 			HttpPost httget = new HttpPost(
 					"http://jiage110101.8643.jspkj.com/infor/Valide");
@@ -116,7 +116,7 @@ public class License extends HttpServlet {
 			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
 			// response.getWriter().write(this.getStatusJson(AppStatus.error,
 			// "访问该网站失败！"));
-		}
+		}*/
 		return true;
 	}
 
