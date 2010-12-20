@@ -49,7 +49,7 @@ public interface AppContext extends Runnable{
 
 	/**
 	 * 
-	 * 
+	 * 获取一个文档
 	 * @param url
 	 * @return
 	 * @throws IOException
@@ -57,6 +57,12 @@ public interface AppContext extends Runnable{
 	 */
 	public Document getHtmlDocByUrl(String url) ;
 	
+	/**
+	 * 
+	 * 
+	 * @param url 初始化页面地址
+	 * @return
+	 */
 	public String getContentByUrl(String url) ;
 
 }
