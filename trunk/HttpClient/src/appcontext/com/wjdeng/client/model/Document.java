@@ -200,10 +200,8 @@ public class Document extends Segment implements IDocument {
 				CompiledScript comptScript = compilable.compile(scriptStr);
 				comptScript.eval(sengine.getContext());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ScriptException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
