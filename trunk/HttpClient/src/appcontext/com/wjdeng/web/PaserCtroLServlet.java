@@ -162,15 +162,14 @@ public class PaserCtroLServlet extends HttpServlet {
 			par = map.get(request.getRequestedSessionId());
 
 			while (true) {
-				Thread.sleep(50);
-				StringBuffer content = sb;
-				synchronized (content) {
+				synchronized (sb) {
+					sb.wait();
 					if (cls.size()>0||sb.length()>0) {
 						sb.insert(0, "{ ");
 						sb.append(" , data:[");
 						this.creatJson(cls, sb);
 						sb.append("] }");
-						response.getWriter().write(content.toString());
+						response.getWriter().write(sb.toString());
 						sb.delete(0, sb.length());
 						return;
 					} else if (par.isEndTask()) {
@@ -284,6 +283,7 @@ public class PaserCtroLServlet extends HttpServlet {
 					IndexManager.Instance().writeIndex(map);
 				}*/
 				//IndexManager.Instance().commit();
+				sb.notifyAll();
 			}
 		}
 	}
@@ -318,6 +318,7 @@ public class PaserCtroLServlet extends HttpServlet {
 				cls.addAll(list);
 				list.clear();
 				//IndexManager.Instance();
+				sb.notifyAll();
 			}
 
 		}
@@ -360,6 +361,7 @@ public class PaserCtroLServlet extends HttpServlet {
 				List<Map<String, String>> list = ev.getModeParament().getDatatemp();
 				cls.addAll(list);
 				list.clear();
+				sb.notifyAll();
 			}
 
 		}
