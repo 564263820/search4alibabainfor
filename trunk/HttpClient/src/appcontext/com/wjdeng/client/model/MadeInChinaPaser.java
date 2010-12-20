@@ -1,7 +1,7 @@
 /******************************************************************************** 
  * Create Author   : Administrator
  * Create Date     : Aug 25, 2010
- * File Name       : AlibabaPaser.java
+ * File Name       : MadeInChinaPaser.java
  *
  ********************************************************************************/
 package com.wjdeng.client.model;
