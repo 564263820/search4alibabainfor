@@ -27,52 +27,6 @@ public class QQClentPaser implements IPaser {
 	public Map<String, String> execuPaseInforPage(Document doc,AppContext appContext) {
 		Map<String, String> contentmap = new HashMap<String, String>();
 		List<Element> list = doc.getAllElementsByClass("tables data");
-		for (Element el : list) {
-			List<Element> trs = el.getAllElements("tr");
-			for (Element tr : trs) {
-				List<Element> ths = tr.getAllElements("th");
-				if (ths.isEmpty())
-					continue;
-				String key = ths.get(0).getContent().toString();
-				if (key != null && key.indexOf("AliExpress.com Store:") > -1)
-					continue;
-				String content = "";
-				try {
-					if ("Contact Person:".equals(key)) {
-						// tr.getAllElements("td").get(1).getAllElementsByClass("contactName").get("0");Website:
-						//String reg = "(http://)?+([\\w-]+\\.)+[\\w-]+(userbehavior/contactPersonUpdate.htm)+(/[\\w-]*)?";
-						//Pattern pa = Pattern.compile(reg);
-						content = tr.getAllElementsByClass("contactName")
-								.get(0).getAllElements("a").get(0).getContent()
-								.toString();
-						// System.out.println(content);
-						// content =
-						// tr.getAllElements("td").get(0).getAllElements("a").get(0).getContent().toString();
-					} else if ("Website:".equals(key)) {
-						content = tr.getAllElements("td").get(0)
-								.getAllElements("a").get(0).getContent()
-								.toString();
-					} else {
-
-						content = tr.getAllElements("td").get(0).getContent()
-								.toString();
-					}
-				} catch (IndexOutOfBoundsException e) {
-					System.out.print(key + ":获取内容失败");
-					// e.printStackTrace();
-					continue;
-				}
-				Map<String ,String> map =(Map<String, String>) appContext.getAttribute("searcheKeyWord");
-				if(null !=map)contentmap.putAll(map);
-				contentmap.put(key, content);
-			}
-
-		}
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			LogUtil.getLogger(this.getClass().getSimpleName()).warn(e);
-		}
 		return contentmap;
 	}
 
@@ -92,39 +46,7 @@ public class QQClentPaser implements IPaser {
 	public Set<String> getPageListUrl(Document doc,AppContext appContext) {
 		Map<String ,String> map = new HashMap<String, String>();
 		Map<String ,String> searcheKeyWord = (Map<String ,String>) appContext.getAttribute("searcheKeyWord");
-		if(searcheKeyWord==null){
-			Element ele = doc.getFirstElementByClass("keywords");
-			if(ele!=null){
-				map.put("IndexKeyWord", ele.getContent().toString());
-			}
-			List<Element> lele = doc.getAllElementsByClass("historyItem");
-			for(Element hise : lele){
-				String key = hise.getFirstElementByClass("pTitle").getContent().toString();
-				String content = hise.getFirstElementByClass("sIcon").getContent().toString();
-				map.put(key, content);
-			}
-			if(map.size()>0)
-			appContext.setAttribute("searcheKeyWord", map);
-		}
-		
-		Pattern pa = Pattern.compile("itemBox *");
 		Set<String> vurl = new HashSet<String>();
-		Iterator<Element> it = doc.getAllElementsByClass("itemBox").iterator();// doc.getAllElements("class",
-																				// pa).iterator();
-		while (it.hasNext()) {
-			Element ele = it.next();
-			// pa = Pattern.compile("^[javaScript:*]");
-			String str = "(http(s)?://)?+([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
-			pa = Pattern.compile(str);
-			List<Element> elist = ele.getAllElements("href", pa);
-			for (Element tele : elist) {
-				String href = tele.getAttributeValue("href");
-				href = SysUtils.getUrlroot(href);
-				href += "/contactinfo.html";
-				vurl.add(href);
-				// System.out.println(href);
-			}
-		}
 		return vurl;
 	}
 
