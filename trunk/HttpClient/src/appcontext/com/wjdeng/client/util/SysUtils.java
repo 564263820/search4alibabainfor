@@ -7,13 +7,18 @@
 package com.wjdeng.client.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.wjdeng.client.model.MadeInChinaPaser;
 
 public class SysUtils {
 
@@ -173,6 +178,10 @@ public class SysUtils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	public static Reader getFileRader(String fileName) throws FileNotFoundException{
+		return new FileReader(SysUtils.class.getClassLoader().getResource(fileName).getPath());
 	}
 	
 	/**
