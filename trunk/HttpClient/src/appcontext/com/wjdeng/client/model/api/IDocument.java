@@ -11,6 +11,7 @@
  ********************************************************************************/
 package com.wjdeng.client.model.api;
 
+import java.io.Reader;
 import java.util.List;
 
 public interface IDocument {
@@ -45,6 +46,9 @@ public interface IDocument {
 	 * @param scriptStr
 	 */
 	public void includeJavascript(String scriptStr);
+	
+	
+	public void includeJavascript(Reader reader);
 	
 	
 	/**
