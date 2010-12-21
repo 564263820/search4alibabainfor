@@ -9,6 +9,7 @@ package com.wjdeng.client.model;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.script.Compilable;
@@ -174,7 +175,7 @@ public class Document extends Segment implements IDocument {
 				Compilable compilable = (Compilable) sengine;
 				CompiledScript comptScript = compilable.compile(jsengineStr);
 				comptScript.eval(sengine.getContext());
-				//System.out.println(inv.invokeFunction("hex_md5", "10864111wjdeng"));
+				//System.out.println(inv.invokeFunction("hex_md5", "password"));
 			}
 		}
 		
@@ -205,11 +206,24 @@ public class Document extends Segment implements IDocument {
 				e.printStackTrace();
 			}
 		}
-		
 	}
 	
 	public void println(String str){
 		System.out.println(str);
 	}
+
+	@Override
+	public List<String> getAllJavaScriptUrls() {
+		List<Element> list = this.getAllElements("script");
+		List<String> rl = new ArrayList<String>();
+		for(Element element : list){
+			String url  =element.getAttributeValue("src");//
+			if(SysUtils.trim2null(url)!=null){
+				rl.add(this.domain+url);//暂时没有考虑复杂情况
+			}
+		}
+		return rl;
+	}
+
 
 }
