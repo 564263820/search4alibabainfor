@@ -9,6 +9,7 @@ package com.wjdeng.client.model;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,6 +200,22 @@ public class Document extends Segment implements IDocument {
 				sengine = getScriptEngine();
 				Compilable compilable = (Compilable) sengine;
 				CompiledScript comptScript = compilable.compile(scriptStr);
+				comptScript.eval(sengine.getContext());
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ScriptException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public void includeJavascript(Reader reader) {
+		if(this.sengine==null){
+			try {
+				sengine = getScriptEngine();
+				Compilable compilable = (Compilable) sengine;
+				CompiledScript comptScript = compilable.compile(reader);
 				comptScript.eval(sengine.getContext());
 			} catch (IOException e) {
 				e.printStackTrace();
