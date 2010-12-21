@@ -7,7 +7,13 @@
  ********************************************************************************/
 package com.wjdeng.imp;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +36,9 @@ import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
@@ -65,6 +74,14 @@ public class URLContentManage implements URLContent {
 		return map;
 	}
 	
+	private HttpGet createHttpGet(String url ){
+		HttpGet httpget = new HttpGet(url);
+		HttpParams params = new BasicHttpParams();
+		params.setParameter("", "");
+		httpget.setParams(params);
+		return httpget;
+	}
+	
 	/**
 	 * 
 	 * 清理混淆cooke
@@ -72,10 +89,12 @@ public class URLContentManage implements URLContent {
 	private void clearMuCookie(){
 		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
 		StringBuilder sb  = new StringBuilder();
+		//((AbstractHttpClient) client).setParams(params)
 		String sid = "";
 		String name  ="";
 		BasicCookieStore bcook = new BasicCookieStore();
 		((AbstractHttpClient) client).setCookieStore(bcook);
+		//((AbstractHttpClient) client).
 		for(int i=0 ;i<list.size();i++){
 			Cookie  cook = list.get(i);
 			name  = cook.getName();
@@ -87,7 +106,7 @@ public class URLContentManage implements URLContent {
 				}
 			}
 			bcook.addCookie(cook);
-			sb.append(cook.getName()).append("=").append(cook.getValue()).append(";");
+			sb.append(cook.getName()).append("=").append(cook.getValue()).append("; ");
 		}
 		System.out.println(sb.toString());
 	}
@@ -109,7 +128,7 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		clearMuCookie();
-		//LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
+		LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
 		return map;
 	}
 
@@ -128,8 +147,29 @@ public class URLContentManage implements URLContent {
 	}
 
 	public static void main(String[] arg) {
+		java.net.URL urlt;
+		try {
+			urlt = new URL("http://web.qq.com/");
+			URLConnection  urlc = urlt.openConnection();
+			urlc.connect();
+			java.io.BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(urlc.getInputStream())));
+			StringBuilder sb = new StringBuilder();
+			while(br.ready()){
+				sb.append(br.readLine());
+			}
+			String st = new String(sb.toString().getBytes(),"utf-8");
+			System.out.println(st);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//String s = new String(urlc.getBytes(),"utf-8");
 		List<String> list = new ArrayList<String>();
-		list.add("http://www.alibaba.com/");
+		//list.add("http://www.alibaba.com/");
+		list.add("http://web.qq.com/");
 		/*
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
@@ -141,9 +181,10 @@ public class URLContentManage implements URLContent {
 		for (String url : list) {
 			try {
 				Map<String, Object> map = um.getContentByURL(url, true);
-				Source s = new Source(map.get(KEY_CONTENT).toString());
-				Element el =s.getFirstElement("body").getFirstElementByClass("homeL");
-				SysUtils.wirtfile(el.getTextExtractor().toString());
+				//Source s = new Source(map.get(KEY_CONTENT).toString());
+				//Element el =s.getFirstElement("body").getFirstElementByClass("homeL");
+				System.out.println(map.get(KEY_CONTENT).toString());
+				//SysUtils.wirtfile(el.getTextExtractor().toString());
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
