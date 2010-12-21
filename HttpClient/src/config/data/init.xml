@@ -24,9 +24,9 @@
 </model>
 
 <model>
-	<name>web2qq</name>
+	<name>web2.qq.com</name>
 	<class>com.wjdeng.client.model.QQClentPaser</class>
-	<url>web2.qq.com</url>
+	<url>http://web2.qq.com</url>
 	<method>get</method>
 </model>
 
