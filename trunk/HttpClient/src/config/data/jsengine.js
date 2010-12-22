@@ -14,18 +14,22 @@
 	if(obj){
 		 if(obj.attribute){//所有属性
 		 	for(var attpar in obj.attribute){
-		 		this[attpar] = obj.attribute[par];	
+		 		this[attpar] = obj.attribute[attpar];	
 		 		this.attribute = obj.attribute;
 		 	}
 		 }
 		 this.elements = new Object();
 		 for(var par in obj){//所有表单元素节点(from对象才会初始化表单元素节点)
+		    if(par=='attribute')continue;
 		 	this.elements[par]= obj[par];
 		 	if(par == 'attribute' ) continue;
 		 	this[par] = obj[par];	
 		 }
 	}
  }
+ 
+
+ 
 
  
  
@@ -38,7 +42,8 @@
 	referrer:Jdocument.referrer,//当前文档url
 	title:'',//暂不提供
 	URL:Jdocument.url,//当前文档url
-	all : new Array()
+	all : new Array(),
+	childElements:new Object()
  });
  
   /**模拟浏览器的window对象**/
@@ -84,7 +89,7 @@
  	var objScr = Jdocument.getElementById4Javascript(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
  		//由于
- 		var obj = new Element(DocCompVar);//DocCompVar javaScript引擎将getElementById的js对象存入到一个临时的全局变量DocCompVar中
+ 		var obj = new Element(document.childElements[id]);//DocCompVar javaScript引擎将getElementById的js对象存入到一个临时的全局变量DocCompVar中
  		document.all[this.all.length]=obj;
  		return obj;
  	}
@@ -122,3 +127,5 @@
  		
  	}*/
  }
+ 
+ 
