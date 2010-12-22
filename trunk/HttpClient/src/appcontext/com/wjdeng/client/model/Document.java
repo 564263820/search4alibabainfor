@@ -116,7 +116,7 @@ public class Document extends Segment implements IDocument {
 	public String getElementById4Javascript(String id){
 		Element  ele= this.getSource().getElementById(id);
 		String js = createJsonByElement(ele);
-		eval(" var DocCompVar = "+js+" ;");
+		eval(" document.childElements."+id+" = "+js+" ;");
 		return js;
 	}
 	
@@ -285,9 +285,10 @@ public class Document extends Segment implements IDocument {
 	 * 
 	 */
 	public void loadCompiledAllPageJS() throws Exception{
-		if(this.urlConnection==null)throw new Exception("该文档获取地址连接URLContentManage不能继续加载js");
+		if(this.urlConnection==null)throw new Exception("该文档没有设置地址连接对象（URLContentManage），不能请求url进行js加载");
 		List<Element> list = this.getAllElements("script");
 		List<String> rl = new ArrayList<String>();
+		this.eval("document.getElementById(\"login_button\");");
 		for(Element element : list){
 			String url  =element.getAttributeValue("src");//
 			if(SysUtils.trim2null(url)==null){
