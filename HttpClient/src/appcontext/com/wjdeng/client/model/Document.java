@@ -12,12 +12,15 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.apache.http.protocol.HTTP;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
@@ -33,6 +36,7 @@ import com.wjdeng.client.model.api.IDocument;
 import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
+import com.wjdeng.imp.URLContentManage;
 
 public class Document extends Segment implements IDocument {
 	/**脚本解析引擎*/
@@ -40,12 +44,24 @@ public class Document extends Segment implements IDocument {
 	
 	private String jsengineStr;
 	
+	private URLContentManage urlConnection;
+	
 	/**该文档url地址*/
 	private final String url;
 	/**该文档域名*/
 	private final String domain;
 	/**该文档url地址*/
 	private final String referrer;
+	
+	private String chartSet = HTTP.UTF_8;
+
+	public String getChartSet() {
+		return chartSet;
+	}
+
+	public void setChartSet(String chartSet) {
+		this.chartSet = chartSet;
+	}
 
 	public String getDomain() {
 		return domain;
@@ -55,19 +71,39 @@ public class Document extends Segment implements IDocument {
 		return referrer;
 	}
 
-	public Document(Source source, String url) {
+	public Document(Source source, String url,String chartSet) {
 		super(source, source.getBegin(), source.getEnd());
 		this.url = url;
 		this.referrer = url;
+		this.chartSet = chartSet;
 		if(StringUtils.trim2null(url)!=null){
 			this.domain=StringUtils.getUrlroot(url);
 		}else{
 			this.domain= "";
 		}
 	}
+	
+	public Document(Source source, String url) {
+		super(source, source.getBegin(), source.getEnd());
+		this.url = url;
+		this.referrer = url;
+		this.chartSet = chartSet;
+		if(StringUtils.trim2null(url)!=null){
+			this.domain=StringUtils.getUrlroot(url);
+		}else{
+			this.domain= "";
+		}
+	}
+	
 
 	public String getUrl() {
 		return url;
+	}
+	
+	
+	public Element getElementById(String id){
+		Element  ele= this.getSource().getElementById(id);
+		return ele;
 	}
 	
 	/**
@@ -77,7 +113,7 @@ public class Document extends Segment implements IDocument {
 	 * @param id
 	 * @return
 	 */
-	public String getElementById(String id){
+	public String getElementById4Javascript(String id){
 		Element  ele= this.getSource().getElementById(id);
 		String js = createJsonByElement(ele);
 		eval(" var DocCompVar = "+js+" ;");
@@ -195,9 +231,10 @@ public class Document extends Segment implements IDocument {
 
 	@Override
 	public void includeJavascript(String scriptStr) {
-		if(this.sengine==null){
 			try {
-				sengine = getScriptEngine();
+				if(this.sengine==null){
+					this.getScriptEngine();
+				}
 				Compilable compilable = (Compilable) sengine;
 				CompiledScript comptScript = compilable.compile(scriptStr);
 				comptScript.eval(sengine.getContext());
@@ -206,22 +243,21 @@ public class Document extends Segment implements IDocument {
 			} catch (ScriptException e) {
 				e.printStackTrace();
 			}
-		}
 	}
 	
 	@Override
 	public void includeJavascript(Reader reader) {
-		if(this.sengine==null){
-			try {
-				sengine = getScriptEngine();
-				Compilable compilable = (Compilable) sengine;
-				CompiledScript comptScript = compilable.compile(reader);
-				comptScript.eval(sengine.getContext());
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ScriptException e) {
-				e.printStackTrace();
+		try {
+			if(this.sengine==null){
+				this.getScriptEngine();
 			}
+			Compilable compilable = (Compilable) sengine;
+			CompiledScript comptScript = compilable.compile(reader);
+			comptScript.eval(sengine.getContext());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ScriptException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -241,6 +277,45 @@ public class Document extends Segment implements IDocument {
 		}
 		return rl;
 	}
+	
+	/**
+	 * 
+	 * 加在当前页面引用的js并编译(这里的引入仅指:页面包含的script标签上的js文件或脚本片段)<BR>
+	 * @throws Exception 
+	 * 
+	 */
+	public void loadCompiledAllPageJS() throws Exception{
+		if(this.urlConnection==null)throw new Exception("该文档获取地址连接URLContentManage不能继续加载js");
+		List<Element> list = this.getAllElements("script");
+		List<String> rl = new ArrayList<String>();
+		for(Element element : list){
+			String url  =element.getAttributeValue("src");//
+			if(SysUtils.trim2null(url)==null){
+				String js = element.getContent().toString();
+				System.out.println(js);
+				System.out.println("/////////////////////////////-----------------------------------");
+				this.includeJavascript(js);
+			}else{
+				Map<String,Object> map = this.urlConnection.getContentByURL(this.domain+url);
+				String jsfile = map.get(URLContentManage.KEY_CONTENT).toString();
+				String chartSet = map.get(URLContentManage.KEY_CHARSET).toString();
+				chartSet = chartSet==null?this.chartSet:chartSet;
+				String js = new String(jsfile.getBytes(HTTP.ISO_8859_1),chartSet);
+				this.includeJavascript(js);
+			}
+		}
+		
+	}
+
+	public URLContentManage getUrlConnection() {
+		return urlConnection;
+	}
+
+	public void setUrlConnection(URLContentManage urlConnection) {
+		this.urlConnection = urlConnection;
+	}
+	
+	
 
 
 }
