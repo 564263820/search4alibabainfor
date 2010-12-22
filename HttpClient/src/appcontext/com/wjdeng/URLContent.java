@@ -24,6 +24,9 @@ public interface URLContent {
 
 	public Map<String, Object> getContentByURL(String url) throws Exception;
 	
+	public void closeClient();
+	
 	public Map<String, Object> getContentByURL(String url, boolean get)throws ClientProtocolException, IOException ,Exception;
+	
 	
 }
