@@ -233,4 +233,4 @@ function binl2b64(D)
    return F
 }
 
-hex_md5("abc")
+//hex_md5("abc")
