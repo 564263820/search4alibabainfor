@@ -53,14 +53,20 @@ public class QQClientAppContext{
 			AppContext  app = DefaultAppContext.Instance(entUrl);
 			//this.getDocument(entUrl, app); //请求主界面
 			Document doc = (Document) this.getDocument(logonWinUrl, app); //请求登录界面
+			doc.eval("var s = document.getElementById('loginform');");
+			doc.eval("var s = document.getElementById('webqq_type');");
+			//doc.eval("var s = document.getElementById('login_button');");
+			
+			
 			//doc.includeJavascript(SysUtils.getFileRader(this.passMD5local));
 			//doc.includeJavascript(SysUtils.getFileRader("qqcommon.js"));
 			//doc.eval("imgLoadReport();");
-			doc.setUrlConnection(app.getModeParament().getUrlConnection());
-			doc.loadCompiledAllPageJS();
-			String httpUrl =this.getLogonUrl(doc);//获取登录地址
-			String logonState = app.getModeParament().getUrlConnection().getContentByURL(httpUrl).get(URLContentManage.KEY_CONTENT).toString();//登录请求 获得登录状态
-			System.out.println(new String(logonState.getBytes(HTTP.ISO_8859_1),HTTP.UTF_8));
+			//doc.setUrlConnection(app.getModeParament().getUrlConnection());
+			
+			//doc.loadCompiledAllPageJS();
+			//String httpUrl =this.getLogonUrl(doc);//获取登录地址
+			//String logonState = app.getModeParament().getUrlConnection().getContentByURL(httpUrl).get(URLContentManage.KEY_CONTENT).toString();//登录请求 获得登录状态
+			//System.out.println(new String(logonState.getBytes(HTTP.ISO_8859_1),HTTP.UTF_8));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
