@@ -5,7 +5,12 @@
  ********************************************************************************/
 package com.wjdeng;
 
+import java.io.IOException;
 import java.util.Map;
+
+import org.apache.http.client.ClientProtocolException;
+
+import com.wjdeng.client.model.api.IDocument;
 
 /**
  * 
@@ -18,4 +23,7 @@ import java.util.Map;
 public interface URLContent {
 
 	public Map<String, Object> getContentByURL(String url) throws Exception;
+	
+	public Map<String, Object> getContentByURL(String url, boolean get)throws ClientProtocolException, IOException ,Exception;
+	
 }
