@@ -28,7 +28,7 @@ public class ModeParament {
 	/**
 	 * url链接管理器
 	 */
-	URLContentManage urlConnectio = new URLContentManage();
+	URLContentManage urlConnection = new URLContentManage();
 	/**
 	 * 模块名
 	 */
@@ -288,7 +288,7 @@ public class ModeParament {
 		this.endTask = endTask;
 	}
 
-	protected URLContentManage getUrlConnectio() {
-		return urlConnectio;
+	protected URLContentManage getUrlConnection() {
+		return urlConnection;
 	}
 }
