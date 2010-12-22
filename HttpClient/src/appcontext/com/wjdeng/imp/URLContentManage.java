@@ -43,6 +43,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import com.wjdeng.URLContent;
+import com.wjdeng.client.model.api.IDocument;
 import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.SysUtils;
 
@@ -53,6 +54,12 @@ public class URLContentManage implements URLContent {
 	public static String KEY_CONTENT = "content";
 
 	public static String KEY_CHARSET = "CharSet";
+	
+	public URLContentManage(){
+		HttpParams params = new BasicHttpParams();
+		params.setParameter(HTTP.USER_AGENT, "	Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.9) Gecko/20100824 Firefox/3.6.9");
+		((AbstractHttpClient) client).setParams(params);
+	}
 
 	public Map<String, Object> getContentByURL(String url, boolean get)
 			throws ClientProtocolException, IOException ,Exception{
@@ -111,6 +118,7 @@ public class URLContentManage implements URLContent {
 		System.out.println(sb.toString());
 	}
 
+	
 	public Map<String, Object> getContentByURL(String url)
 			throws ClientProtocolException, IOException,Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -147,7 +155,7 @@ public class URLContentManage implements URLContent {
 	}
 
 	public static void main(String[] arg) {
-		java.net.URL urlt;
+		/*java.net.URL urlt;
 		try {
 			urlt = new URL("http://web.qq.com/");
 			URLConnection  urlc = urlt.openConnection();
@@ -165,11 +173,11 @@ public class URLContentManage implements URLContent {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		//String s = new String(urlc.getBytes(),"utf-8");
 		List<String> list = new ArrayList<String>();
 		//list.add("http://www.alibaba.com/");
-		list.add("http://web.qq.com/");
+		list.add("http://www.163.com");
 		/*
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
@@ -183,7 +191,9 @@ public class URLContentManage implements URLContent {
 				Map<String, Object> map = um.getContentByURL(url, true);
 				//Source s = new Source(map.get(KEY_CONTENT).toString());
 				//Element el =s.getFirstElement("body").getFirstElementByClass("homeL");
-				System.out.println(map.get(KEY_CONTENT).toString());
+				String s =map.get(KEY_CONTENT).toString();
+				s  = new String(s.getBytes("gbk"),"gbk");
+				System.out.println(s);
 				//SysUtils.wirtfile(el.getTextExtractor().toString());
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -195,5 +205,6 @@ public class URLContentManage implements URLContent {
 			}
 		}
 	}
+
 
 }
