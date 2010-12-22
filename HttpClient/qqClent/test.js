@@ -1,15 +1,16 @@
-var str_uintip = "<请输入帐号>";
-var str_no_uin = "您还没有输入帐号！";
-var str_no_pwd = "您还没有输入密码！";
-var str_no_vcode = "您还没有输入验证码！";
-var str_inv_uin = "请输入正确的QQ帐号！";
-var str_inv_vcode = "请输入完整的验证码！";
-var str_switch_qlogin = "切换到快速登录模式";
-var str_switch_normal = "使用其他号码登录";
-var str_qlogin_no_uin = "系统检测到您机器上QQ未启动或已被锁定。请您先登录QQ或解锁后再使用本功能。";
-var str_qlogin_other_err = "快速登录失败，请您返回重试或切换到普通登录模式。";
-var str_qlogin_select_offline = "您所选择号码对应的QQ已经失效，请检查该号码对应的QQ是否已经被关闭。";
-var str_qlogining = "正在登录中，请稍候……";
+
+var str_uintip = "<\u8bf7\u8f93\u5165\u5e10\u53f7>";
+var str_no_uin = "\u60a8\u8fd8\u6ca1\u6709\u8f93\u5165\u5e10\u53f7\uff01";
+var str_no_pwd = "\u60a8\u8fd8\u6ca1\u6709\u8f93\u5165\u5bc6\u7801\uff01";
+var str_no_vcode = "\u60a8\u8fd8\u6ca1\u6709\u8f93\u5165\u9a8c\u8bc1\u7801\uff01";
+var str_inv_uin = "\u8bf7\u8f93\u5165\u6b63\u786e\u7684QQ\u5e10\u53f7\uff01";
+var str_inv_vcode = "\u8bf7\u8f93\u5165\u5b8c\u6574\u7684\u9a8c\u8bc1\u7801\uff01";
+var str_switch_qlogin = "\u5207\u6362\u5230\u5feb\u901f\u767b\u5f55\u6a21\u5f0f";
+var str_switch_normal = "\u4f7f\u7528\u5176\u4ed6\u53f7\u7801\u767b\u5f55";
+var str_qlogin_no_uin = "\u7cfb\u7edf\u68c0\u6d4b\u5230\u60a8\u673a\u5668\u4e0aQQ\u672a\u542f\u52a8\u6216\u5df2\u88ab\u9501\u5b9a\u3002\u8bf7\u60a8\u5148\u767b\u5f55QQ\u6216\u89e3\u9501\u540e\u518d\u4f7f\u7528\u672c\u529f\u80fd\u3002";
+var str_qlogin_other_err = "\u5feb\u901f\u767b\u5f55\u5931\u8d25\uff0c\u8bf7\u60a8\u8fd4\u56de\u91cd\u8bd5\u6216\u5207\u6362\u5230\u666e\u901a\u767b\u5f55\u6a21\u5f0f\u3002";
+var str_qlogin_select_offline = "\u60a8\u6240\u9009\u62e9\u53f7\u7801\u5bf9\u5e94\u7684QQ\u5df2\u7ecf\u5931\u6548\uff0c\u8bf7\u68c0\u67e5\u8be5\u53f7\u7801\u5bf9\u5e94\u7684QQ\u662f\u5426\u5df2\u7ecf\u88ab\u5173\u95ed\u3002";
+var str_qlogining = "\u6b63\u5728\u767b\u5f55\u4e2d\uff0c\u8bf7\u7a0d\u5019\u2026\u2026";
 function $(id) {
 	return document.getElementById(id);
 }
@@ -31,7 +32,7 @@ document.domain = "qq.com";
 var g_t = "str_uintip}";
 var g_lang = "2052";
 function $(A) {
-	return document.getElementById(A)
+	return document.getElementById(A);
 }
 var isAbleSubmit = false;
 function ptui_notifySize(C) {
@@ -41,31 +42,29 @@ function ptui_notifySize(C) {
 			width = 1;
 			height = 1;
 			if (obj.offsetWidth > 0) {
-				width = obj.offsetWidth
+				width = obj.offsetWidth;
 			}
 			if (obj.offsetHeight > 0) {
-				height = obj.offsetHeight
+				height = obj.offsetHeight;
 			}
 			var A = window.location + "";
-			A = A.replace(/^((https|http)?:\/\/ui.ptlogin2.)?/, "").replace(
-					/(\/\S*)$/g, "");
-			document.cookie = "ptui_width=" + width + ";domain=" + A
-					+ ";path=/";
-			document.cookie = "ptui_height=" + height + ";domain=" + A
-					+ ";path=/";
+			A = A.replace(/^((https|http)?:\/\/ui.ptlogin2.)?/, "").replace(/(\/\S*)$/g, "");
+			document.cookie = "ptui_width=" + width + ";domain=" + A + ";path=/";
+			document.cookie = "ptui_height=" + height + ";domain=" + A + ";path=/";
 			if (parent.ptlogin2_onResize) {
 				parent.ptlogin2_onResize(width, height);
-				window.scroll(0, 10)
+				window.scroll(0, 10);
 			} else {
 				frameElement.width = width;
 				frameElement.style.width = width + "px";
 				frameElement.height = height;
 				frameElement.style.height = height + "px";
 				frameElement.style.visibility = "hidden";
-				frameElement.style.visibility = "visible"
+				frameElement.style.visibility = "visible";
 			}
 		}
-	} catch (B) {
+	}
+	catch (B) {
 	}
 }
 var g_speedArray = new Array();
@@ -73,14 +72,14 @@ var g_time = {};
 g_time.time1 = g_begTime;
 function ptui_setSpeed(B) {
 	if (B <= 0) {
-		return
+		return;
 	}
 	var A = g_speedArray.length;
-	g_speedArray[A] = new Array(B, new Date())
+	g_speedArray[A] = new Array(B, new Date());
 }
 function ptui_check_qlogin() {
 	if (!window.ActiveXObject) {
-		return 0
+		return 0;
 	}
 	try {
 		var D = new ActiveXObject("SSOAxCtrlForPTLogin.SSOForPTLogin2");
@@ -91,12 +90,13 @@ function ptui_check_qlogin() {
 		var B = A.GetArray("PTALIST");
 		var C = B.GetSize();
 		if (C > 0) {
-			return C
+			return C;
 		}
-	} catch (G) {
-		return 0
 	}
-	return 0
+	catch (G) {
+		return 0;
+	}
+	return 0;
 }
 var xuiFrame = false;
 var curXui = false;
@@ -108,142 +108,117 @@ function qlogin_check() {
 	document.cookie = "ptui_qstatus=1;domain=ptlogin2." + g_domain;
 	function B() {
 		if (A == 0) {
-			switchpage()
+			switchpage();
 		}
 		if (document.cookie.indexOf("ptui_qstatus=2") > -1) {
-			clearInterval(q_clock)
+			clearInterval(q_clock);
 		}
 		if (document.cookie.indexOf("ptui_qstatus=3") > -1) {
 			clearInterval(q_clock);
-			switchpage()
+			switchpage();
 		}
-		A--
+		A--;
 	}
 }
 function loadxui(G) {
 	if (xuiFrame) {
 		$("qlogin").style.display = "block";
-		return
+		return;
 	} else {
 		var B = 1;
 		if (g_jumpname != "") {
 			if (g_qtarget != -1) {
-				B = parseInt(g_qtarget)
+				B = parseInt(g_qtarget);
 			}
 		} else {
 			switch (g_target) {
-				case "_self" :
-					B = 0;
-					break;
-				case "_top" :
-					B = 1;
-					break;
-				case "_parent" :
-					B = 2;
-					break;
-				default :
-					B = 1
+			  case "_self":
+				B = 0;
+				break;
+			  case "_top":
+				B = 1;
+				break;
+			  case "_parent":
+				B = 2;
+				break;
+			  default:
+				B = 1;
 			}
 		}
 		var F = "";
 		if (g_jumpname == "" || g_jumpname == "jump") {
-			F = encodeURIComponent("u1=" + document.forms[0].u1.value)
+			F = encodeURIComponent("u1=" + document.forms[0].u1.value);
 		}
-		var E = "q"
-				+ g_href.substring(g_href.indexOf("/cgi-bin/") + 9, g_href
-								.indexOf("?"));
-		var A = "http://xui.ptlogin2."
-				+ g_domain
-				+ "/cgi-bin/"
-				+ E
-				+ "?domain="
-				+ g_domain
-				+ "&lang="
-				+ g_lang
-				+ "&qtarget="
-				+ B
-				+ "&jumpname="
-				+ g_jumpname
-				+ "&ptcss="
-				+ g_ptcss
-				+ "&param="
-				+ encodeURIComponent((g_param ? encodeURIComponent(g_param) : F))
-				+ "&css=" + g_css + "#" + (g_begTime - 0);
+		var E = "q" + g_href.substring(g_href.indexOf("/cgi-bin/") + 9, g_href.indexOf("?"));
+		var A = "http://xui.ptlogin2." + g_domain + "/cgi-bin/" + E + "?domain=" + g_domain + "&lang=" + g_lang + "&qtarget=" + B + "&jumpname=" + g_jumpname + "&ptcss=" + g_ptcss + "&param=" + encodeURIComponent((g_param ? encodeURIComponent(g_param) : F)) + "&css=" + g_css + "#" + (g_begTime - 0);
 		var D = $("qlogin");
 		var C = 136;
 		if (G > 5) {
-			G = 5
+			G = 5;
 		}
 		C += 28 * (G - 1);
-		D.innerHTML = '<iframe id="xui" name="xui" allowtransparency="true" scrolling="no" frameborder="0" width="100%" height="'
-				+ C + '" src="' + A + '">';
+		D.innerHTML = "<iframe id=\"xui\" name=\"xui\" allowtransparency=\"true\" scrolling=\"no\" frameborder=\"0\" width=\"100%\" height=\"" + C + "\" src=\"" + A + "\">";
 		D.style.display = "block";
 		$("web_login").style.display = "none";
 		curXui = true;
 		xuiFrame = true;
-		qlogin_check()
+		qlogin_check();
 	}
 }
 function switchpage() {
 	if (curXui) {
 		$("web_login").style.display = "block";
 		$("qlogin").style.display = "none";
-		$("switch").innerHTML = '<a style="cursor:pointer;" onclick="switchpage();">'
-				+ str_switch_qlogin + "</a>";
+		$("switch").innerHTML = "<a style=\"cursor:pointer;\" onclick=\"switchpage();\">" + str_switch_qlogin + "</a>";
 		ptui_notifySize("login");
-		if (typeof(ptui_initFocus) != "undefined") {
-			ptui_initFocus(document.forms[0])
+		if (typeof (ptui_initFocus) != "undefined") {
+			ptui_initFocus(document.forms[0]);
 		}
 		curXui = false;
-		clearInterval(q_clock)
+		clearInterval(q_clock);
 	} else {
 		$("qlogin").style.display = "block";
 		$("web_login").style.display = "none";
-		$("switch").innerHTML = '<a style="cursor:pointer;" onclick="switchpage();">'
-				+ str_switch_normal + "</a>";
+		$("switch").innerHTML = "<a style=\"cursor:pointer;\" onclick=\"switchpage();\">" + str_switch_normal + "</a>";
 		curXui = true;
 		qlogin_check();
-		ptui_notifySize("login")
+		ptui_notifySize("login");
 	}
 }
 function ptui_onUserFocus(C, A) {
 	var B = $(C);
 	if (str_uintip == B.value) {
-		B.value = ""
+		B.value = "";
 	}
-	B.style.color = A
+	B.style.color = A;
 }
 function ptui_onUserBlue(C, A) {
 	var B = $(C);
 	if ("" == B.value) {
 		B.value = str_uintip;
-		B.style.color = A
+		B.style.color = A;
 	}
-};
-str_uintip = "<请输入帐号>";
+}
+str_uintip = "<\u8bf7\u8f93\u5165\u5e10\u53f7>";
 function loadweblogin() {
-	if (typeof(ptui_setUinColor) == 'undefined') {
+	if (typeof (ptui_setUinColor) == "undefined") {
 		reloadweb = true;
 		return;
 	}
-	ptui_setUinColor('u', '#000000', '#cccccc');
-
+	ptui_setUinColor("u", "#000000", "#cccccc");
 	$("loginform").verifycode.value = "";
 }
 function onSelectLoad() {
-
 	loadweblogin();
-	$('label_unable_tips').innerHTML = '';
-	if ($('switch') != null) {
-		$('switch').style.display = 'none';
+	$("label_unable_tips").innerHTML = "";
+	if ($("switch") != null) {
+		$("switch").style.display = "none";
 	}
-
 	ptui_setSpeed(1);
 	ptui_notifySize("login");
 }
 function onPrePageLoad() {
 	var login_form = $("loginform");
-
 	$("changeimg_link").href = "javascript:ptui_changeImg('qq.com', 1003903, true);";
 	$("login_button").disabled = false;
 	ptui_setDefUin(login_form, "");
@@ -251,9 +226,10 @@ function onPrePageLoad() {
 	var reportTime4 = 0;
 	try {
 		if (location.hash) {
-			reportTime4 = location.hash.substr(1, location.hash.length)
-		};
-	} catch (e) {
+			reportTime4 = location.hash.substr(1, location.hash.length);
+		}
+	}
+	catch (e) {
 		var f = arguments.callee;
 		setTimeout(f, 50);
 	}
@@ -265,7 +241,6 @@ function onPrePageLoad() {
 		ptui_initFocus(login_form);
 	}
 }
-
 /*
 aid	1003903
 dumy	
@@ -297,4 +272,52 @@ h=1
 &aid=1003903
 &ptredirect=0
 &webqq_type=1
-&dumy= */
+&dumy= 
+
+var DocCompVar = {
+	local:"12196", 
+	attribute:{
+		elementName:"input", 
+		type:"submit", 
+		class:"signin-btn", 
+		src:"http://imgcache.qq.com/ptlogin/v3/style/4/images/btn-signin.gif", 
+		value:"", 
+		tabindex:"5", 
+		id:"login_button"
+	}
+};
+
+
+js= "{ 
+	local:'9759'  ,
+ 	attribute:{ 
+ 		elementName:'form', 
+		id:'loginform'  , 
+		autocomplete:'off'  , 
+		name:'loginform'  , 
+		action:'http://ptlogin2.qq.com/login'  , 
+		method:'post'  , 
+		onsubmit:'onFormSubmit(this);return false;'  , 
+		onreset:'return onFormReset(loginform)'  , 
+		target:'_self'  , 
+		style:'margin:0px;'  }, 
+ 		u:{ 
+ 			value:'QQ号码或Email帐号' 
+ 			} , 
+ 		p:{ value:'' } , 
+ 		verifycode:{ value:'' } , 
+ 		webqq_type:{ value:'1' } , 
+ 		remember_uin:{ value:'1' } , 
+ 		aid:{ value:'1003903' } , 
+ 		u1:{ value:'http://web2.qq.com/loginproxy.html?strong=true' } , 
+ 		fp:{ value:'loginerroralert' } , 
+ 		h:{ value:'1' } , 
+ 		ptredirect:{ value:'0' } , 
+ 		ptlang:{ value:'2052' } , 
+ 		from_ui:{ value:'1' } , 
+ 		pttype:{ value:'1' } , 
+ 		dumy:{ value:'' } 
+ }"
+
+
+*/
