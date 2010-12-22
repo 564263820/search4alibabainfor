@@ -54,8 +54,18 @@
 		previous:{},
 		back :function(){},
 		forward :function(){}
+	},
+	navigator:{
+		appName:'',
+		appVersion:'',
+		language:'',
+		userAgent:''
 	}
  });
+ //window.navigator.appName;
+ //window.navigator.appVersion;
+ //window.navigator.language;
+ //window.navigator.userAgent
  
  /*String.
  window.history.current;
@@ -71,7 +81,7 @@
  
  /**模拟浏览器的getElementById()方法**/
  Element.prototype.getElementById = function(id){
- 	var objScr = Jdocument.getElementById(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
+ 	var objScr = Jdocument.getElementById4Javascript(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
  		//由于
  		var obj = new Element(DocCompVar);//DocCompVar javaScript引擎将getElementById的js对象存入到一个临时的全局变量DocCompVar中
@@ -93,7 +103,7 @@
  
  /**submit方法在并不提交url请求 它在这里只组装好url参数并返回这个又参数构成的字符串**/
  Element.prototype.submit = function(){//模拟submit方法 在这里实际只返回生成的地址
- 	if(this.action){
+ 	if(this.attribute.action){
  		var str = this.attribute.action+"?1=1";
  		for(var par in this){
  			if(par== 'elements') continue;
@@ -104,6 +114,8 @@
  		window.location.href = str;
  		alert(str);
  		return str;
+ 	}else{
+ 		alert('当前表单没有action属性..........submit方法执行失败');
  	}
  	return "";//
  	/*for(var par in this){
