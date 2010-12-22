@@ -14,6 +14,10 @@ package com.wjdeng.client.model.api;
 import java.io.Reader;
 import java.util.List;
 
+import com.wjdeng.imp.URLContentManage;
+
+import net.htmlparser.jericho.Element;
+
 public interface IDocument {
 	
 	/**
@@ -22,7 +26,9 @@ public interface IDocument {
 	 * @param id
 	 * @return
 	 */
-	public String getElementById(String id);
+	public Element getElementById(String id);
+	
+	
 	
 	/**
 	 * 
@@ -42,7 +48,7 @@ public interface IDocument {
 	
 	/**
 	 * 
-	 * 单独引入javascript代码片段
+	 * 单独引入javascript代码片段,并编译
 	 * @param scriptStr
 	 */
 	public void includeJavascript(String scriptStr);
@@ -50,13 +56,14 @@ public interface IDocument {
 	
 	public void includeJavascript(Reader reader);
 	
-	
 	/**
 	 * 
 	 * 获取该文档所有引入的javascript文件地址列表
 	 * @return
 	 */
 	public List<String> getAllJavaScriptUrls();
+	
+	
 	
 }
 
