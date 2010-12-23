@@ -82,9 +82,11 @@ public class QQClientAppContext{
 	}
 	
 	private String getLogonUrl(IDocument doc){
-		doc.eval("onFormSubmit(document.getElementById('loginform'))");
 		String p = doc.eval("hex_md5('"+passw+"')").toString();
 		StringBuilder sb = new StringBuilder();
+		/*String setJs = "var sform  = document.getElementById('loginform'); sform.u.value='"+user+"';sform.p.value='"+p+"';";
+		setJs = setJs + "onFormSubmit(document.getElementById('loginform'))";
+		doc.eval(setJs);*/
 		sb.append(" var form = document.getElementById('loginform'); \n");
 		sb.append("  form.u.value='").append(user).append("';\n");
 		sb.append("  form.p.value='").append(p).append("';\n");
@@ -93,7 +95,7 @@ public class QQClientAppContext{
 		}else{
 			//sb.append("  form.verifycode.value='!EFB';\n");			
 		}
-		sb.append("  form.submit();\n");
+		sb.append("  onFormSubmit(form);form.submit();\n");
 		String httpUrl = doc.eval(sb.toString()).toString();
 		return httpUrl;
 	}
