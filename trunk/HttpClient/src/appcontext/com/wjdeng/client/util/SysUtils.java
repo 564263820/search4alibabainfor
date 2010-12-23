@@ -36,6 +36,15 @@ public class SysUtils {
 			return null;
 		return src;
 	}
+	
+	public static String trim2null(Object src) {
+		if (src == null)
+			return null;
+		String str = src.toString().trim();
+		if ("".equals(str))
+			return null;
+		return str;
+	}
 
 	/**
 	 * 
