@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import net.htmlparser.jericho.FormFields;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
+import net.sf.json.JSONArray;
 
 import com.wjdeng.client.model.api.IDocument;
 import com.wjdeng.client.util.LogUtil;
@@ -116,7 +118,8 @@ public class Document extends Segment implements IDocument {
 	public String getElementById4Javascript(String id){
 		Element  ele= this.getSource().getElementById(id);
 		String js = createJsonByElement(ele);
-		eval(" document.childElements."+id+" = "+js+" ;");
+		//eval(" document.childElements."+id+" = "+js+" ;");
+		//js =" document.childElements."+id+" = "+js+" ;";
 		return js;
 	}
 	
@@ -135,32 +138,49 @@ public class Document extends Segment implements IDocument {
 	 */
 	private String createJsonByElement(Element  ele){
 		StringBuilder sb  = new StringBuilder();
-		sb.append("{ local:'").append(ele.getBegin()).append("' ");//位置
-		sb.append(" ,\n attribute:{ elementName:'").append(ele.getName()).append("'");//节点基本属性
+		sb.append(" var tem  = new Object();\n");
+		sb.append(" tem.local ='").append(ele.getBegin()).append("'; \n");;
+		sb.append(" tem.attribute = new Object(); \n");
+		sb.append(" tem.attribute.elementName='").append(ele.getName()).append("'; \n");//节点基本属性
+		sb.append("");
+		sb.append("");
+		sb.append("");
+		//sb.append("{ local:'").append(ele.getBegin()).append("' ");//位置
+		//sb.append(" ,\n attribute:{ elementName:'").append(ele.getName()).append("'");//节点基本属性
 		Attributes  atts = ele.getAttributes();
 		for(Attribute att : atts){
-			sb.append(", \n" ).append(att.getName()).append(":'").append(att.getValue()).append("'  ");
+			String name  = att.getName();
+			if("class".equals(name)){
+				name = "className";
+			}
+			sb.append("tem.attribute.").append(name).append(" ='").append(StringUtils.string2Json(att.getValue())).append("';  \n");
+			//sb.append(", \n" ).append(att.getName()).append(":'").append(att.getValue()).append("'  ");
 		}
-		sb.append("}");
+		//sb.append("}");
 		if(HTMLElementName.FORM.equals(ele.getName())){//form节点
 			FormFields  formfields = ele.getFormFields();
 			for(FormField field: formfields){
-				sb.append(", \n " ).append(field.getName()).append(":{");
+				
+				sb.append(" tem.").append(field.getName()).append("= new Object();\n");
+				//sb.append(", \n " ).append(field.getName()).append(":{");
 				List<String> vals = field.getValues();
 				if(vals.size()==1){
-					sb.append(" value:'").append(vals.get(0)).append("' ");
+					sb.append(" tem.").append(field.getName()).append(".value='").append(StringUtils.string2Json(vals.get(0))).append("'; \n");
+					//sb.append(" value:'").append(vals.get(0)).append("' ");
 				}else if(vals.size()>2){
-					sb.append(" value:[");
+					sb.append(" tem.").append(field.getName()).append(".value = new Array();\n");
+					//sb.append(" value:[");
 					for(int i=0;i<vals.size()-1;i++){
-						sb.append("'").append(vals.get(i)).append("',");
+						sb.append(" tem.").append(field.getName()).append(".value.push('").append(StringUtils.string2Json(vals.get(i))).append("');\n");
+						//sb.append("'").append(vals.get(i)).append("',");
 					}
-					sb.append("'").append(vals.get(vals.size()-2)).append("'");
-					sb.append(vals.get(0)).append("] ");
+					//sb.append("'").append(vals.get(vals.size()-2)).append("'");
+					//sb.append(vals.get(0)).append("] ");
 				} 
-				sb.append("} ");
+				//sb.append("} ");
 			}
 		}else{
-			FormControl fc = ele.getFormControl();
+			/*FormControl fc = ele.getFormControl();
 			if(null != fc){
 				List<String> vals = fc.getValues();
 				if(vals.size()==1){
@@ -173,10 +193,11 @@ public class Document extends Segment implements IDocument {
 					sb.append("'").append(vals.get(vals.size()-2)).append("'");
 					sb.append(vals.get(0)).append("] ");
 				} 
-			}
+			}*/
 		}
 		
-		sb.append("}");
+		//sb.append("}");
+		sb.append(" return tem; ");
 		return sb.toString();
 	}
 
@@ -288,23 +309,24 @@ public class Document extends Segment implements IDocument {
 		if(this.urlConnection==null)throw new Exception("该文档没有设置地址连接对象（URLContentManage），不能请求url进行js加载");
 		List<Element> list = this.getAllElements("script");
 		List<String> rl = new ArrayList<String>();
-		this.eval("document.getElementById(\"login_button\");");
+		//this.eval("document.getElementById(\"login_button\");");
 		for(Element element : list){
 			String url  =element.getAttributeValue("src");//
 			if(SysUtils.trim2null(url)==null){
 				String js = element.getContent().toString();
-				System.out.println(js);
-				System.out.println("/////////////////////////////-----------------------------------");
+				//System.out.println(js);
 				this.includeJavascript(js);
 			}else{
-				Map<String,Object> map = this.urlConnection.getContentByURL(this.domain+url);
+				//System.out.println(this.getSource().toString())
+				Map<String,Object> map = this.urlConnection.getContentByURL(url);
 				String jsfile = map.get(URLContentManage.KEY_CONTENT).toString();
-				String chartSet = map.get(URLContentManage.KEY_CHARSET).toString();
+				String chartSet =SysUtils.trim2null(map.get(URLContentManage.KEY_CHARSET));
 				chartSet = chartSet==null?this.chartSet:chartSet;
 				String js = new String(jsfile.getBytes(HTTP.ISO_8859_1),chartSet);
 				this.includeJavascript(js);
 			}
 		}
+		//System.out.println("/////////////////////////////-----------------------------------");
 		
 	}
 
@@ -316,6 +338,15 @@ public class Document extends Segment implements IDocument {
 		this.urlConnection = urlConnection;
 	}
 	
+	
+	public String encode(String url){
+		try {
+			return java.net.URLEncoder.encode(url, HTTP.UTF_8);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return url;
+		}
+	}
 	
 
 
