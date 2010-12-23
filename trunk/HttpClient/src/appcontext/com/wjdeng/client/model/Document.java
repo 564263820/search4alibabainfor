@@ -207,10 +207,12 @@ public class Document extends Segment implements IDocument {
 			return getScriptEngine().eval(script);
 		} catch (ScriptException e) {
 			e.printStackTrace();
-			LogUtil.getLogger(getClass().getSimpleName()).error("js脚本错误");
+			System.out.println(script);
+			//LogUtil.getLogger(getClass().getSimpleName()).error("js脚本错误");
 		} catch (IOException e) {
+			System.out.println(script);
 			e.printStackTrace();
-			LogUtil.getLogger(getClass().getSimpleName()).error("加载脚本引擎失败!");
+			//LogUtil.getLogger(getClass().getSimpleName()).error("加载脚本引擎失败!");
 		}
 		return null;
 	}
