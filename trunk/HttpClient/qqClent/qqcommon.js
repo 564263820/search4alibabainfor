@@ -172,6 +172,7 @@ function ptui_checkQQUin(qquin) {
 	}
 	return true
 }
+//qq.com ,2010 ,true ,0
 function ptui_changeImgEx(D, C, G, F) {
 	changeimg = true;
 	var A = $("imgVerify");
@@ -195,6 +196,7 @@ function ptui_changeImg(B, A, D) {
 	if ((g_appid == t_appid) && isNaN(g_uin) && (g_uin.indexOf("@") < 0)) {
 		C = "@" + g_uin
 	}
+		//qq.com ,2010 ,true ,0
 	ptui_changeImgEx(B, A, D, "http://captcha." + B + "/getimage?&uin=" + C)
 }
 function ptui_changeImgHttps(B, A, D) {
@@ -498,11 +500,15 @@ function ptui_speedReport(E) {
 	if (!first) {
 		return
 	}
-	if (Math.random() > 0.001) {
-		return
+	var t = Math.random()
+	alert(t);
+	if (t > 0.001) {
+		//return
 	}
+	alert(".................");
 	var B = "http://isdspeed.qq.com/cgi-bin/r.cgi?flag1=6000&flag2=1&flag3="
 			+ browser_version();
+	alert(B);
 	var C = 0;
 	for (var D in E) {
 		B += "&" + D + "=" + E[D];
@@ -511,6 +517,7 @@ function ptui_speedReport(E) {
 	if (C == 0) {
 		return
 	}
+	alert("左思的..............................22222222");
 	var A = new Image();
 	A.src = B
 }
@@ -639,6 +646,7 @@ function ptui_checkValidate(B) {
 	ajax_Submit();
 	ptui_reportNum(g_changeNum);
 	g_changeNum = 0;
+	alert(B.verifycode+'                     '+B.verifycode.value);
 	return true
 }
 function setCookie(C, E) {
@@ -1056,3 +1064,16 @@ try {
 	}
 } catch (e) {
 };/*  |xGv00|eaa967eeb44f408aa6535efd5ff763f1 */
+
+
+function onFormSubmit(form)
+{
+	if (form.remember_uin.checked){
+		return ptui_onLoginEx(form, "qq.com")
+	}else{				
+		var myDate=new Date();
+		myDate.setFullYear(1971,1,1);
+		setCookie("ptui_loginuin",  "", myDate, '/', 'ui.ptlogin2.qq.com');
+		return ptui_onLogin(form);
+	}
+}
