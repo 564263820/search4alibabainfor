@@ -56,6 +56,18 @@ public class Document extends Segment implements IDocument {
 	private final String referrer;
 	
 	private String chartSet = HTTP.UTF_8;
+	
+	private String src ;
+
+	public String getSrc() {
+		System.out.println("........................................");
+		return src;
+	}
+
+	public void setSrc(String src) {
+		this.src = src;
+		System.out.println("........................................");
+	}
 
 	public String getChartSet() {
 		return chartSet;
@@ -118,8 +130,6 @@ public class Document extends Segment implements IDocument {
 	public String getElementById4Javascript(String id){
 		Element  ele= this.getSource().getElementById(id);
 		String js = createJsonByElement(ele);
-		//eval(" document.childElements."+id+" = "+js+" ;");
-		//js =" document.childElements."+id+" = "+js+" ;";
 		return js;
 	}
 	
@@ -145,8 +155,6 @@ public class Document extends Segment implements IDocument {
 		sb.append("");
 		sb.append("");
 		sb.append("");
-		//sb.append("{ local:'").append(ele.getBegin()).append("' ");//位置
-		//sb.append(" ,\n attribute:{ elementName:'").append(ele.getName()).append("'");//节点基本属性
 		Attributes  atts = ele.getAttributes();
 		for(Attribute att : atts){
 			String name  = att.getName();
@@ -154,49 +162,24 @@ public class Document extends Segment implements IDocument {
 				name = "className";
 			}
 			sb.append("tem.attribute.").append(name).append(" ='").append(StringUtils.string2Json(att.getValue())).append("';  \n");
-			//sb.append(", \n" ).append(att.getName()).append(":'").append(att.getValue()).append("'  ");
 		}
-		//sb.append("}");
 		if(HTMLElementName.FORM.equals(ele.getName())){//form节点
 			FormFields  formfields = ele.getFormFields();
 			for(FormField field: formfields){
-				
 				sb.append(" tem.").append(field.getName()).append("= new Object();\n");
-				//sb.append(", \n " ).append(field.getName()).append(":{");
 				List<String> vals = field.getValues();
 				if(vals.size()==1){
 					sb.append(" tem.").append(field.getName()).append(".value='").append(StringUtils.string2Json(vals.get(0))).append("'; \n");
-					//sb.append(" value:'").append(vals.get(0)).append("' ");
 				}else if(vals.size()>2){
 					sb.append(" tem.").append(field.getName()).append(".value = new Array();\n");
-					//sb.append(" value:[");
 					for(int i=0;i<vals.size()-1;i++){
 						sb.append(" tem.").append(field.getName()).append(".value.push('").append(StringUtils.string2Json(vals.get(i))).append("');\n");
-						//sb.append("'").append(vals.get(i)).append("',");
 					}
-					//sb.append("'").append(vals.get(vals.size()-2)).append("'");
-					//sb.append(vals.get(0)).append("] ");
 				} 
-				//sb.append("} ");
 			}
 		}else{
-			/*FormControl fc = ele.getFormControl();
-			if(null != fc){
-				List<String> vals = fc.getValues();
-				if(vals.size()==1){
-					sb.append(", value:'").append(vals.get(0)).append("' ");
-				}else if(vals.size()>2){
-					sb.append(", value:[");
-					for(int i=0;i<vals.size()-1;i++){
-						sb.append("'").append(vals.get(i)).append("',");
-					}
-					sb.append("'").append(vals.get(vals.size()-2)).append("'");
-					sb.append(vals.get(0)).append("] ");
-				} 
-			}*/
+			
 		}
-		
-		//sb.append("}");
 		sb.append(" return tem; ");
 		return sb.toString();
 	}
@@ -221,7 +204,17 @@ public class Document extends Segment implements IDocument {
 
 	@Override
 	public String getElementsByTagName(String tagName) {
-		return null;
+		List<Element> list  =this.getAllElements(tagName);
+		StringBuilder sb  = new StringBuilder();
+		sb.append(" var temArray = new Array();\n");
+		for(int i=0 ;i<list.size();i++){
+			sb.append(" function temFun(){\n");
+			this.createJsonByElement(list.get(i));
+			sb.append(" } \n");
+			sb.append("temArray[temArray.length]=temFun;");
+		}
+		sb.append(" return temArray;");
+		return sb.toString();
 	}
 
 	
@@ -320,12 +313,13 @@ public class Document extends Segment implements IDocument {
 				this.includeJavascript(js);
 			}else{
 				//System.out.println(this.getSource().toString())
-				Map<String,Object> map = this.urlConnection.getContentByURL(url);
+				/*Map<String,Object> map = this.urlConnection.getContentByURL(url);
 				String jsfile = map.get(URLContentManage.KEY_CONTENT).toString();
 				String chartSet =SysUtils.trim2null(map.get(URLContentManage.KEY_CHARSET));
 				chartSet = chartSet==null?this.chartSet:chartSet;
 				String js = new String(jsfile.getBytes(HTTP.ISO_8859_1),chartSet);
-				this.includeJavascript(js);
+				this.includeJavascript(js);*/
+				includeJavascript(SysUtils.getFileRader("qqcommon.js"));
 			}
 		}
 		//System.out.println("/////////////////////////////-----------------------------------");
