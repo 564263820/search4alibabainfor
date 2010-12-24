@@ -95,7 +95,7 @@ public class QQClientAppContext{
 		}else{
 			//sb.append("  form.verifycode.value='!EFB';\n");			
 		}
-		sb.append("  onFormSubmit(form);form.submit();\n");
+		sb.append("imgLoadReport();onFormSubmit(form);//form.submit();\n");
 		String httpUrl = doc.eval(sb.toString()).toString();
 		return httpUrl;
 	}
