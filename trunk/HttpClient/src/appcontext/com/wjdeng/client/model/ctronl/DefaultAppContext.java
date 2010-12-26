@@ -194,7 +194,7 @@ public class DefaultAppContext implements AppContext {
 	 */
 	public String getContentByUrl(String url) {
 		ModeParament par = parLoacl.get();
-		URLContentManage um = par.getUrlConnectio();
+		URLContentManage um = par.getUrlConnection();
 		Map<String, Object> map = null;
 		String str = "";
 		try {
@@ -244,7 +244,7 @@ public class DefaultAppContext implements AppContext {
 			// boolean b=
 			// url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
 			// System.out.println(b);
-			String url = "http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Shanghai--------------------";
+			//String url = "http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Shanghai--------------------";
 			//String url3= "http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Zhejiang--------------------";
 			String url4="http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Jiangsu--------------------";
 			String url5="http://www.alibaba.com/Toy-Cars_sid2606?npp=2606--CN----Anhui--------------------";
@@ -259,13 +259,13 @@ public class DefaultAppContext implements AppContext {
 			//String url =  "http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true";
 		    //boolean b= url.equals("http://www.globalsources.com/gsol/GeneralManager?&design=clean&language=en&supplier_search=off&stateVal=Zhejiang&query=christmas+items&loc=t&type=new&point_search=on&product_search=on&search_what=1&page=search/ProductSearchResults&ctryVal=China%20(mainland)&action=GetPoint&action=DoFreeTextSearch&AGG=N&cpallfrProd=kw&compare_table=true&point_id=3000000149681&catalog_id=2000000003844&supp_list=true");
 			//System.out.println(b);
-			String url6= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Zhejiang--------------------";
+			String url6= "http://web2.qq.com/js/jet.all.js?t=20101111002";
 			String url7= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Shanghai--------------------";
-			String url8= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Jiangsu--------------------";
-			String url9= "http://www.alibaba.com/Fitness-Body-Building_sid2009?npp=2009--CN----Anhui--------------------";
+			String url8= "http://www.alibaba.com/trade/search?SearchText=anhui&Country=&CatId=26&IndexArea=product_en&fsb=y&viewAllCategory=";
+			String url9= "http://www.alibaba.com/products/toys/CN----Zhejiang------------_1-CN,.html";
 			String url0= "http://www.made-in-china.com/productdirectory.do?action=hunt&code=mOpYSQEPznJx&order=0&style=b&page=2&memberLevel=&asFlag=&comProvince=nolimit&propertyValues=2902070000_79674&from=hunt&word=auto+parts&mode=and&comName=&comCode=&subCode=&size=30&viewType=1&toTradeMarkets=&sizeHasChanged=0&viewMoreOrLessClass=viewLess";
 			String ssss= "http://www.made-in-china.com/productdirectory.do?comname=&propertyvalues=2902070000_79674&word=auto+parts&style=b&order=0&from=hunt&memberlevel=&size=30&viewtype=1&asflag=&mode=and&viewmoreorlessclass=viewLess&comprovince=nolimit&elements=undefined&subcode=&totrademarkets=&page=3&sizehaschanged=0&code=mOpYSQEPznJx&comcode=&";
-		    AppContext  app =DefaultAppContext.Instance(url0);
+		    AppContext  app =DefaultAppContext.Instance(url8,100);
 			Thread th = new Thread(app);
 			//Thread th= new Thread(app);
 			th.start();
