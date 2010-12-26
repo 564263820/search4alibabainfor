@@ -6,11 +6,17 @@
  ********************************************************************************/
 package com.wjdeng.client.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
@@ -80,11 +86,6 @@ public class SysUtils {
 			String filePath = SysUtils.class.getClassLoader().getResource("")
 					.getPath();
 			filePath = filePath.replaceAll("%20", " ");
-			/*
-			 * String filePath = "D:" + File.separator + "alibabhtml"; filePath =
-			 * filePath.toString(); File myFilePath = new File(filePath); if
-			 * (!myFilePath.exists()) { myFilePath.mkdir(); }
-			 */
 			filePath += File.separator + System.currentTimeMillis() + ".html";
 			File myFilePath = new File(filePath);
 			if (!myFilePath.exists()) {
@@ -96,6 +97,26 @@ public class SysUtils {
 			myFile.println(strContent);
 			resultFile.close();
 		} catch (IOException e) {
+			LogUtil.getLogger(SysUtils.class.getSimpleName()).error(e);
+		}
+
+	}
+
+	public static void wirtfile(byte[] bytes,String pex) {
+		try {
+			String filePath = SysUtils.class.getClassLoader().getResource("").getPath();
+			filePath = filePath.replaceAll("%20", " ");
+			filePath += File.separator + System.currentTimeMillis() + "."+pex;
+			File myFilePath = new File(filePath);
+			if (!myFilePath.exists()) {
+				myFilePath.createNewFile();
+			}
+			java.io.FileOutputStream fos = new FileOutputStream(myFilePath);
+			fos.write(bytes);
+			fos.close();
+			System.out.println(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
 			LogUtil.getLogger(SysUtils.class.getSimpleName()).error(e);
 		}
 
