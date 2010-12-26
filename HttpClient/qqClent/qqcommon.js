@@ -517,7 +517,6 @@ function ptui_speedReport(E) {
 	if (C == 0) {
 		return
 	}
-	alert("左思的..............................22222222");
 	var A = new Image();
 	A.src = B
 }
@@ -875,6 +874,7 @@ function check() {
 		g_time.time9 = B
 	}
 	var A = ptui_trim($("u").value);
+	alert("-----------------------------1111111111111111111"+A);
 	if (g_uin == A || (!ptui_checkQQUin(A))) {
 		return
 	}
@@ -886,6 +886,7 @@ function check() {
 		}
 	} catch (C) {
 	}
+	alert("-----------------------------1111111111111111111");
 	ptui_needVC(g_uin, g_appid)
 }
 function loadVC(A) {

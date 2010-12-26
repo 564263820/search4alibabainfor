@@ -323,5 +323,14 @@ http://ptlogin2.qq.com/login?u=1732960362&p=2D90410AC622A25678064A6F0370AFB7&ver
 http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Fstrong%3Dtrue&h=1&ptredirect=0&ptlang=2052&from_ui=1&pttype=1&dumy=&fp=loginerroralert
 http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Fstrong%3Dtrue
 http://ptlogin2.qq.com/login?1=1&h=1&u1=http://web2.qq.com/loginproxy.html?strong=true&verifycode=&p=5BEC7815599AA7C902988C8DE080A7D8&attribute=undefined&u=1732960362&pttype=1&fp=loginerroralert&ptlang=2052&from_ui=1&remember_uin=1&aid=1003903&ptredirect=0&webqq_type=1&dumy= 
+http://ui.ptlogin2.qq.com/cgi-bin/login?
+target=self&
+style=4&
+appid=1003903&
+enable_qlogin=0&
+no_verifyimg=1&
+s_url=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Fstrong%3Dtrue&
+f_url=loginerroralert
+http://ptlogin2.qq.com/login?h=1&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Fstrong%3Dtrue&verifycode=vdpq&p=5BEC7815599AA7C902988C8DE080A7D8&u=1732960362&pttype=1&fp=loginerroralert&ptlang=2052&from_ui=1&remember_uin=1&aid=1003903&ptredirect=0&webqq_type=1&dumy=& 
 
 */
