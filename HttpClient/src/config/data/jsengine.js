@@ -11,8 +11,8 @@
  }
  
  function setTimeout(code,millisec){
- 	alert(code);
- 	alert(millisec);
+ 	alert("TimeCode:   "+code);
+ 	alert("TimeCode:millisec "+millisec);
  }
  
  
@@ -26,10 +26,18 @@
 	 		this.attribute = obj.attribute;
 		 }
 		 this.elements = new Object();
+		 if(!document)return;
 		 for(var par in obj){//所有表单元素节点(from对象才会初始化表单元素节点)
 		    if(par=='attribute')continue;
-		 	this.elements[par]= obj[par];
-		 	this[par] = obj[par];	
+		    var element  = 	new Element(obj[par]);
+		 	this.elements[par]= element; 
+		 	var id = element.id;
+		 	if(id){
+		 		document.childElements["'"+id+"'"] = element;
+		 	} 
+		 	document.docAllElements[element.local]= element;//local标记可以唯一确定该节点对象，每个节点在文档的位置肯定是不同的
+		 	document.all[document.all.length]=element;
+		 	this[par] = element;	
 		 }
 	}
 	this.style = {
@@ -40,7 +48,6 @@
  
  function Image(){
  	Element.call(this);
- 	alert("_______________________________________");
  	Jdocument.src='test';
  }
 
@@ -51,25 +58,22 @@
  
  /**模拟浏览器的getElementById()方法**/
  Element.prototype.getElementById = function(id){
- 	//alert(id);
  	var returnObj=null;
  	if(document.childElements["'"+id+"'"]){
- 		returnObj= document.childElements["'"+id+"'"];
+ 		return document.childElements["'"+id+"'"];
  	}
  	var objScr = Jdocument.getElementById4Javascript(id);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	objScr = " function genraObject(){ "+objScr + "};genraObject();";
  	if(objScr){
-	 	//alert('-------------------------------------------------------');
  		var tem = Jdocument.eval(objScr);//这里的 objSrc == document.childElements[id]={} 
- 		var obj = new Element(tem);//所以有了 document.childElements[id]的引用
- 		document.childElements["'"+id+"'"]=obj;
- 		//alert(obj);
- 		//alert(document.all);
- 		document.all.push(obj);
- 		returnObj= obj;
- 	}
- 	if(id=='loginform'){
- 		alert(returnObj.u.value.length);
+ 		var element = new Element(tem);//所以有了 document.childElements[id]的引用
+ 		if(document.docAllElements[element.local]){
+ 			returnObj= document.docAllElements[element.local];
+ 		}else{
+	 		document.childElements["'"+id+"'"]=element;
+	 		document.all.push(element);
+	 		returnObj= element;
+ 		}
  	}
  	return returnObj;
  }
@@ -84,16 +88,18 @@
 	 		this.childElements[element.id] = element;
 	 	}
 	 	if(element.src){
-	 		alert(element.src);
+	 		if(element.tagName.toLowerCase()=='script'){
+	 			Jdocument.includeJavascriptByUrl(element.src);
+	 		}
 	 		return element.src;
 	 	}
  	}
  }
  
-  Element.prototype.createElement = function(tageName){
+  Element.prototype.createElement = function(tagName){
  	var tem = new Element();
- 	if(tageName){
- 		tem.tageName = tageName;
+ 	if(tagName){
+ 		tem.tagName = tagName;
  	}
  	return tem;
  }
@@ -136,7 +142,6 @@
  		}
  		str = this.attribute.action+"?"+ str;
  		window.location.href = str;
- 		alert(str);
  		return str;
  	}else{
  		alert('当前表单没有action属性..........submit方法执行失败');
@@ -154,41 +159,50 @@
  
   /**模拟浏览器的window对象**/
  var window = new Element({
-	document:document,
-	location:{
-		href:{},
-		port:{}
-	},
-	history:{
-		current:{},
-		next:{},
-		previous:{},
-		back :function(){},
-		forward :function(){}
-	},
-	navigator:{
-		appName:'',
-		appVersion:'',
-		language:'',
-		userAgent:'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.9) Gecko/20100824 Firefox/3.6.9'
+	 attribute:{
+		document:document,
+		location:{
+			href:{},
+			port:{}
+		},
+		history:{
+			current:{},
+			next:{},
+			previous:{},
+			back :function(){},
+			forward :function(){}
+		},
+		navigator:{
+			appName:'',
+			appVersion:'',
+			language:'',
+			userAgent:'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.9) Gecko/20100824 Firefox/3.6.9'
+		}
 	}
  });
  
  /**模拟浏览器的document对象**/
  var document= new Element({
-	body:new Element(),
-	cookie:new Array(),//coookie
-	domain	:Jdocument.domain,//当前文档域名
-	lastModified:'',//暂不提供
-	referrer:Jdocument.referrer,//当前文档url
-	title:'',//暂不提供
-	URL:Jdocument.url,//当前文档url
-	all : new Array(),
-	childElements:new Object(),
-	navigator:window.navigator
+ 	attribute:{
+ 		local:'0',
+		cookie:new Array(),//coookie
+		domain	:Jdocument.domain,//当前文档域名
+		lastModified:'',//暂不提供
+		referrer:Jdocument.referrer,//当前文档url
+		title:'',//暂不提供
+		URL:Jdocument.url,//当前文档url
+		childElements:new Object(),
+		docAllElements:new Object(),
+		navigator:window.navigator
+	}
  });
- document.forms=document.getElementsByTagName('form');
  
+
+ 
+ document.forms=document.getElementsByTagName('form');
+ document.all=new Array();
+ document.body = document.getElementsByTagName('body')[0];
+
  var navigator = window.navigator;
  
  /*
