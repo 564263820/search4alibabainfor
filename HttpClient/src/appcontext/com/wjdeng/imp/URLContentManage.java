@@ -51,6 +51,8 @@ public class URLContentManage implements URLContent {
 	private HttpClient client = new DefaultHttpClient();
 
 	public static String KEY_CONTENT = "content";
+	
+	public static String KEY_CONTENT_BYTES = "content_bytes";
 
 	public static String KEY_CHARSET = "CharSet";
 	
@@ -72,7 +74,15 @@ public class URLContentManage implements URLContent {
 		response = client.execute(httget);
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
-			map.put(KEY_CONTENT, EntityUtils.toString(entity));
+			String conteT =response.getHeaders("Content-Type").toString();
+			if(conteT.indexOf("image")>-1){
+			   byte[] content =EntityUtils.toByteArray(entity);
+				map.put(KEY_CONTENT_BYTES, content);
+			}else{
+				String content = EntityUtils.toString(entity);
+				map.put(KEY_CONTENT, content);
+				map.put(KEY_CONTENT_BYTES, content.getBytes());
+			}
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		this.clearMuCookie();
@@ -116,6 +126,8 @@ public class URLContentManage implements URLContent {
 		}
 		System.out.println(sb.toString());
 	}
+	
+
 
 	
 	public Map<String, Object> getContentByURL(String url)
@@ -131,7 +143,15 @@ public class URLContentManage implements URLContent {
 		response = client.execute(httpost);
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
-			map.put(KEY_CONTENT, EntityUtils.toString(entity));
+			String conteT =response.getFirstHeader("Content-Type").toString();
+			if(conteT.indexOf("image")>-1){
+				byte[] content =EntityUtils.toByteArray(entity);
+				map.put(KEY_CONTENT_BYTES, content);
+			}else{
+				String content = EntityUtils.toString(entity);
+				map.put(KEY_CONTENT, content);
+				map.put(KEY_CONTENT_BYTES, content.getBytes());
+			}
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		clearMuCookie();
@@ -154,9 +174,11 @@ public class URLContentManage implements URLContent {
 	}
 
 	public static void main(String[] arg) {
-		/*java.net.URL urlt;
+		java.net.URL urlt;
 		try {
-			urlt = new URL("http://web.qq.com/");
+			String ulr = "http://ptlogin2.qq.com/check?uin=1732960362&appid=1003903&r=0.6346154530793598";
+				//String ulr = "http://ptlogin2.qq.com/check?uin=dffds@qq.com&appid=1003903&r=0.3902226305408123";
+			urlt = new URL(ulr );
 			URLConnection  urlc = urlt.openConnection();
 			urlc.connect();
 			java.io.BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(urlc.getInputStream())));
@@ -172,18 +194,20 @@ public class URLContentManage implements URLContent {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
+		
+		/*
 		//String s = new String(urlc.getBytes(),"utf-8");
 		List<String> list = new ArrayList<String>();
 		//list.add("http://www.alibaba.com/");
 		list.add("http://www.163.com");
-		/*
+		
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
 		list.add("http://192.168.0.126:8080/MainFrame");
-		list.add("http://192.168.0.126:8080/MainFrame");*/
+		list.add("http://192.168.0.126:8080/MainFrame");
 		URLContentManage um = new URLContentManage();
 		for (String url : list) {
 			try {
@@ -201,7 +225,7 @@ public class URLContentManage implements URLContent {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 
 	@Override
