@@ -60,13 +60,12 @@ public class Document extends Segment implements IDocument {
 	private String src ;
 
 	public String getSrc() {
-		System.out.println("........................................");
 		return src;
 	}
 
 	public void setSrc(String src) {
 		this.src = src;
-		System.out.println("........................................");
+		System.out.println(src);
 	}
 
 	public String getChartSet() {
@@ -149,12 +148,9 @@ public class Document extends Segment implements IDocument {
 	private String createJsonByElement(Element  ele){
 		StringBuilder sb  = new StringBuilder();
 		sb.append(" var tem  = new Object();\n");
-		sb.append(" tem.local ='").append(ele.getBegin()).append("'; \n");;
 		sb.append(" tem.attribute = new Object(); \n");
-		sb.append(" tem.attribute.elementName='").append(ele.getName()).append("'; \n");//节点基本属性
-		sb.append("");
-		sb.append("");
-		sb.append("");
+		sb.append(" tem.attribute.tagName='").append(ele.getName()).append("'; \n");//节点基本属性
+		sb.append(" tem.attribute.local ='").append(ele.getBegin()).append("'; \n");;
 		Attributes  atts = ele.getAttributes();
 		for(Attribute att : atts){
 			String name  = att.getName();
@@ -167,6 +163,18 @@ public class Document extends Segment implements IDocument {
 			FormFields  formfields = ele.getFormFields();
 			for(FormField field: formfields){
 				sb.append(" tem.").append(field.getName()).append("= new Object();\n");
+				sb.append(" tem.").append(field.getName()).append(".attribute = new Object(); \n");
+				Element fele =field.getFormControl().getElement();
+				sb.append(" tem.").append(field.getName()).append(".attribute.local ='").append(fele.getBegin()).append("'; \n");;
+				sb.append(" tem.").append(field.getName()).append(".attribute.tagName ='").append(fele.getName()).append("'; \n");;
+				Attributes  fatts = fele.getAttributes();
+				for(Attribute att : fatts){
+					String name  = att.getName();
+					if("class".equals(name)){
+						name = "className";
+					}
+					sb.append(" tem.").append(field.getName()).append(".attribute.").append(name).append(" ='").append(StringUtils.string2Json(att.getValue())).append("';  \n");
+				}
 				List<String> vals = field.getValues();
 				if(vals.size()==1){
 					sb.append(" tem.").append(field.getName()).append(".value='").append(StringUtils.string2Json(vals.get(0))).append("'; \n");
@@ -247,18 +255,40 @@ public class Document extends Segment implements IDocument {
 
 	@Override
 	public void includeJavascript(String scriptStr) {
-			try {
-				if(this.sengine==null){
-					this.getScriptEngine();
-				}
-				Compilable compilable = (Compilable) sengine;
-				CompiledScript comptScript = compilable.compile(scriptStr);
-				comptScript.eval(sengine.getContext());
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ScriptException e) {
-				e.printStackTrace();
+		try {
+			if(this.sengine==null){
+				this.getScriptEngine();
 			}
+			Compilable compilable = (Compilable) sengine;
+			CompiledScript comptScript = compilable.compile(scriptStr);
+			comptScript.eval(sengine.getContext());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 * 从地址源include js
+	 * @param scriptUrl
+	 */
+	public void includeJavascriptByUrl(String scriptUrl) {
+		try {
+			Map<String,Object> map = this.urlConnection.getContentByURL(scriptUrl,true);
+			String jsfile = map.get(URLContentManage.KEY_CONTENT).toString();
+			String chartSet =SysUtils.trim2null(map.get(URLContentManage.KEY_CHARSET));
+			chartSet = chartSet==null?this.chartSet:chartSet;
+			String js = new String(jsfile.getBytes(HTTP.ISO_8859_1),chartSet);
+			this.includeJavascript(js);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -303,26 +333,16 @@ public class Document extends Segment implements IDocument {
 	public void loadCompiledAllPageJS() throws Exception{
 		if(this.urlConnection==null)throw new Exception("该文档没有设置地址连接对象（URLContentManage），不能请求url进行js加载");
 		List<Element> list = this.getAllElements("script");
-		List<String> rl = new ArrayList<String>();
-		//this.eval("document.getElementById(\"login_button\");");
 		for(Element element : list){
 			String url  =element.getAttributeValue("src");//
 			if(SysUtils.trim2null(url)==null){
 				String js = element.getContent().toString();
-				//System.out.println(js);
 				this.includeJavascript(js);
 			}else{
-				//System.out.println(this.getSource().toString())
-				/*Map<String,Object> map = this.urlConnection.getContentByURL(url);
-				String jsfile = map.get(URLContentManage.KEY_CONTENT).toString();
-				String chartSet =SysUtils.trim2null(map.get(URLContentManage.KEY_CHARSET));
-				chartSet = chartSet==null?this.chartSet:chartSet;
-				String js = new String(jsfile.getBytes(HTTP.ISO_8859_1),chartSet);
-				this.includeJavascript(js);*/
+				//this.includeJavascriptByUrl(url);
 				includeJavascript(SysUtils.getFileRader("qqcommon.js"));
 			}
 		}
-		//System.out.println("/////////////////////////////-----------------------------------");
 		
 	}
 
