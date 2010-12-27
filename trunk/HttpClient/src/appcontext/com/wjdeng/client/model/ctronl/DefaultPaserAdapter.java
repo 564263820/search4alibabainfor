@@ -68,7 +68,7 @@ public class DefaultPaserAdapter implements IPaser,IpaserAdapter {
 			}
 			rmap.put(tem, val);
 		}
-		if(smap.size()==0)return dmap;
+		if(smap.size()==0)return dmap;//电话和手机 都没有返回空
 		/*if(!SearchService.Instance().isExist(smap)){//索引查询该信息是否已经存在
 			IndexManager.Instance().writeIndex(rmap);
 			return rmap;
