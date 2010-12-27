@@ -13,7 +13,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -21,21 +20,18 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.apache.http.protocol.HTTP;
-
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Element;
-import net.htmlparser.jericho.FormControl;
 import net.htmlparser.jericho.FormField;
 import net.htmlparser.jericho.FormFields;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
-import net.sf.json.JSONArray;
+
+import org.apache.http.protocol.HTTP;
 
 import com.wjdeng.client.model.api.IDocument;
-import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.URLContentManage;
@@ -231,6 +227,7 @@ public class Document extends Segment implements IDocument {
 			ScriptEngineManager smanager = new ScriptEngineManager();
 			sengine = smanager.getEngineByName("javascript");
 			sengine.put("Jdocument", this);
+			sengine.put("function TElement(){}", JsDomElement.class);
 			if(this.jsengineStr==null){
 				jsengineStr = this.loadJsEngineStr();
 				Compilable compilable = (Compilable) sengine;
