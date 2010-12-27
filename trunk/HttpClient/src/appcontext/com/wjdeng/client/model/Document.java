@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -173,11 +174,11 @@ public class Document extends Segment implements IDocument {
 				}
 				List<String> vals = field.getValues();
 				if(vals.size()==1){
-					sb.append(" tem.").append(field.getName()).append(".value='").append(StringUtils.string2Json(vals.get(0))).append("'; \n");
+					sb.append(" tem.").append(field.getName()).append(".attribute.value='").append(StringUtils.string2Json(vals.get(0))).append("'; \n");
 				}else if(vals.size()>2){
-					sb.append(" tem.").append(field.getName()).append(".value = new Array();\n");
+					sb.append(" tem.").append(field.getName()).append(".attribute.value = new Array();\n");
 					for(int i=0;i<vals.size()-1;i++){
-						sb.append(" tem.").append(field.getName()).append(".value.push('").append(StringUtils.string2Json(vals.get(i))).append("');\n");
+						sb.append(" tem.").append(field.getName()).append(".attribute.value.push('").append(StringUtils.string2Json(vals.get(i))).append("');\n");
 					}
 				} 
 			}
@@ -227,7 +228,6 @@ public class Document extends Segment implements IDocument {
 			ScriptEngineManager smanager = new ScriptEngineManager();
 			sengine = smanager.getEngineByName("javascript");
 			sengine.put("Jdocument", this);
-			sengine.put("function TElement(){}", JsDomElement.class);
 			if(this.jsengineStr==null){
 				jsengineStr = this.loadJsEngineStr();
 				Compilable compilable = (Compilable) sengine;
@@ -336,8 +336,11 @@ public class Document extends Segment implements IDocument {
 				String js = element.getContent().toString();
 				this.includeJavascript(js);
 			}else{
-				//this.includeJavascriptByUrl(url);
-				includeJavascript(SysUtils.getFileRader("qqcommon.js"));
+				if(url.indexOf("comm.js")>-1){
+					includeJavascript(SysUtils.getFileRader("qqcommon.js"));
+				}else{
+					this.includeJavascriptByUrl(url);
+				}
 			}
 		}
 		
