@@ -30,14 +30,21 @@
 		 for(var par in obj){//所有表单元素节点(from对象才会初始化表单元素节点)
 		    if(par=='attribute')continue;
 		    var element  = 	new Element(obj[par]);
-		 	this.elements[par]= element; 
 		 	var id = element.id;
-		 	if(id){
-		 		document.childElements["'"+id+"'"] = element;
-		 	} 
-		 	document.docAllElements[element.local]= element;//local标记可以唯一确定该节点对象，每个节点在文档的位置肯定是不同的
-		 	document.all[document.all.length]=element;
-		 	this[par] = element;	
+		 	if(element.local){
+		 		var cachet =document.docAllElements[element.local];
+		 		if(cachet){//该位置存在节点
+		 			element = cachet;
+			 		if(id && !document.childElements["'"+id+"'"]){
+				 		document.childElements["'"+id+"'"] = element;
+				 	} 
+		 		}else{
+		 			document.docAllElements[element.local]=element ;
+				 	document.all[document.all.length]=element;
+		 		}
+	 			this[par] = element;
+		 	}
+		 	this.elements[par]= element; 
 		 }
 	}
 	this.style = {
@@ -70,10 +77,11 @@
  		if(document.docAllElements[element.local]){
  			returnObj= document.docAllElements[element.local];
  		}else{
-	 		document.childElements["'"+id+"'"]=element;
+ 			document.docAllElements[element.local]=element;
 	 		document.all.push(element);
 	 		returnObj= element;
  		}
+ 		document.childElements["'"+id+"'"]=returnObj;
  	}
  	return returnObj;
  }
@@ -104,6 +112,11 @@
  	return tem;
  }
  
+ /**
+  * 模拟getElementsByTagName方法
+  * @param {} name
+  * @return {}
+  */
  Element.prototype.getElementsByTagName = function(name){
  	var result = new Array();
  	if(!name)return result;
@@ -112,17 +125,21 @@
 	 	objScr = " function genraObject(){ "+objScr + "}; genraObject(); ";
 	 	var elements = Jdocument.eval(objScr);
 	 	for(var i=0;i<elements.length;i++){
-	 		var obj =  new Element(elements[i]);
-	 		if(obj.id){
-	 			var temObj =document.childElements["'"+obj.id+"'"]; 
-	 			if(!temObj ){//在document对象中不存在
-	 				document.childElements["'"+obj.id+"'"] = obj;
-			 		document.all.push(obj);
-	 			}else{
-	 				elements[i] =temObj ;//已经存在
+	 		var element =  new Element(elements[i]);
+	 		if(document.docAllElements[element.local]){//
+	 			element= document.docAllElements[element.local];//该位置已经存入缓存
+	 		}else{
+	 			if(element.id){
+		 			if(document.childElements["'"+element.id+"'"]){
+				 		element = document.childElements["'"+element.id+"'"];
+				 	}else{
+				 		document.childElements["'"+id+"'"]=element;
+				 		document.all.push(element);
+				 	}
 	 			}
+	 			document.docAllElements[element.local] = element;//将该位置记录到缓存中
 	 		}
-	 		result[result.length] = obj;
+	 		result[result.length] = element;
 	 	}
  	}
  	return result;
@@ -138,6 +155,7 @@
  			if(par== 'style')continue;
  			if(typeof(this[par]) == 'object'){
  				str += par + "=" + Jdocument.encode(this[par].value) +"&";
+ 				//str += par + "=" + this[par].value +"&";
  			}
  		}
  		str = this.attribute.action+"?"+ str;
@@ -150,6 +168,11 @@
  }
  
  
+Element.prototype.setAttribute= function(name,value){
+	if(name){
+		this[name] = value;
+	}
+}
  Element.prototype.focus= function(){
  }
  
@@ -204,19 +227,6 @@
  document.body = document.getElementsByTagName('body')[0];
 
  var navigator = window.navigator;
- 
- /*
- window.navigator.appVersion;
- window.navigator.language;
- window.navigator.userAgent
- window.navigator.appName;
- window.history.current;
- window.location.host;
- window.location.port;
- window.history.next;
- window.history.previous;
- window.history.back();
- window.history.forward();
- window.history.
- */
- 
+ alert(document.forms[0].id+"           ----------------------------------------------");
+ alert(document.getElementById('loginform').u.value+"           ----------------------------------------------");
+
