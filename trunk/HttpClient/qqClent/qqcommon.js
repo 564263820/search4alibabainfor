@@ -172,7 +172,6 @@ function ptui_checkQQUin(qquin) {
 	}
 	return true
 }
-//qq.com ,2010 ,true ,0
 function ptui_changeImgEx(D, C, G, F) {
 	changeimg = true;
 	var A = $("imgVerify");
@@ -196,7 +195,6 @@ function ptui_changeImg(B, A, D) {
 	if ((g_appid == t_appid) && isNaN(g_uin) && (g_uin.indexOf("@") < 0)) {
 		C = "@" + g_uin
 	}
-		//qq.com ,2010 ,true ,0
 	ptui_changeImgEx(B, A, D, "http://captcha." + B + "/getimage?&uin=" + C)
 }
 function ptui_changeImgHttps(B, A, D) {
@@ -254,6 +252,7 @@ function ajax_Submit() {
 	var E = document.forms[0];
 	var B = "";
 	for (var A = 0; A < E.length; A++) {
+		alert(A);
 		if (E[A].name == "fp" || E[A].type == "submit") {
 			continue
 		}
@@ -298,6 +297,7 @@ function ajax_Submit() {
 	if (pt.isHttps) {
 		return true
 	}
+	alert('11111111111111111111111111111111'+B);
 	var C = document.createElement("script");
 	C.src = E.action + "?" + B;
 	document.cookie = "login_param=" + encodeURIComponent(login_param)
@@ -336,9 +336,9 @@ function ptuiCB(C, A, B, G, F) {
 	} else {
 		if (A == 0) {
 			if (F && F != "") {
-				pt.show_err(F)
+				pt.show_err(F);
 			} else {
-				pt.show_err('');
+				pt.show_err("");
 			}
 		} else {
 			pt.show_err(F);
@@ -500,15 +500,11 @@ function ptui_speedReport(E) {
 	if (!first) {
 		return
 	}
-	var t = Math.random()
-	alert(t);
-	if (t > 0.001) {
-		//return
+	if (Math.random() > 0.001) {
+		return
 	}
-	alert(".................");
 	var B = "http://isdspeed.qq.com/cgi-bin/r.cgi?flag1=6000&flag2=1&flag3="
 			+ browser_version();
-	alert(B);
 	var C = 0;
 	for (var D in E) {
 		B += "&" + D + "=" + E[D];
@@ -645,7 +641,6 @@ function ptui_checkValidate(B) {
 	ajax_Submit();
 	ptui_reportNum(g_changeNum);
 	g_changeNum = 0;
-	alert(B.verifycode+'                     '+B.verifycode.value);
 	return true
 }
 function setCookie(C, E) {
@@ -874,7 +869,6 @@ function check() {
 		g_time.time9 = B
 	}
 	var A = ptui_trim($("u").value);
-	alert("-----------------------------1111111111111111111"+A);
 	if (g_uin == A || (!ptui_checkQQUin(A))) {
 		return
 	}
@@ -886,7 +880,6 @@ function check() {
 		}
 	} catch (C) {
 	}
-	alert("-----------------------------1111111111111111111");
 	ptui_needVC(g_uin, g_appid)
 }
 function loadVC(A) {
@@ -1065,16 +1058,3 @@ try {
 	}
 } catch (e) {
 };/*  |xGv00|eaa967eeb44f408aa6535efd5ff763f1 */
-
-
-function onFormSubmit(form)
-{
-	if (form.remember_uin.checked){
-		return ptui_onLoginEx(form, "qq.com")
-	}else{				
-		var myDate=new Date();
-		myDate.setFullYear(1971,1,1);
-		setCookie("ptui_loginuin",  "", myDate, '/', 'ui.ptlogin2.qq.com');
-		return ptui_onLogin(form);
-	}
-}

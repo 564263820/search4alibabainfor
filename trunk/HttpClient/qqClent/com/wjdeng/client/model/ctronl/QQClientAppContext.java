@@ -77,19 +77,26 @@ public class QQClientAppContext{
 	 * @param doc
 	 * @return
 	 */
-	private String getLogonUrl(IDocument doc){
+	private String getLogonUrl(Document doc){
+		//doc.includeJavascriptByUrl("http://imgcache.qq.com/ptlogin/ac/v8/js/comm.js?v=1.2.5");
 		//java.util.Scanner scaner = new Scanner(System.in);
 		//verifycode =scaner.next();
 		String p = doc.eval("hex_md5('"+passw+"')").toString();
+		p="920753286AC041F19850CAFE164D3B81";
 		StringBuilder sb = new StringBuilder();
+		System.out.println(passw);
 		/*String setJs = "var sform  = document.getElementById('loginform'); sform.u.value='"+user+"';sform.p.value='"+p+"';";
 		setJs = setJs + "onFormSubmit(document.getElementById('loginform'))";
 		doc.eval(setJs);*/
+		//920753286AC041F19850CAFE164D3B81 ...服务器端
+		//5BEC7815599AA7C902988C8DE080A7D8
+		//http://ptlogin2.qq.com/login?u=1732960362&p=920753286AC041F19850CAFE164D3B81&verifycode=!56T&webqq_type=1&remember_uin=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Fstrong%3Dtrue&h=1&ptredirect=0&ptlang=2052&from_ui=1&pttype=1&dumy=&fp=loginerroralert
+		//http://ptlogin2.qq.com/login?h=1&u1=http://web2.qq.com/loginproxy.html?strong=true&verifycode=!VUP&p=920753286AC041F19850CAFE164D3B81&u=1732960362&pttype=1&fp=loginerroralert&ptlang=2052&from_ui=1&remember_uin=1&aid=1003903&ptredirect=0&webqq_type=1&dumy=&
 		sb.append(" var form = document.getElementById('loginform'); \n");//
 		sb.append(" form.u.value='").append(user).append("';\n");
 		sb.append("  form.p.value='").append(p).append("';\n");
 		sb.append("check();\n");//检查验证码 并获取校验码
-		sb.append("form.submit();\n");
+		sb.append("onFormSubmit(form);//form.submit();\n");
 		String httpUrl = doc.eval(sb.toString()).toString();
 		return httpUrl;
 	}
