@@ -11,8 +11,10 @@
  }
  
  function setTimeout(code,millisec){
+ 	alert("定时器任务------------------------");
  	alert("TimeCode:   "+code);
  	alert("TimeCode:millisec "+millisec);
+ 	alert("------------------------end");
  }
  
  
@@ -27,6 +29,7 @@
 		 }
 		 this.elements = new Object();
 		 if(!document)return;
+		 var count =0 ;//子元素个数
 		 for(var par in obj){//所有表单元素节点(from对象才会初始化表单元素节点)
 		    if(par=='attribute')continue;
 		    var element  = 	new Element(obj[par]);
@@ -40,16 +43,25 @@
 				 	} 
 		 		}else{
 		 			document.docAllElements[element.local]=element ;
-				 	document.all[document.all.length]=element;
+				 	document.all.push(element);
+				 	if(this.tagName.toLowerCase()=='form'){
+				 		while(this[count]){//该位置存在了元素
+			    			count++;//继续累加下标
+	    				}
+		    			this[count]=element;
+				 	}
 		 		}
 	 			this[par] = element;
 		 	}
+		 	if(this.tagName.toLowerCase()=='form'){this.length = count;}
 		 	this.elements[par]= element; 
 		 }
+	     
 	}
 	this.style = {
 		display:""
 	}
+	
  }
  
  
@@ -120,10 +132,14 @@
  Element.prototype.getElementsByTagName = function(name){
  	var result = new Array();
  	if(!name)return result;
+ 	name = name.toLowerCase();
  	var objScr = Jdocument.getElementsByTagName(name);//Jdocument 详见:ava com.wjdeng.client.Doment.getScriptEngine()
  	if(objScr){
 	 	objScr = " function genraObject(){ "+objScr + "}; genraObject(); ";
 	 	var elements = Jdocument.eval(objScr);
+	 	//alert(elements.length+"  +++++++++++++++++++++++++++++++++" +name);
+	 	//alert(objScr);
+	 	//alert(elements.length+"  +++++++++++++++++++++++++++++++++" +name);
 	 	for(var i=0;i<elements.length;i++){
 	 		var element =  new Element(elements[i]);
 	 		if(document.docAllElements[element.local]){//
@@ -133,7 +149,7 @@
 		 			if(document.childElements["'"+element.id+"'"]){
 				 		element = document.childElements["'"+element.id+"'"];
 				 	}else{
-				 		document.childElements["'"+id+"'"]=element;
+				 		document.childElements["'"+element.id+"'"]=element;
 				 		document.all.push(element);
 				 	}
 	 			}
@@ -175,6 +191,10 @@ Element.prototype.setAttribute= function(name,value){
 }
  Element.prototype.focus= function(){
  }
+ 
+  Element.prototype.blur= function(){
+  
+  }
  
  Element.prototype.select= function(){
  }
@@ -222,11 +242,8 @@ Element.prototype.setAttribute= function(name,value){
  
 
  
- document.forms=document.getElementsByTagName('form');
  document.all=new Array();
+ document.forms=document.getElementsByTagName('form');
  document.body = document.getElementsByTagName('body')[0];
 
  var navigator = window.navigator;
- alert(document.forms[0].id+"           ----------------------------------------------");
- alert(document.getElementById('loginform').u.value+"           ----------------------------------------------");
-
