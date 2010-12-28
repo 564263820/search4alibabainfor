@@ -214,9 +214,9 @@ public class Document extends Segment implements IDocument {
 		sb.append(" var temArray = new Array();\n");
 		for(int i=0 ;i<list.size();i++){
 			sb.append(" function temFun(){\n");
-			this.createJsonByElement(list.get(i));
+			sb.append(createJsonByElement(list.get(i)));
 			sb.append(" } \n");
-			sb.append("temArray[temArray.length]=temFun;");
+			sb.append("temArray[temArray.length]=temFun();");
 		}
 		sb.append(" return temArray;");
 		return sb.toString();
