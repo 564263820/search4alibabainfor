@@ -165,13 +165,15 @@
  Element.prototype.submit = function(){//模拟submit方法 在这里实际只返回生成的地址
  	if(this.attribute.action){
  		var str ="";//;
- 		for(var par in this){
- 			if(par== 'elements') continue;
+ 		for(var par=0;par<this.length;par++){
+ 			/*if(par== 'elements') continue;
  			if(par== 'attribute')continue;
- 			if(par== 'style')continue;
- 			if(typeof(this[par]) == 'object'){
- 				str += par + "=" + Jdocument.encode(this[par].value) +"&";
- 				//str += par + "=" + this[par].value +"&";
+ 			if(par== 'style')continue;*/
+ 			if(this[par].name){
+	 			if(typeof(this[par]) == 'object'){
+	 				//str += this[par].name + "=" + Jdocument.encode(this[par].value) +"&";
+	 				str += this[par].name + "=" + this[par].value +"&";
+	 			}
  			}
  		}
  		str = this.attribute.action+"?"+ str;
