@@ -277,6 +277,8 @@ public class Document extends Segment implements IDocument {
 			String jsfile = map.get(URLContentManage.KEY_CONTENT).toString();
 			String chartSet =SysUtils.trim2null(map.get(URLContentManage.KEY_CHARSET));
 			chartSet = chartSet==null?this.chartSet:chartSet;
+			System.out.println("\ninclude javascript:--------------------------\n"+jsfile);
+			System.out.println("include javascript:end--------------------------\n");
 			String js = new String(jsfile.getBytes(HTTP.ISO_8859_1),chartSet);
 			this.includeJavascript(js);
 		} catch (IOException e) {
@@ -336,11 +338,11 @@ public class Document extends Segment implements IDocument {
 				String js = element.getContent().toString();
 				this.includeJavascript(js);
 			}else{
-				if(url.indexOf("comm.js")>-1){
-					includeJavascript(SysUtils.getFileRader("qqcommon.js"));
-				}else{
+				//if(url.indexOf("comm.js")>-1){
+				//	includeJavascript(SysUtils.getFileRader("qqcommon.js"));
+				//}else{
 					this.includeJavascriptByUrl(url);
-				}
+				//}
 			}
 		}
 		
