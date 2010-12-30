@@ -8,9 +8,7 @@ package com.wjdeng.client.model.ctronl;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Scanner;
 
-import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 
 import org.apache.http.client.ClientProtocolException;
@@ -19,7 +17,6 @@ import org.apache.http.protocol.HTTP;
 import com.wjdeng.client.model.Document;
 import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.api.IDocument;
-import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.URLContentManage;
 
 /**
@@ -58,6 +55,9 @@ public class QQClientAppContext{
 			/*byte[] bytes =(byte[]) app.getModeParament().getUrlConnection().getContentByURL(vercodUrl).get(URLContentManage.KEY_CONTENT_BYTES);
 			if(null != bytes){
 				SysUtils.wirtfile(bytes,"jpeg");//获取校验码
+				get_user_friends2
+5263
+5303
 			}*/
 			String httpUrl =this.getLogonUrl(doc);//获取登录地址
 			/*Map<String, Object> temmap = app.getModeParament().getUrlConnection().getContentByURL(httpUrl,true);
