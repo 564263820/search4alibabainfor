@@ -22,6 +22,7 @@ import java.util.Map;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -56,11 +57,39 @@ public class URLContentManage implements URLContent {
 
 	public static String KEY_CHARSET = "CharSet";
 	
+	public List<Cookie> getCookies(){
+		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
+		return list;
+	}
+	
+	public String getCookieValueByName(String name){
+		name = SysUtils.trim2empty(name);
+		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
+		for(Cookie cookie :list){
+			if(cookie.getName().equals(name)){
+				return cookie.getValue();
+			}
+		}
+		return "";
+	}
+	
 	public URLContentManage(){
 		HttpParams params = new BasicHttpParams();
 		params.setParameter(HTTP.USER_AGENT, "	Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.9) Gecko/20100824 Firefox/3.6.9");
 		((AbstractHttpClient) client).setParams(params);
 	}
+	
+	public Map<String, Object> getContentByURL(String url, boolean get,String accpet)
+		throws ClientProtocolException, IOException ,Exception{
+		HttpParams params = new BasicHttpParams();
+		params.setParameter("Accept", accpet);
+		((AbstractHttpClient) client).setParams(params);
+		Map<String, Object> map = this.getContentByURL(url, get);
+		params.setParameter("Accept", "*/*");
+		((AbstractHttpClient) client).setParams(params);
+		return map;
+	}
+	
 
 	public Map<String, Object> getContentByURL(String url, boolean get)
 			throws ClientProtocolException, IOException ,Exception{
@@ -70,23 +99,32 @@ public class URLContentManage implements URLContent {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(url==null)return map;
 		HttpGet httget = new HttpGet(url);
+		
 		HttpResponse response;
 		response = client.execute(httget);
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
-			String conteT =response.getHeaders("Content-Type").toString();
-			if(conteT.indexOf("image")>-1){
-			   byte[] content =EntityUtils.toByteArray(entity);
-				map.put(KEY_CONTENT_BYTES, content);
+			Header[] headers = response.getHeaders("Content-Type");
+			String html="";
+			if(null != headers){
+				String conteT =headers.toString();
+				if(conteT.indexOf("image")>-1){
+					byte[] content =EntityUtils.toByteArray(entity);
+					map.put(KEY_CONTENT_BYTES, content);
+				}else{
+					String content = EntityUtils.toString(entity);
+					html = content;
+					map.put(KEY_CONTENT_BYTES, content.getBytes());
+				}
 			}else{
-				String content = EntityUtils.toString(entity);
-				map.put(KEY_CONTENT, content);
-				map.put(KEY_CONTENT_BYTES, content.getBytes());
+				html = EntityUtils.toString(entity);
 			}
+			map.put(KEY_CONTENT, html);
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		this.clearMuCookie();
-		LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取" + url + "内容成功！");
+		System.out.println("获取" + url + "内容成功！");
+		//LogUtil.getLogger(this.getClass().getSimpleName()).warn("获取" + url + "内容成功！");
 		return map;
 	}
 	
@@ -143,15 +181,22 @@ public class URLContentManage implements URLContent {
 		response = client.execute(httpost);
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
-			String conteT =response.getFirstHeader("Content-Type").toString();
-			if(conteT.indexOf("image")>-1){
-				byte[] content =EntityUtils.toByteArray(entity);
-				map.put(KEY_CONTENT_BYTES, content);
+			Header[] headers = response.getHeaders("Content-Type");
+			String html="";
+			if(null != headers){
+				String conteT =headers.toString();
+				if(conteT.indexOf("image")>-1){
+					byte[] content =EntityUtils.toByteArray(entity);
+					map.put(KEY_CONTENT_BYTES, content);
+				}else{
+					String content = EntityUtils.toString(entity);
+					html = content;
+					map.put(KEY_CONTENT_BYTES, content.getBytes());
+				}
 			}else{
-				String content = EntityUtils.toString(entity);
-				map.put(KEY_CONTENT, content);
-				map.put(KEY_CONTENT_BYTES, content.getBytes());
+				html = EntityUtils.toString(entity);
 			}
+			map.put(KEY_CONTENT, html);
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		clearMuCookie();
