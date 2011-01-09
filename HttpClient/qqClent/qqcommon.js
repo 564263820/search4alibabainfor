@@ -311,6 +311,7 @@ function ptuiCB(C, A, B, G, F) {
 	};
 	ptui_speedReport(E);
 	first = false;
+	alert("qiguo re de ...................................");
 	if (B != "") {
 		switch (G) {
 			case "0" :
