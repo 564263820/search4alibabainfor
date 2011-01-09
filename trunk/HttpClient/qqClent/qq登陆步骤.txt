@@ -1,14 +1,14 @@
-1¡£µÇÂ½
+1ï¿½ï¿½ï¿½ï¿½Â½
 http://ptlogin2.qq.com/login?u=82891911&p=222ADC4C8DA51A6EAE51D4FA61DA8991&verifycode=!8T9&remember_uin=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin_level%3D3&h=1&ptredirect=0&ptlang=2052&from_ui=1&pttype=1&dumy=&fp=loginerroralert
-·µ»ØptuiCB('0','0','http://web2.qq.com/loginproxy.html?login_level=3','0','µÇÂ¼³É¹¦£¡');
-2¡£ÇëÇóhttp://web2.qq.com/loginproxy.html?login_level=3 
-»ñÈ¡cookie:pgv_pvid=9276947131; pgv_flv=9.0 r45; pgv_info=pgvReferrer=&ssid=s8201090420; 
+ï¿½ï¿½ï¿½ï¿½ptuiCB('0','0','http://web2.qq.com/loginproxy.html?login_level=3','0','ï¿½ï¿½Â¼ï¿½É¹ï¿½ï¿½ï¿½');
+2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½http://web2.qq.com/loginproxy.html?login_level=3 
+ï¿½ï¿½È¡cookie:pgv_pvid=9276947131; pgv_flv=9.0 r45; pgv_info=pgvReferrer=&ssid=s8201090420; 
 	ptui_width=370; ptui_height=192; pt2gguin=o0082891911; uin=o0082891911; 
 	skey=@WSZOMAvET; ptisp=ctc; ptcz=82e580c127069214b596d986f6886ab00d74338146864d3c9c2c4e7f96b43af3; 
 	ptwebqq=b2fe40e8f0ae7ae496064a7e514b8e5aaf48bb6cbbbb4761f0cb8b77eed04545
-ÖÐptwebqq
+ï¿½ï¿½ptwebqq
 
-3¡£getlog
+3ï¿½ï¿½getlog
 http://tj.qstatic.com/getlog?
 >1. 
 p	pass_ptlogin$start$11ba40ebcb832d54$0$0
@@ -25,7 +25,7 @@ t	1294547249985
 >4.
 p	loadEqqAllJs$end_loadEqqAllJs$82891911$0$0
 t	1294547249986
-3¡£¶þ´ÎµÇÂ½
+3ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½Â½
 http://d.web2.qq.com/channel/login2
 >5.
 p	pass_ptlogin$end$82891911$0$0
@@ -63,3 +63,6 @@ t	1294547254661
 >16.
 p	appinfo$end$82891911$0$0
 t	1294547258007
+
+
+http://www.cnblogs.com/hackren/
