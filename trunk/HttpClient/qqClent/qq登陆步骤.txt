@@ -1,0 +1,65 @@
+1。登陆
+http://ptlogin2.qq.com/login?u=82891911&p=222ADC4C8DA51A6EAE51D4FA61DA8991&verifycode=!8T9&remember_uin=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin_level%3D3&h=1&ptredirect=0&ptlang=2052&from_ui=1&pttype=1&dumy=&fp=loginerroralert
+返回ptuiCB('0','0','http://web2.qq.com/loginproxy.html?login_level=3','0','登录成功！');
+2。请求http://web2.qq.com/loginproxy.html?login_level=3 
+获取cookie:pgv_pvid=9276947131; pgv_flv=9.0 r45; pgv_info=pgvReferrer=&ssid=s8201090420; 
+	ptui_width=370; ptui_height=192; pt2gguin=o0082891911; uin=o0082891911; 
+	skey=@WSZOMAvET; ptisp=ctc; ptcz=82e580c127069214b596d986f6886ab00d74338146864d3c9c2c4e7f96b43af3; 
+	ptwebqq=b2fe40e8f0ae7ae496064a7e514b8e5aaf48bb6cbbbb4761f0cb8b77eed04545
+中ptwebqq
+
+3。getlog
+http://tj.qstatic.com/getlog?
+>1. 
+p	pass_ptlogin$start$11ba40ebcb832d54$0$0
+t	1294547238396
+>2. 
+p	loadEqqAllJs$start$82891911$0$0
+t	1294547238439
+-----------------------
+isdspeed QQ
+-----------------------
+>3.
+p	eqqLoginCgi$start$82891911$0$0
+t	1294547249985
+>4.
+p	loadEqqAllJs$end_loadEqqAllJs$82891911$0$0
+t	1294547249986
+3。二次登陆
+http://d.web2.qq.com/channel/login2
+>5.
+p	pass_ptlogin$end$82891911$0$0
+t	1294547251644
+>6.
+p	get_selfinfo$start$82891911$0$0
+t	1294547251645
+>7.
+p	eqqGetData$start$82891911$0$0
+t	1294547251660
+>8.
+p	eqqLoginCgi$end_eqqLoginCgi$82891911$ok$0
+t	1294547251662
+>9.
+p	get_selfinfo$end$82891911$0$0
+t	1294547253734
+>10.
+p	get_custom$start$82891911$0$0
+t	1294547253735
+>11.
+p	eqqGetData$end_BuddyList$82891911$ok$0
+t	1294547253823
+>12.
+p	eqqGetData$end_eqqGetData$82891911$ok$0
+t	1294547253878
+>13.
+p	eqqGetData$end_GroupList$82891911$ok$0
+t	1294547253881
+>14.
+p	appinfo$start$82891911$0$0
+t	1294547254644
+>15.
+p	get_custom$end$82891911$0$0
+t	1294547254661
+>16.
+p	appinfo$end$82891911$0$0
+t	1294547258007
