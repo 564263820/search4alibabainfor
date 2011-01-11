@@ -54,6 +54,9 @@ public class QQClientAppContext{
 			//this.getDocument(entUrl, app); //请求主界面
 			Document doc = (Document) this.getDocument(logonWinUrl, app); //请求登录界面
 			connection =app.getModeParament().getUrlConnection();
+			connection.setCookie("pgv_pvid", "3024370100");//pgv_pvid=3024370100; pgv_flv=9.0 r45; pgv_info=pgvReferrer=&ssid=s2836044620
+			connection.setCookie("pgv_flv", "9.0 r45");
+			connection.setCookie("pgv_info", "pgvReferrer=&ssid=s2836044620");
 			doc.setUrlConnection(connection);
 			doc.loadCompiledAllPageJS();
 			String ptui = " function ptuiCB(a,b,c,d,e){alert(c);alert(e)};";
@@ -67,6 +70,7 @@ public class QQClientAppContext{
 			String loginproxy = "http://web2.qq.com/loginproxy.html?strong=true";
 			Map<String, Object> temmap = connection.getContentByURL(loginproxy,true);
 			String logonState =temmap.get(URLContentManage.KEY_CONTENT).toString();//登录请求 获得登录状态
+			System.out.println(logonState);//登陆成功。。		
 			String plog = "http://tj.qstatic.com/getlog?t="+System.currentTimeMillis()+"&p=pass_ptlogin%24start%2411ba40ebcb832d54%240%240";
 			connection.getContentByURL(plog,true);
 			Thread.currentThread().sleep(100);
@@ -84,14 +88,13 @@ public class QQClientAppContext{
 			connection.getContentByURL(plog,true);
 			Thread.currentThread().sleep(100);
 			
-			System.out.println(logonState);//登陆成功。。		
 			String ptwebqq  =this.connection.getCookieValueByName("ptwebqq");
 			Math.random();
 			Random a = new Random(this.getClass().hashCode());
 			String clientId = a.nextInt(99)+ (String) doc.eval("String((new Date()).getTime() % 1000000);");
 			String log2url = "http://d.web2.qq.com/channel/login2?";//二次验证登陆
 			//r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid":"48247021","psessionid":null}
-			log2url+="%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%"+clientId+"%22%2C%22psessionid%22%3Anull%7D";
+			log2url+="r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%"+clientId+"%22%2C%22psessionid%22%3Anull%7D";
 			temmap =this.connection.getContentByURL(log2url, false, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 			System.out.println(temmap.get(URLContentManage.KEY_CONTENT));//登陆成功。。	
 			//r={"status":"","ptwebqq":"1e836fb862aad64d8b40eb02cccda1d1b2c5253fdd8849fd5e1d4271941ffe2e","passwd_sig":"","clientid":"53555591","psessionid":null}
