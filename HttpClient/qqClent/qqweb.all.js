@@ -1,31 +1,656 @@
-Jet().$package("qqweb", function(f) {
-	var d;
-	document.domain = "qq.com";
-	d = window.location.host;
-	window.onerror = function() {
-		return true
-	};
-	this.init = function() {
-		f.$namespace("qqweb.app");
-		this.portal.init({});
-		qqweb.portal.speedTest.sRTS(7, "start", window._SPEEDTIME_WINDOWSTART);
-		qqweb.portal.speedTest.sRTS(7, "end", new Date, true);
-		qqweb.portal.speedTest.sRTS(8, "start", new Date)
-	};
-	this.CONST = {
+var pvCurDomain = "", pvCurUrl = "", pvCurParam = "", pvRefDomain = "", pvRefUrl = "", pvRealDomain = "", pvRefParam = "", pvRealDomainToSet = "qq.com", pvGifUrl = "http://pingfore.", pvHotUrl = "http://pinghot.", pvDoc = document, pgvImage, pgvExtParam = "", pgvReserved1Param = "", pvUseCookie = "";
+function pgvCircleQueue(a) {
+	this.initialize(a)
+}
+pgvCircleQueue.prototype = {
+	initialize : function(a) {
+		this.list = [];
+		this.capacity = a + 1;
+		this.tail = this.head = 0
+	},
+	push : function(a) {
+		if (!(a == "undefined" || a == "")) {
+			var b = this.find(a);
+			if (b == -1) {
+				this.list[this.head] = a;
+				this.head = (this.head + 1) % this.capacity;
+				if (this.head == this.tail)
+					this.tail = (this.tail + 1) % this.capacity
+			} else {
+				for (var c = (b + 1) % this.capacity; c != this.head;) {
+					this.list[b] = this.list[c];
+					b = c;
+					c = (c + 1) % this.capacity
+				}
+				this.list[b] = a
+			}
+		}
+	},
+	join : function(a) {
+		if (this.head == this.tail)
+			return new String;
+		var b = this.tail, c = new String(this.list[b]);
+		for (b = (b + 1) % this.capacity; b != this.head;) {
+			c += a + new String(this.list[b]);
+			b = (b + 1) % this.capacity
+		}
+		return c
+	},
+	size : function() {
+		return this.head >= this.tail ? this.head - this.tail : this.head
+				- this.tail + this.capacity
+	},
+	set : function(a, b) {
+		a = a.split(b);
+		b = a.length;
+		for (var c = 0; c < b; ++c)
+			this.push(a[c])
+	},
+	find : function(a) {
+		for (var b = this.tail; b != this.head;)
+			if (this.list[b] == a)
+				return b;
+			else
+				b = (b + 1) % this.capacity;
+		return -1
+	}
+};
+if (window != top)
+	try {
+		pvDoc = top.document
+	} catch (e) {
+	}
+var pvLoc = pvDoc.location, pvBody = pvDoc.body, pvNone = "-", pvVersion = "tcss.3.2";
+if (typeof pvRepeatCount == "undefined")
+	var pvRepeatCount = 1;
+function pgvGetParameter(a, b) {
+	if (a && b) {
+		a = b.match(new RegExp("(\\?|#|&)" + a + "=([^&^#]*)(#|&|$)"));
+		return !a ? "" : a[2]
+	}
+	return ""
+}
+function pgvVoid() {
+}
+function pgvGetCookieByName(a) {
+	var b = pvNone, c = pvDoc.cookie.indexOf(a), d = 0, h = 0;
+	if (c != -1) {
+		c += a.length;
+		d = pvDoc.cookie.indexOf(";", c);
+		if (d == -1)
+			d = pvDoc.cookie.length;
+		h = pvDoc.cookie.indexOf("&", c);
+		if (h != -1)
+			d = Math.min(d, h);
+		b = unescape(pvDoc.cookie.substring(c, d))
+	}
+	return b
+}
+function pgvRealSetCookie(a) {
+	pvDoc.cookie = a + ";path=/;domain=" + pvRealDomainToSet
+			+ ";expires=Sun, 18 Jan 2038 00:00:00 GMT;"
+}
+function pgvRealDelCookie(a) {
+	pvDoc.cookie = a + ";path=/;domain=" + pvRealDomainToSet
+			+ ";expires=Sun, 18 Jan 1970 00:00:00 GMT;"
+}
+function pgvGetCookieSetDomain() {
+	for (var a = [], b = 0, c = pvRealDomain.length, d = 0; d < c; d++)
+		if (pvRealDomain.charAt(d) == ".") {
+			a[b] = d;
+			b++
+		}
+	b = pvRealDomain.indexOf(".cn");
+	c = a.length;
+	b != -1 && c--;
+	return c < 1 ? "qq.com" : c == 1 ? pvRealDomain : pvRealDomain.substring(
+			a[c - 2] + 1, pvRealDomain.length)
+}
+function pgvGetDomainByUrl() {
+	var a = pvDoc.domain;
+	if (pgvVirtualDomain != pvNone && pgvVirtualDomain != "")
+		a = pgvVirtualDomain;
+	else {
+		var b = pvDoc.URL.indexOf("://");
+		if (b != -1) {
+			b = pvDoc.URL.substr(b + 3, pvDoc.URL.length - b - 3);
+			var c = b.indexOf("/");
+			if (c != -1)
+				a = b.substr(0, c)
+		}
+	}
+	return a
+}
+function pgvGetCurrentUrl() {
+	var a = "";
+	if (pgvVirtualURL != pvNone && pgvVirtualURL != "")
+		a = pgvVirtualURL;
+	else {
+		a = escape(pvCurUrl);
+		if (pvCurUrl == "" && pvLoc.pathname) {
+			pvCurUrl = a = escape(pvLoc.pathname);
+			pvCurParam = escape(pvLoc.search.substr(1))
+		}
+		if (pgvSenseParam != pvNone && pgvSenseParam != "") {
+			var b = pgvGetParameter(pgvSenseParam, pvDoc.URL);
+			if (b != pvNone && b != "")
+				a += "_" + b
+		}
+	}
+	return a
+}
+function pgvGetDomainInfo(a, b) {
+	var c = "", d = "", h = "";
+	c = pvCurDomain;
+	if (pvCurDomain == "")
+		c = pgvGetDomainByUrl();
+	pvRealDomain = pvCurDomain = c;
+	d = pgvGetCurrentUrl();
+	h = pvNone;
+	if (pgvVirtualTitle != pvNone && pgvVirtualTitle != "")
+		h = pgvVirtualTitle;
+	else if (pvDoc.title)
+		h = pvDoc.title;
+	if (b)
+		c += ".hot";
+	return a && a == "title" ? "dm=" + c + "&url=" + escape(d) : "dm=" + c
+			+ "&url=" + escape(d) + "&tt=" + escape(h)
+}
+function pgvGetRefInfo() {
+	var a = refurl = pvNone, b = pvDoc.referrer;
+	if (pgvStatIframe || pvUseCookie == "true") {
+		b = pgvGetCookieByName("pgvReferrer=");
+		var c = pvDoc.URL, d = c.indexOf("?");
+		if (d != -1)
+			c = c.substr(0, d);
+		pgvSetSessionCookie("pgvReferrer", c)
+	} else if (pvUseCookie == "set" && pvRefDomain != "" && pvRefUrl != "") {
+		c = "https:" == document.location.protocol ? "https://" : "http://";
+		c += pvRefDomain + pvRefUrl;
+		pgvSetSessionCookie("pgvReferrer", c)
+	} else if (pvUseCookie == "set"
+			&& (pgvVirtualDomain != pvNone || pgvVirtualURL != pvNone)) {
+		c = "https:" == document.location.protocol ? "https://" : "http://";
+		c += pgvVirtualDomain == pvNone ? pvCurDomain : pgvVirtualDomain;
+		c += pgvVirtualURL == pvNone ? pvCurUrl : pgvVirtualURL;
+		pgvSetSessionCookie("pgvReferrer", c)
+	} else {
+		if (pvUseCookie == "get") {
+			c = pgvGetCookieByName("pgvReferrer=");
+			if (c != "")
+				b = c
+		}
+		pgvSetSessionCookie("pgvReferrer", "")
+	}
+	c = "ADTAG";
+	if (pgvTagParamName != "" && pgvTagParamName != pvNone)
+		c = pgvTagParamName;
+	c = pgvGetParameter(c, pvDoc.URL);
+	if (c != pvNone && c != "") {
+		a = "ADTAG";
+		refurl = c
+	}
+	c = b.indexOf("://");
+	if (c != -1 && a == pvNone) {
+		a = b = b.substr(c + 3, b.length);
+		c = b.indexOf("/");
+		if (c != -1) {
+			a = b.substr(0, c);
+			refurl = b = b.substr(c, b.length);
+			c = b.indexOf("?");
+			if (c != -1) {
+				pvRefParam = escape(b.substr(c + 1));
+				if (b = b.match(/^(.*)(\?.*)$/))
+					refurl = b[1]
+			}
+			c = refurl.indexOf("#");
+			if (c != -1)
+				if (b = refurl.match(/^(.*)(\#.*)$/))
+					refurl = b[1]
+		}
+	}
+	if (pvRefDomain != "" && pvUseCookie == "false")
+		a = pvRefDomain;
+	if (pvRefUrl != "" && pvUseCookie == "false")
+		refurl = pvRefUrl;
+	pvRefDomain = pvRealReferInfo = a;
+	pvRefUrl = escape(refurl);
+	return "&rdm=" + a + "&rurl=" + escape(refurl)
+}
+function pgvGetUserInfo() {
+	try {
+		if (!navigator.cookieEnabled)
+			return "&pvid=NoCookie"
+	} catch (a) {
+		return "&pvid=NoCookie"
+	}
+	var b = pgvGetCookieByName("pgv_pvid=");
+	pgvSetCookies(b);
+	pvRealPvid = b;
+	pvUserid = pvUserid == "" ? pvRealPvid : pvUserid;
+	return "&pvid=" + b
+}
+function pgvSetCookies(a) {
+	var b = a;
+	if (a == pvNone) {
+		a = (new Date).getUTCMilliseconds();
+		pvUserid = b = Math.round(Math.random() * 2147483647) * a % 1E10
+	}
+	pvRealDomainToSet = pgvGetCookieSetDomain();
+	pgvRealSetCookie("pgv_pvid=" + b)
+}
+function pgvGetMainEnvInfo() {
+	var a = "";
+	try {
+		var b = scl = lang = flash = cpuc = pf = ce = tz = pvNone, c = 0, d = navigator;
+		if (self.screen) {
+			b = screen.width + "x" + screen.height;
+			scl = screen.colorDepth + "-bit"
+		}
+		if (d.language)
+			lang = d.language.toLowerCase();
+		else if (d.browserLanguage)
+			lang = d.browserLanguage.toLowerCase();
+		c = d.javaEnabled() ? 1 : 0;
+		cpuc = d.cpuClass;
+		pf = d.platform;
+		tz = (new Date).getTimezoneOffset() / 60;
+		a = "&scr=" + b + "&scl=" + scl + "&lang=" + lang + "&java=" + c
+				+ "&cc=" + cpuc + "&pf=" + pf + "&tz=" + tz
+	} catch (h) {
+	} finally {
+		return a
+	}
+}
+function pgvGetExtendEnvInfo() {
+	var a = "";
+	try {
+		if (pgvGetCookieByName("pgv_flv=") == pvNone)
+			a += "&flash=" + pgvFlashInfo();
+		var b = pvLoc.href, c = "N";
+		if (pvBody.addBehavior && pvBody.isHomePage) {
+			pvBody.addBehavior("#default#homePage");
+			c = pvBody.isHomePage(b) ? "Y" : "N"
+		}
+		if (c == "Y")
+			a += "&hp=Y";
+		b = pvNone;
+		if (pvBody.addBehavior) {
+			pvBody.addBehavior("#default#clientCaps");
+			b = pvBody.connectionType
+		}
+		a += "&ct=" + b
+	} catch (d) {
+	} finally {
+		return a
+	}
+}
+function pgvGetEnvInfo() {
+	return pgvGetMainEnvInfo() + pgvGetExtendEnvInfo()
+}
+function pgvFlashInfo() {
+	var a = pvNone, b = navigator;
+	try {
+		var c = b.plugins, d = c.length;
+		if (c && d)
+			for (var h = 0; h < d; h++) {
+				if (c[h].name.indexOf("Shockwave Flash") != -1) {
+					a = c[h].description.split("Shockwave Flash ")[1];
+					break
+				}
+			}
+		else if (window.ActiveXObject)
+			for (h = 10; h >= 2; h--)
+				try {
+					if (eval("new ActiveXObject('ShockwaveFlash.ShockwaveFlash."
+							+ h + "');")) {
+						a = h + ".0";
+						break
+					}
+				} catch (n) {
+				}
+		pgvRealSetCookie("pgv_flv=" + a)
+	} catch (r) {
+	}
+	return a
+}
+function pgvSendInfo(a) {
+	pgvImage = new Image(1, 1);
+	pgvImage.src = a
+}
+function pgvGenImageUrl() {
+	var a = pgvGetDomainInfo();
+	a += pgvGetRefInfo();
+	a += pgvGetUserInfo();
+	a += pgvGetEnvInfo();
+	a += "&vs=" + pvVersion;
+	return a = pvGifUrl + pgvGetCookieSetDomain() + "/pingd?" + a
+}
+function pgvGetCstm() {
+	var a = pvDoc.domain;
+	if (pvCurDomain != "")
+		a = pvCurDomain;
+	return "&cstm=" + a.replace(/\./g, "_") + "_" + pvCSTM
+}
+var pvRealReferInfo = pvNone, pvCSTM = "", pvRealPvid = pvNone, pvUserid = "";
+function initGlobalVariable(a) {
+	if (a) {
+		if (a.statIframe) {
+			pgvStatIframe = a.statIframe;
+			pgvInitStatIframe(a.statIframe)
+		}
+		if (a.senseParam)
+			pgvSenseParam = a.senseParam;
+		if (a.tagParamName)
+			pgvTagParamName = a.tagParamName;
+		if (a.virtualURL)
+			pgvVirtualURL = a.virtualURL;
+		if (a.virtualDomain)
+			pgvVirtualDomain = a.virtualDomain;
+		if (a.virtualTitle)
+			pgvVirtualTitle = escape(a.virtualTitle);
+		if (a.sessionSpan)
+			pgvSessionSpan = a.sessionSpan;
+		if (a.originalReferer)
+			pgvOriginalReferer = a.originalReferer;
+		if (a.extParam)
+			pgvExtParam = a.extParam;
+		if (a.reserved1Param)
+			pgvReserved1Param = a.reserved1Param;
+		if (a.virtualRefDomain)
+			pvRefDomain = a.virtualRefDomain;
+		if (a.virtualRefURL)
+			pvRefUrl = a.virtualRefURL;
+		if (a.useCookie)
+			pvUseCookie = a.useCookie
+	}
+}
+function pgvMain(a, b) {
+	try {
+		var c = new Date, d = c.getTime();
+		initGlobalVariable(b);
+		if (pvRepeatCount == 1) {
+			pvRepeatCount = 2;
+			pgvInitSessionCookie();
+			var h = pgvGenImageUrl();
+			if (pvCSTM && pvCSTM != "")
+				h += pgvGetCstm();
+			if (a && a == "return_url")
+				return h;
+			pgvSetSsIdCookie();
+			h += pgvPathTrace(a, b);
+			pgvFlushSessionCookies();
+			if (pgvOriginalReferer != "")
+				h += "&or=" + pgvOriginalReferer;
+			c = new Date;
+			var n = c.getTime();
+			h += pgvExtParam == "" ? "&ext=" + escape(n - d) : "&ext="
+					+ escape(pgvExtParam + "|" + (n - d));
+			h += "&reserved1=" + escape(pgvReserved1Param);
+			h += "&rand=" + Math.round(Math.random() * 1E5);
+			pgvSendInfo(h)
+		}
+	} catch (r) {
+	}
+}
+var pgvStatIframe = false, pgvSenseParam = pvNone, pgvTagParamName = pvNone, pgvVirtualURL = pvNone, pgvVirtualDomain = pvNone, pgvVirtualTitle = pvNone, pgvSessionSpan = 0, pgvOriginalReferer = "";
+function pgvInitStatIframe(a) {
+	if (a && a == true)
+		pvDoc = document;
+	else {
+		pvDoc = document;
+		if (window != top)
+			try {
+				pvDoc = top.document
+			} catch (b) {
+			}
+	}
+	pvLoc = pvDoc.location;
+	pvBody = pvDoc.body
+}
+var pvSCA = null, pvSCK = null, pvSCO = null;
+function pgvInitSessionCookie() {
+	pvSCA = [];
+	pvSCK = [];
+	pvSCO = {};
+	var a = pvDoc.cookie.indexOf("pgv_info=");
+	if (a != -1) {
+		a += 9;
+		var b = pvDoc.cookie.indexOf(";", a);
+		if (b == -1)
+			b = pvDoc.cookie.length;
+		a = unescape(pvDoc.cookie.substring(a, b)).split("&");
+		b = a.length;
+		for (var c = 0; c < b; c++) {
+			var d = a[c].split("=");
+			pvSCO[d[0]] = d[1];
+			for (var h = false, n = pvSCK.length, r = 0; r < n; r++)
+				if (d[0] == pvSCK[r]) {
+					h = true;
+					break
+				}
+			h || pvSCK.push(d[0])
+		}
+	}
+}
+function pgvSetSessionCookie(a, b) {
+	pvSCO[a] = b;
+	b = false;
+	for (var c = pvSCK.length, d = 0; d < c; d++)
+		if (a == pvSCK[d]) {
+			b = true;
+			break
+		}
+	b || pvSCK.push(a)
+}
+function pgvFlushSessionCookies() {
+	if (pgvSessionSpan && pgvSessionSpan != 0) {
+		var a = new Date;
+		a.setTime(a.getTime() + pgvSessionSpan * 60 * 1E3)
+	}
+	for (var b = pvSCK.length, c = 0; c < b; c++)
+		pvSCA.push(pvSCK[c] + "=" + pvSCO[pvSCK[c]]);
+	b = "";
+	var d = pvSCA.length;
+	for (c = 0; c < d; c++) {
+		b += pvSCA[c];
+		if (c != d - 1)
+			b += "&"
+	}
+	c = "pgv_info=" + b;
+	if (a)
+		c += "; expires=" + a.toGMTString();
+	c += "; path=/; domain=" + pgvGetCookieSetDomain() + ";";
+	pvDoc.cookie = c
+}
+function pgvSetSsIdCookie() {
+	var a = pgvGetCookieByName("ssid=");
+	if (a == pvNone) {
+		a = (new Date).getUTCMilliseconds();
+		a = "s" + Math.round(Math.random() * 2147483647) * a % 1E10
+	}
+	pgvSetSessionCookie("ssid", a);
+	return a
+}
+function pgvPathTrace(a, b) {
+	var c = "";
+	if (a != "pathtrace")
+		return c;
+	if (b) {
+		if (b.pathStart) {
+			var d = pgvGetCookieByName("SPATHTAG=");
+			a = "";
+			var h = 1;
+			if (b.spQueueLen != null)
+				h = Math.max(1, b.spQueueLen);
+			h = new pgvCircleQueue(h);
+			if (d == "-")
+				d = "";
+			h.set(d, "!");
+			if (d == "" || d == pvNone || d == pvNone + pvNone
+					|| typeof b.override == "undefined" || b.override == true) {
+				d = true;
+				if (pvRefDomain == "ADTAG")
+					a = pvRefUrl;
+				else if (b.useRefUrl)
+					if (b.careSameDomainRef || pvCurDomain != pvRefDomain)
+						a = pvRefDomain + pvRefUrl;
+					else
+						d = false;
+				if (d) {
+					if (a == "" || a == pvNone || a == pvNone + pvNone)
+						a = "NONE_REF";
+					a = pvCurDomain + pvCurUrl + "|" + a;
+					if (a != null && a != "" && a != pvNone) {
+						h.push(a);
+						d = h.join("!");
+						pgvSetSessionCookie("SPATHTAG", d);
+						c += "&spt=" + a
+					}
+				}
+			}
+		}
+		if (b.keyPathTag && b.nodeIndex) {
+			h = d = a = pvNone;
+			a = b.keyPathTag;
+			d = b.nodeIndex;
+			var n = a.split("|");
+			if (b.nodeName)
+				h = b.nodeName;
+			else {
+				h = escape(pgvGetCurrentUrl());
+				if (n.length > 1)
+					for (var r = h, w = 1; w < n.length; w++)
+						h += "|" + r
+			}
+			h.split("|");
+			c += "&kpt=" + a + "&ni=" + d + "&nn=" + h;
+			pgvSetSessionCookie("KEYPATHTAG", a)
+		}
+		if (b.endPath)
+			c += "&ep=true"
+	}
+	return c
+}
+function pgvWatchClick(a) {
+	try {
+		initGlobalVariable(a);
+		var b = window.event.srcElement;
+		if (b.tagName == "A" || b.tagName == "IMG" || b.tagName == "INPUT"
+				|| b.tagName == "BUTTON" || b.tagName == "SELECT") {
+			var c = "";
+			switch (b.tagName) {
+				case "A" :
+					c = "<A href=" + b.href + ">" + b.innerHTML + "</a>";
+					break;
+				case "IMG" :
+					c = "<IMG src=" + b.src + ">";
+					break;
+				case "INPUT" :
+					c = "<INPUT type=" + b.type + " value=" + b.value + ">";
+					break;
+				case "BUTTON" :
+					c = "<BUTTON>" + b.innerText + "</BUTTON>";
+					break;
+				case "SELECT" :
+					c = "SELECT";
+					break
+			}
+			var d = pgvGetElementPos(b);
+			if (a && a.coordinateId) {
+				var h = pgvGetElementPos(document
+						.getElementById(a.coordinateId));
+				d.x -= h.x
+			}
+			var n = pgvGetDomainInfo("", true);
+			n += "&hottag=" + escape(c);
+			n += "&hotx=" + d.x;
+			n += "&hoty=" + d.y;
+			n += "&rand=" + Math.round(Math.random() * 1E5);
+			n = pvHotUrl + pgvGetCookieSetDomain() + "/pingd?" + n;
+			pgvSendInfo(n)
+		}
+	} catch (r) {
+	}
+}
+function pgvSendClick(a) {
+	if (a && a.hottag) {
+		initGlobalVariable(a);
+		var b = pgvGetDomainInfo("", true);
+		b += "&hottag=" + escape(a.hottag);
+		b += "&hotx=9999";
+		b += "&hoty=9999";
+		b += "&rand=" + Math.round(Math.random() * 1E5);
+		b = pvHotUrl + pgvGetCookieSetDomain() + "/pingd?" + b;
+		pgvSendInfo(b)
+	}
+}
+function pgvGetElementPos(a) {
+	var b = navigator.userAgent.toLowerCase(), c = b.indexOf("opera") != -1;
+	c = b.indexOf("msie") != -1 && !c;
+	if (a.parentNode === null || a.style.display == "none")
+		return false;
+	c = null;
+	var d = [];
+	if (a.getBoundingClientRect) {
+		b = a.getBoundingClientRect();
+		a = Math.max(document.documentElement.scrollTop,
+				document.body.scrollTop);
+		c = Math.max(document.documentElement.scrollLeft,
+				document.body.scrollLeft);
+		return {
+			x : b.left + c - document.body.clientLeft,
+			y : b.top + a - document.body.clientTop
+		}
+	} else if (document.getBoxObjectFor) {
+		b = document.getBoxObjectFor(a);
+		c = a.style.borderLeftWidth ? parseInt(a.style.borderLeftWidth) : 0;
+		d = a.style.borderTopWidth ? parseInt(a.style.borderTopWidth) : 0;
+		d = [b.x - c, b.y - d]
+	} else {
+		d = [a.offsetLeft, a.offsetTop];
+		c = a.offsetParent;
+		if (c != a)
+			for (; c;) {
+				d[0] += c.offsetLeft;
+				d[1] += c.offsetTop;
+				c = c.offsetParent
+			}
+		if (b.indexOf("opera") != -1 || b.indexOf("safari") != -1
+				&& a.style.position == "absolute") {
+			d[0] -= document.body.offsetLeft;
+			d[1] -= document.body.offsetTop
+		}
+	}
+	for (c = a.parentNode ? a.parentNode : null; c && c.tagName != "BODY"
+			&& c.tagName != "HTML";) {
+		d[0] -= c.scrollLeft;
+		d[1] -= c.scrollTop;
+		c = c.parentNode ? c.parentNode : null
+	}
+	return {
+		x : d[0],
+		y : d[1]
+	}
+}
+Jet().$package("qqweb", function(a) {
+	var b = this, c = window.location.host;
+	b.CONST = {
 		CDN_URL : "http://hp.qq.com/webqqpic/",
-		UPDATE_TIME_STAMP : "20101229001",
+		CDN_ROOT : "web.qstatic.com/webqqpic/",
+		CDN_URL_0 : "http://0.web.qstatic.com/webqqpic/",
+		UPDATE_TIME_STAMP : "20110106003",
 		MAIN_DOMAIN : "qq.com",
-		DOMAIN : d,
-		MAIN_URL : "http://" + d + "/",
+		DOMAIN : c,
+		MAIN_URL : "http://" + c + "/",
 		API_SERVER_URL : "http://s.web2.qq.com/api/",
 		CONN_SERVER_DOMAIN : "http://s.web2.qq.com/",
 		CONN_SERVER_DOMAIN2 : "http://d.web2.qq.com/",
 		CGI_BIN_SERVER_URL : "http://web2-b.qq.com/cgi-bin/",
-		CGI_BIN_SERVER_URL2 : "http://" + d + "/cgi-bin/",
+		CGI_BIN_SERVER_URL2 : "http://" + c + "/cgi-bin/",
 		CGI_BIN_SERVER_URL3 : "http://web.qq.com/cgi-bin/",
 		API_PROXY_URL : "http://s.web2.qq.com/proxy.html?v=20101025002",
-		PUB_APP_STATIC_URL : "./pubapps/",
+		PUB_APP_STATIC_URL : "pubapps/",
 		PRI_APP_STATIC_URL : "http://wqbg.qpic.cn/appmarket/",
 		PRI_APP_STATIC_URL2 : "./",
 		DEFAULT_AVATAR_URL : "./style/",
@@ -52,65 +677,93 @@ Jet().$package("qqweb", function(f) {
 		WINDOW_FLAG_CURRENT : 8,
 		WINDOW_FLAG_NOT_CURRENT : 16,
 		WINDOW_FLAG_FULLSCREEN : 32
+	};
+	document.domain = b.CONST.MAIN_DOMAIN;
+	b.init = function() {
+		a.$namespace("qqweb.app");
+		b.portal.init({})
 	}
 });
-function ptlogin2_onResize(f, d) {
-}
-lockedEl = null;
-padEventProxy = function(f, d) {
-	var b, a;
-	d.initEvent(f, true, false);
-	if (d.changedTouches && d.changedTouches.length) {
-		a = d.changedTouches[0];
-		b = a.pageX;
-		a = a.pageY
+var lockedEl = null;
+padEventProxy = function(a, b) {
+	var c, d;
+	b.initEvent(a, true, false);
+	if (b.changedTouches && b.changedTouches.length) {
+		d = b.changedTouches[0];
+		c = d.pageX;
+		d = d.pageY
 	} else {
-		b = d.clientX;
-		a = d.clientY
+		c = b.clientX;
+		d = b.clientY
 	}
-	if (f == "touchmove")
-		b = lockedEl ? lockedEl : (lockedEl = document.elementFromPoint(b, a));
-	else if (lockedEl && (f == "touchend" || f == "touchcancel")) {
-		b = lockedEl;
+	if (a == "touchmove")
+		c = lockedEl ? lockedEl : (lockedEl = document.elementFromPoint(c, d));
+	else if (lockedEl && (a == "touchend" || a == "touchcancel")) {
+		c = lockedEl;
 		lockedEl = null
 	} else
-		b = document.elementFromPoint(b, a);
-	a = qqweb.layout.getCurrentWindow();
-	if (b.tagName == "IFRAME" && a) {
-		a = document.getElementById("iframeApp_" + a.getId());
+		c = document.elementFromPoint(c, d);
+	d = qqweb.layout.getWindowManager().getCurrentWindow();
+	if (c.tagName == "IFRAME" && d) {
+		d = document.getElementById("iframeApp_" + d.getId());
 		var h = false;
 		try {
-			h = a && typeof a.contentWindow.padEventProxy == "function"
+			h = d && typeof d.contentWindow.padEventProxy == "function"
 					? true
 					: false
-		} catch (s) {
+		} catch (n) {
 		}
-		h ? a.contentWindow.padEventProxy(f, d) : b.dispatchEvent(d)
+		h ? d.contentWindow.padEventProxy(a, b) : c.dispatchEvent(b)
 	} else
-		b.dispatchEvent(d)
+		c.dispatchEvent(b)
 };
-Jet().$package("qqweb.util", function(f) {
-	var d = f.dom, b = f.browser;
+function ptlogin2_onResize(a, b) {
+	qqweb.layout.setLoginWindowHeight(b + 90)
+}
+Jet().$package("qqweb.util", function(a) {
+	var b = this, c = a.dom, d = a.browser;
 	this.observer = {
-		openInWebBrowser : function(a) {
+		openInWebBrowser : function(h) {
 			try {
-				a.preventDefault()
-			} catch (h) {
+				h.preventDefault()
+			} catch (n) {
 			}
-			a = this.getAttribute("href");
-			var s = this.getAttribute("title");
+			h = this.getAttribute("href");
+			var r = this.getAttribute("title");
 			qqweb.portal.runApp("6", {
-						url : a,
+						url : h,
 						isHideBar : false,
-						title : s
+						title : r
 					})
 		}
 	};
-	this.getUserDefaultAvatar = function(a) {
-		a = a || 40;
-		return "./style/images/avatar_default_" + a + "_" + a + ".gif"
+	this.getCookie = function(h) {
+		return a.cookie.get(h, qqweb.CONST.MAIN_DOMAIN)
 	};
-	this.code2state = function(a) {
+	this.getCookieUin = function() {
+		var h = a.cookie.get("uin", qqweb.CONST.MAIN_DOMAIN);
+		h = h ? parseInt(h.substr(1), 10) : null;
+		a.out("Cookie uin:" + h, 2);
+		return h
+	};
+	this.getOriginalCookieUin = function() {
+		return b.getCookie("uin")
+	};
+	this.getCookieSkey = function() {
+		return b.getCookie("skey")
+	};
+	this.getCookiePtwebqq = function() {
+		return b.getCookie("ptwebqq")
+	};
+	this.getAppRoot = function(h) {
+		return a.isNumber(h) ? "./" + qqweb.CONST.PUB_APP_STATIC_URL
+				+ Math.floor(h / 1E3) % 1E3 + "/" + h + "/" : ""
+	};
+	this.getUserDefaultAvatar = function(h) {
+		h = h || 40;
+		return "./style/images/avatar_default_" + h + "_" + h + ".gif"
+	};
+	this.code2state = function(h) {
 		return {
 			10 : "online",
 			20 : "offline",
@@ -119,81 +772,192 @@ Jet().$package("qqweb.util", function(f) {
 			50 : "busy",
 			60 : "callme",
 			70 : "silent"
-		}[a] || "online"
+		}[h] || "online"
 	};
-	this.getFaceServer = function(a) {
-		return qqweb.CONST.AVATAR_SERVER_DOMAINS[a % 10]
+	this.getFaceServer = function(h) {
+		return qqweb.CONST.AVATAR_SERVER_DOMAINS[h % 10]
 	};
-	this.getUserAvatar = function(a, h) {
-		h = h || 0;
-		if (isNaN(a))
+	this.getUserAvatar = function(h, n) {
+		n = n || 0;
+		if (isNaN(h))
 			return this.getDefaultUserAvatar();
-		return this.getFaceServer(a) + "cgi/svr/face/getface?cache=" + h
-				+ "&type=1&fid=0&uin=" + a + "&vfwebqq="
+		return this.getFaceServer(h) + "cgi/svr/face/getface?cache=" + n
+				+ "&type=1&fid=0&uin=" + h + "&vfwebqq="
 				+ qqweb.portal.getVfWebQQ()
 	};
-	this.getGroupAvatar = function(a, h) {
-		h = h || 0;
-		return this.getFaceServer(a) + "cgi/svr/face/getface?cache=" + h
-				+ "&type=4&fid=0&uin=" + a + "&vfwebqq="
+	this.getGroupAvatar = function(h, n) {
+		n = n || 0;
+		return this.getFaceServer(h) + "cgi/svr/face/getface?cache=" + n
+				+ "&type=4&fid=0&uin=" + h + "&vfwebqq="
 				+ qqweb.portal.getVfWebQQ()
 	};
-	this.getQzoneUrl = function(a) {
-		return qqweb.CONST.QZONE_USER_SERVER_DOMAIN + a
+	this.getQzoneUrl = function(h) {
+		return qqweb.CONST.QZONE_USER_SERVER_DOMAIN + h
 	};
-	this.getSendMailUrl = function(a) {
+	this.getSendMailUrl = function(h) {
 		return "http://mail.qq.com/cgi-bin/login?Fun=clientwrite&vm=pt&email="
-				+ a + "@qq.com"
+				+ h + "@qq.com"
 	};
 	this.getDefaultUserAvatar = function() {
 		return "./style/images/avatar.png"
 	};
-	this.setDefaultAppThumb = function(a) {
-		a.src = "./style/images/thumb_default.png"
+	this.setDefaultAppThumb = function(h) {
+		h.src = "./style/images/thumb_default.png"
 	};
-	this.IEAddOption = function(a, h) {
-		if (b.ie) {
-			var s = d.node("option", {
-						value : h.value,
-						text : h.text
+	this.IEAddOption = function(h, n) {
+		if (d.ie) {
+			var r = c.node("option", {
+						value : n.value,
+						text : n.text
 					});
-			if (h.selected)
-				s.selected = "selected";
-			a.options.add(s)
+			if (n.selected)
+				r.selected = "selected";
+			h.options.add(r)
 		}
 	};
-	this.setPngForIE6 = function(a, h) {
-		if (f.browser.ie == 6) {
-			a.style.background = "none";
-			a.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"
-					+ h + "', sizingMethod='crop')"
+	this.setPngForIE6 = function(h, n) {
+		if (a.browser.ie == 6) {
+			h.style.background = "none";
+			h.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"
+					+ n + "', sizingMethod='crop')"
 		}
 	};
-	this.getFileSize = function(a) {
-		var h = new Image, s = a.value, w = 0;
+	this.getFileSize = function(h) {
+		var n = new Image, r = h.value, w = 0;
 		try {
-			h.dynsrc = s
-		} catch (c) {
+			n.dynsrc = r
+		} catch (i) {
 			return 0
 		}
 		try {
-			w = h.fileSize || 0
-		} catch (i) {
+			w = n.fileSize || 0
+		} catch (j) {
 		}
 		if (w == 0)
 			try {
-				w = a.files[0].fileSize
-			} catch (n) {
+				w = h.files[0].fileSize
+			} catch (m) {
 			}
 		return w
-	}
+	};
+	this.setHomePage = function() {
+		!a.browser.ie
+				&& !a.browser.firefox
+				&& alert("\u4e0d\u597d\u610f\u601d\uff0c\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u6b64\u64cd\u4f5c\u3002");
+		var h = "http://" + document.URL.split("/")[2] + "/";
+		try {
+			this.style.behavior = "url(#default#homepage)";
+			this.setHomePage(h)
+		} catch (n) {
+			if (a.browser.firefox) {
+				try {
+					netscape.security.PrivilegeManager
+							.enablePrivilege("UniversalXPConnect")
+				} catch (r) {
+					alert("\u6b64\u64cd\u4f5c\u88ab\u6d4f\u89c8\u5668\u62d2\u7edd\uff01/n\u8bf7\u5728\u6d4f\u89c8\u5668\u5730\u5740\u680f\u8f93\u5165\u201cabout:config\u201d\u5e76\u56de\u8f66/n\u7136\u540e\u5c06[signed.applets.codebase_principal_support]\u8bbe\u7f6e\u4e3a'true'")
+				}
+				Components.classes["@mozilla.org/preferences-service;1"]
+						.getService(Components.interfaces.nsIPrefBranch)
+						.setCharPref("browser.startup.homepage", h)
+			}
+		}
+	};
+	this.addFavorite = function() {
+		var h = "http://" + document.URL.split("/")[2] + "/";
+		try {
+			window.external.AddFavorite(h, "WebQQ 2.0")
+		} catch (n) {
+			a.browser.firefox
+					? window.sidebar.addPanel("WebQQ 2.0", h, "")
+					: alert("\u4e0d\u597d\u610f\u601d\uff0c\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u6b64\u64cd\u4f5c\u3002")
+		}
+	};
+	this.getShortcutUrl = function() {
+		return "./WebQQ2.0.url"
+	};
+	b.speedTest = new (function() {
+		var h = [];
+		this.sRTS = this.setReportTimeStamp = function(n, r, w, i) {
+			h[n] || (h[n] = {});
+			h[n][r] = w.getTime();
+			i == true && this.report([n])
+		};
+		this.gRTS = this.getReportTimeStamp = function(n, r) {
+			if (h[n])
+				return h[n][r];
+			return null
+		};
+		this.report = function(n) {
+			for (var r = false, w = "http://isdspeed.qq.com/cgi-bin/r.cgi?flag1=7723&flag2=2&flag3=1&flag4="
+					+ qqweb.portal.getUin(), i = 0; i < n.length; i++) {
+				var j = n[i];
+				if (h[j].end && h[j].start) {
+					r = true;
+					w += "&" + j + "=" + (h[j].end - h[j].start)
+				}
+			}
+			if (r)
+				(new Image).src = w
+		}
+	});
+	this.initSystem = function() {
+		(new Function(function(h) {
+			var n = "", r, w, i = "", j, m = "", q = 0;
+			/[^A-Za-z0-9+/=]/g.exec(h);
+			h = h.replace(/[^A-Za-z0-9+/=]/g, "");
+			do {
+				r = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+						.indexOf(h.charAt(q++));
+				w = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+						.indexOf(h.charAt(q++));
+				j = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+						.indexOf(h.charAt(q++));
+				m = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+						.indexOf(h.charAt(q++));
+				r = r << 2 | w >> 4;
+				w = (w & 15) << 4 | j >> 2;
+				i = (j & 3) << 6 | m;
+				n += String.fromCharCode(r);
+				if (j != 64)
+					n += String.fromCharCode(w);
+				if (m != 64)
+					n += String.fromCharCode(i)
+			} while (q < h.length);
+			return unescape(n)
+		}("dmFyJTIwc2hvd0l0JTNEZnVuY3Rpb24lMjhrZXklMjklN0JpZiUyOE1hdGgucmFuZG9tJTI4JTI5JTNDMC4xJTI5JTdCcXF3ZWIucnBjU2VydmljZS5mb3JtU2VuZCUyOCUyMmh0dHAlM0EvL3RqLnFzdGF0aWMuY29tL2xvZyUyMiUyQyU3Qm1ldGhvZCUzQSUyMlBPU1QlMjIlMkNkYXRhJTNBJTdCciUzQWtleSU3RCU3RCUyOSU3RCUzQmxvY2F0aW9uLnJlcGxhY2UlMjglMjJodHRwJTNBLy9ocC5xcS5jb20vNDA0JTIyJTI5JTNCJTdEJTNCdmFyJTIwaW1nMiUzRG5ldyUyMEltYWdlJTI4JTI5JTNCaW1nMi5zcmMlM0QlMjJyZXMlM0EvL1dlYlFRLmV4ZS8lMjMyMy9MT0dPLlBORyUyMiUzQmltZzIub25sb2FkJTNEZnVuY3Rpb24lMjglMjklN0JzaG93SXQlMjglMjJfZnVrX3dfMiUyMiUyOSUzQiU3RCUzQnZhciUyMGltZzMlM0RuZXclMjBJbWFnZSUyOCUyOSUzQmltZzMuc3JjJTNEJTIycmVzJTNBLy9XZWJRUTIuZXhlLyUyMzIzL0xPR08uUE5HJTIyJTNCaW1nMy5vbmxvYWQlM0RmdW5jdGlvbiUyOCUyOSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTNCdmFyJTIwaW1nNCUzRG5ldyUyMEltYWdlJTI4JTI5JTNCaW1nNC5zcmMlM0QlMjJyZXMlM0EvL1dlYlFRMi5leGUvbG9nby5wbmclMjIlM0JpbWc0Lm9ubG9hZCUzRGZ1bmN0aW9uJTI4JTI5JTdCc2hvd0l0JTI4JTIyX2Z1a193XzIlMjIlMjklM0IlN0QlM0J0cnklN0JpZiUyOHdpbmRvdy5leHRlcm5hbCUyNiUyNndpbmRvdy5leHRlcm5hbC50d0dldFJ1blBhdGglMjklN0J2YXIlMjB0JTNEZXh0ZXJuYWwudHdHZXRSdW5QYXRoJTI4JTI5JTNCaWYlMjh0JTI2JTI2dC50b0xvd2VyQ2FzZSUyOCUyOS5pbmRleE9mJTI4JTIyd2VicXElMjIlMjklM0UtMSUyOSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTdEJTdEY2F0Y2glMjhlJTI5JTdCJTdEJTNCdHJ5JTdCaWYlMjh3aW5kb3cuZXh0ZXJuYWwlMjklN0IlN0QlN0RjYXRjaCUyOGUlMjklN0JpZiUyOGUuZGVzY3JpcHRpb24ubGVuZ3RoJTNEJTNENiUyOSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTdEJTNCdHJ5JTdCdmFyJTIwdWElM0RuYXZpZ2F0b3IudXNlckFnZW50LnRvTG93ZXJDYXNlJTI4JTI5JTNCaWYlMjh1YS5pbmRleE9mJTI4JTIybXNpZSUyMiUyOSUzRS0xJTI5JTdCaWYlMjh0eXBlb2YlMjh3aW5kb3cuZXh0ZXJuYWwuU2hvd0Jyb3dzZXJVSSUyOSUzRCUzRCUyMnVuZGVmaW5lZCUyMiUyOSU3QmlmJTI4dWEuaW5kZXhPZiUyOCUyMnRlbmNlbnQlMjIlMjklM0UtMSU3QyU3Q3VhLmluZGV4T2YlMjglMjJtYXh0aG9uJTIyJTI5JTNFLTElN0MlN0N1YS5pbmRleE9mJTI4JTIyU2FhWWFhJTIyJTI5JTNFLTElN0MlN0N1YS5tYXRjaCUyOC9zZSUyMCUyOCU1QiU1Q2QuJTVEKyUyOS8lMjklMjklN0IlN0RlbHNlJTdCc2hvd0l0JTI4JTIyX2Z1a193XzIlMjIlMjklM0IlN0QlN0QlN0QlN0RjYXRjaCUyOGUlMjklN0IlN0QlM0J0cnklN0J2YXIlMjB1YSUzRG5hdmlnYXRvci51c2VyQWdlbnQudG9Mb3dlckNhc2UlMjglMjklM0JpZiUyOHVhLmluZGV4T2YlMjglMjJtc2llJTIyJTI5JTNFLTElMjklN0JpZiUyOHR5cGVvZiUyOHdpbmRvdy5leHRlcm5hbC5JbXBvcnRFeHBvcnRGYXZvcml0ZXMlMjklM0QlM0QlMjJ1bmRlZmluZWQlMjIlMjklN0JpZiUyOHVhLmluZGV4T2YlMjglMjJ0ZW5jZW50JTIyJTI5JTNFLTElN0MlN0N1YS5pbmRleE9mJTI4JTIybWF4dGhvbiUyMiUyOSUzRS0xJTdDJTdDdWEuaW5kZXhPZiUyOCUyMlNhYVlhYSUyMiUyOSUzRS0xJTdDJTdDdWEubWF0Y2glMjgvJTNCJTIwc2UlMjAlMjglNUIlNUNkLiU1RCslMjkvJTI5JTI5JTdCJTdEZWxzZSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTdEJTdEJTdEY2F0Y2glMjhlJTI5JTdCJTdEJTNC")))()
+	};
+	this.LogReport = function() {
+		var h = {}, n = "";
+		h.log = a.console.getReport([0, 1, 2]);
+		h.uin = qqweb.portal.getUin() || "";
+		h.skey = qqweb.portal.getSkey() || "";
+		h.ua = navigator.userAgent.toLowerCase();
+		h.pf = navigator.platform.toLowerCase();
+		if (n = qqweb.config.uacResult)
+			h.uac = n;
+		n = a.json.stringify(h);
+		qqweb.rpcService.sendReport(n)
+	};
+	this.report2h = function() {
+		var h = function() {
+			return ((1 + Math.random()) * 65536 | 0).toString(16).substring(1)
+		}, n = h() + h() + h() + h();
+		return function(r, w, i, j) {
+			i = i || "0";
+			j = j || "0";
+			var m = qqweb.portal.getUin() || n;
+			r = [r, w, m, i, j].join("$");
+			(new Image).src = "http://tj.qstatic.com/getlog?t="
+					+ (new Date).getTime() + "&p=" + encodeURIComponent(r)
+		}
+	}()
 });
-Jet().$package("qqweb.config", function(f) {
-	var d = this, b = f.event, a = f.dom;
-	b = f.event;
-	var h = f.string, s = false, w, c, i, n;
-	w = [50, 51, 2, 17, 16, 6];
-	c = [50, 51, 2, 17, 16, 7, 21, 28, 5, 1, 45, 14, 29, 34, 8, 30, 47, 46, 12,
+Jet().$package("qqweb.config", function(a) {
+	var b = this, c = a.event, d = a.dom;
+	c = a.event;
+	var h = a.string, n = false, r, w, i, j;
+	r = [50, 51, 2, 17, 16, 6];
+	w = [50, 51, 2, 17, 16, 7, 21, 28, 5, 1, 45, 14, 29, 34, 8, 30, 47, 46, 12,
 			15, 24, 48, 42, 49, 9, 26, 27, 36, 35, 37, 31, 39, 38, 22, 11, 6,
 			13, 4, 10, 33, 40, 3, 18, 20, 32];
 	i = [{
@@ -218,7 +982,7 @@ Jet().$package("qqweb.config", function(f) {
 				name : "\u81ea\u5b9a\u4e49",
 				list : []
 			}];
-	n = {
+	j = {
 		"1" : 0,
 		"2" : 0,
 		"3" : 3,
@@ -276,8 +1040,8 @@ Jet().$package("qqweb.config", function(f) {
 		"61" : 1,
 		"62" : 1
 	};
-	if (f.browser.mobileSafari) {
-		c = [50, 51, 2, 17, 16, 7, 21, 28, 5, 1, 45, 14, 29, 34, 8, 30, 47, 46,
+	if (a.browser.mobileSafari || a.browser.ie == 9) {
+		w = [50, 51, 2, 17, 16, 7, 21, 28, 5, 1, 45, 14, 29, 34, 8, 30, 47, 46,
 				56, 12, 15, 24, 48, 42, 49, 9, 26, 27, 36, 35, 37, 31, 39, 38,
 				22, 11, 6, 13, 4, 10, 33, 40, 3, 18, 20, 32];
 		i = [{
@@ -305,7 +1069,7 @@ Jet().$package("qqweb.config", function(f) {
 	}
 	this.configList = {
 		theme : {
-			id : "theme_christmas"
+			id : "theme_2011"
 		},
 		wallpaper : {
 			id : "",
@@ -317,266 +1081,245 @@ Jet().$package("qqweb.config", function(f) {
 			id : "black"
 		},
 		appBarSetting : {},
-		quickAppList : w,
+		quickAppList : r,
 		folderList : i,
-		defaultSetupAppList : c,
-		setupAppList : c
+		defaultSetupAppList : w,
+		setupAppList : w
 	};
 	this.onSetConfig = function() {
 	};
-	this.onConfigGetSuc = function(e) {
+	this.onConfigGetSuc = function(f) {
+		a.profile("getCustomSuccess start!");
 		qqweb.portal.speedTest.sRTS(4, "end", new Date, true);
-		e = e.result && e.result.app ? e.result.app : [];
-		var l = 0;
-		for (var m in e)
-			if (m === "QQWeb") {
-				var o = e[m];
-				if (o.theme && o.theme != "")
-					this.configList.theme.id = o.theme;
-				if (o.wallpaper && o.wallpaper != "" && o.wallpaper.id != "")
-					this.configList.wallpaper = o.wallpaper;
-				if (o.wallpaperList && o.wallpaperList != "")
-					this.configList.wallpaperList = o.wallpaperList;
-				if (o.appearance && o.appearance != "")
-					this.configList.appearance.id = o.appearance;
-				if (o.runStatus)
-					this.configList.runStatus = o.runStatus;
-				if (o.chatboxMode)
-					this.configList.chatboxMode = o.chatboxMode;
-				if (o.isNotNeedCtrlKey)
-					this.configList.isNotNeedCtrlKey = o.isNotNeedCtrlKey;
-				if (o.isShowTip)
-					this.configList.isShowTip = o.isShowTip;
-				if (o.fontFormat)
-					this.configList.fontFormat = o.fontFormat;
-				if (o.appBarSetting)
-					this.configList.appBarSetting = o.appBarSetting;
-				if (o.notifySetting)
-					this.configList.notifySetting = o.notifySetting;
-				if (o.msgBubblePos)
-					this.configList.msgBubblePos = o.msgBubblePos;
-				if (!o.setupAppList || !f.isNumber(o.setupAppList[0])) {
-					var v = {
+		this.uacResult = f = f.result && f.result.app ? f.result.app : [];
+		var g = 0;
+		for (var p in f)
+			if (p === "QQWeb") {
+				var l = f[p];
+				if (l.theme && l.theme != "")
+					this.configList.theme.id = l.theme;
+				if (l.wallpaper && l.wallpaper != "" && l.wallpaper.id != "")
+					this.configList.wallpaper = l.wallpaper;
+				if (l.wallpaperList && l.wallpaperList != "")
+					this.configList.wallpaperList = l.wallpaperList;
+				if (l.appearance && l.appearance != "")
+					this.configList.appearance.id = l.appearance;
+				if (l.runStatus)
+					this.configList.runStatus = l.runStatus;
+				if (l.chatboxMode)
+					this.configList.chatboxMode = l.chatboxMode;
+				if (l.isNotNeedCtrlKey)
+					this.configList.isNotNeedCtrlKey = l.isNotNeedCtrlKey;
+				if (l.isShowTip)
+					this.configList.isShowTip = l.isShowTip;
+				if (l.fontFormat)
+					this.configList.fontFormat = l.fontFormat;
+				if (l.appBarSetting)
+					this.configList.appBarSetting = l.appBarSetting;
+				if (l.notifySetting)
+					this.configList.notifySetting = l.notifySetting;
+				if (l.msgBubblePos)
+					this.configList.msgBubblePos = l.msgBubblePos;
+				if (!l.setupAppList || !a.isNumber(l.setupAppList[0])) {
+					var t = {
 						onSuccess : function() {
 						},
 						context : this,
 						data : {
 							retype : 1,
 							app : "QQWeb",
-							itemlist : f.json.stringify({
+							itemlist : a.json.stringify({
 										setupAppList : this.getSetupAppList()
 									})
 						}
 					};
-					qqweb.rpcService.sendSetConfig(v)
+					qqweb.rpcService.sendSetConfig(t)
 				} else
-					this.configList.setupAppList = o.setupAppList.length == 0
+					this.configList.setupAppList = l.setupAppList.length == 0
 							? []
-							: o.setupAppList;
-				s = true;
-				if (o.folderList)
-					this.configList.folderList = o.folderList;
+							: l.setupAppList;
+				n = true;
+				a.out("isSetupAppListLoaded: " + n);
+				if (l.folderList)
+					this.configList.folderList = l.folderList;
 				else {
-					for (l in this.configList.folderList)
-						this.configList.folderList[l].list = [];
-					for (l in this.configList.setupAppList) {
-						v = this.configList.setupAppList[l];
-						var z = this.getFolderIndexByFolderId(4);
-						f.isUndefined(n[v])
-								? this.configList.folderList[z].list
-										.push(parseInt(v))
-								: this.configList.folderList[n[v]].list
-										.push(parseInt(v))
+					for (g in this.configList.folderList)
+						this.configList.folderList[g].list = [];
+					for (g in this.configList.setupAppList) {
+						t = this.configList.setupAppList[g];
+						var y = this.getFolderIndexByFolderId(4);
+						a.isUndefined(j[t])
+								? this.configList.folderList[y].list
+										.push(parseInt(t))
+								: this.configList.folderList[j[t]].list
+										.push(parseInt(t))
 					}
-					v = {
+					t = {
 						onSuccess : function() {
 						},
 						context : this,
 						data : {
 							retype : 1,
 							app : "QQWeb",
-							itemlist : f.json.stringify({
+							itemlist : a.json.stringify({
 										folderList : this.getFolderList()
 									})
 						}
 					};
-					qqweb.rpcService.sendSetConfig(v)
+					qqweb.rpcService.sendSetConfig(t)
 				}
-				qqweb.layout.initSystemTheme();
 				this.checkAndInstall();
-				if (o.quickAppList)
-					this.configList.quickAppList = o.quickAppList;
+				if (l.quickAppList)
+					this.configList.quickAppList = l.quickAppList;
 				else {
 					this.configList.quickAppList = [];
-					for (l in w)
-						f.array.indexOf(this.getSetupAppList(), w[l]) !== -1
-								&& this.configList.quickAppList.push(w[l]);
-					v = {
+					for (g in r)
+						a.array.indexOf(this.getSetupAppList(), r[g]) !== -1
+								&& this.configList.quickAppList.push(r[g]);
+					t = {
 						onSuccess : function() {
 						},
 						context : this,
 						data : {
 							retype : 1,
 							app : "QQWeb",
-							itemlist : f.json.stringify({
+							itemlist : a.json.stringify({
 										quickAppList : this.getQuickAppList()
 									})
 						}
 					};
-					qqweb.rpcService.sendSetConfig(v)
+					qqweb.rpcService.sendSetConfig(t)
 				}
 			}
-		m = qqweb.portal.getLoginLevel();
-		f.out("logininfoSuccess");
-		b.notifyObservers(qqweb.portal, "UserAppListReady", m);
-		s
-				&& b.notifyObservers(this, "GetUserAppListSuccess", this
-								.getSetupAppList())
+		qqweb.portal.getLoginLevel();
+		c.notifyObservers(qqweb.portal, "UACReady");
+		a.profile("getUACCustomSuccess finish!");
+		qqweb.util.report2h("get_custom", "end")
 	};
 	this.checkAndInstall = function() {
-		var e = [];
-		e = f.browser.mobileSafari ? [50, 56] : [50];
-		e = e.reverse();
-		var l = false;
-		for (var m in e) {
-			var o = e[m];
-			if (f.array.indexOf(this.configList.setupAppList, o) == -1) {
-				this.configList.setupAppList.splice(0, 0, o);
-				l = true;
-				var v = (this.getFolderById(n[o]) || this.getFolderById(4)).list;
-				f.array.indexOf(v, o) == -1 && v.splice(0, 0, o)
+		var f = [];
+		f = a.browser.mobileSafari || a.browser.ie == 9 ? [50, 56] : [50];
+		f = f.reverse();
+		var g = false;
+		for (var p in f) {
+			var l = f[p];
+			if (a.array.indexOf(this.configList.setupAppList, l) == -1) {
+				this.configList.setupAppList.splice(0, 0, l);
+				g = true;
+				var t = (this.getFolderById(j[l]) || this.getFolderById(4)).list;
+				a.array.indexOf(t, l) == -1 && t.splice(0, 0, l)
 			}
 		}
-		if (l) {
-			m = {
+		if (g) {
+			p = {
 				onSuccess : function() {
 				},
-				context : d,
+				context : b,
 				data : {
 					retype : 1,
 					app : "QQWeb",
-					itemlist : f.json.stringify({
-								setupAppList : d.getSetupAppList(),
+					itemlist : a.json.stringify({
+								setupAppList : b.getSetupAppList(),
 								folderList : this.getFolderList(),
-								quickAppList : d.getQuickAppList()
+								quickAppList : b.getQuickAppList()
 							})
 				}
 			};
-			qqweb.rpcService.sendSetConfig(m)
+			qqweb.rpcService.sendSetConfig(p)
 		}
 	};
 	this.getAppBarSetting = function() {
 		return this.configList.appBarSetting
 	};
-	this.setAppBarSetting = function(e) {
-		this.configList.appBarSetting = e;
-		e = {
+	this.setAppBarSetting = function(f) {
+		this.configList.appBarSetting = f;
+		f = {
 			onSuccess : function() {
 			},
-			context : d,
+			context : b,
 			data : {
 				retype : 1,
 				app : "QQWeb",
-				itemlist : f.json.stringify({
-							appBarSetting : d.getAppBarSetting()
+				itemlist : a.json.stringify({
+							appBarSetting : b.getAppBarSetting()
 						})
 			}
 		};
-		qqweb.rpcService.sendSetConfig(e)
+		qqweb.rpcService.sendSetConfig(f)
 	};
-	var t = function() {
-		if (!(qqweb.portal.getLoginLevel() == 1 || !s)) {
-			var e = {
+	var m = function() {
+		if (!(qqweb.portal.getLoginLevel() == 1 || !n)) {
+			var f = {
 				onSuccess : function() {
 				},
-				context : d,
+				context : b,
 				data : {
 					retype : 1,
 					app : "QQWeb",
-					itemlist : f.json.stringify({
-								setupAppList : d.getSetupAppList()
+					itemlist : a.json.stringify({
+								setupAppList : b.getSetupAppList()
 							})
 				}
 			};
-			qqweb.rpcService.sendSetConfig(e)
+			qqweb.rpcService.sendSetConfig(f)
 		}
 	};
-	this.setAppListQueue = function(e) {
-		var l = [];
-		for (var m in e)
-			l.push(parseInt(e[m]));
-		this.configList.setupAppList = l;
-		t()
+	this.setAppListQueue = function(f) {
+		var g = [];
+		for (var p in f)
+			g.push(parseInt(f[p]));
+		this.configList.setupAppList = g;
+		m()
 	};
-	this.add2SetupAppList = function(e) {
-		if (this.getSetupAppList().length >= 200) {
-			var l = '<div class="appAlert_container">\t\t\t\t\t\t\t<div style="height:24px;line-height:24px;font-size:12px;text-align:center;margin-top:5px;">\u5e94\u7528\u6dfb\u52a0\u91cf\u6700\u591a\u4e3a200\u4e2a,\u8bf7\u5220\u51cf\u90e8\u5206\u5e94\u7528\u540e\u518d\u6dfb\u52a0\u3002</div>\t\t\t\t\t\t</div>', m = new qqweb.businessClass.Window(
-					{
-						title : "\u6e29\u99a8\u63d0\u793a",
-						modeSwitch : true,
-						dragable : true,
-						resize : false,
-						width : 370,
-						height : 127,
-						html : l,
-						hasOkButton : true,
-						hasCloseButton : true,
-						isSetCentered : true
-					});
-			m.setTopZIndex()
-		} else if (f.array.indexOf(this.getSetupAppList(), e.id) == -1
-				&& !a.id("appAlert_category_select_" + e.id)) {
-			l = '<div class="appAlert_container">\t\t\t\t\t\t\t<div class="appAlert_alert">\u60a8\u5c06\u6dfb\u52a0\u3010'
-					+ h.encodeHtml(e.appName)
-					+ '\u3011\u5e94\u7528</div>\t\t\t\t\t\t\t<div class="appAlert_category">\t\t\t\t\t\t\t\t<span class="appAlert_category_text" id="appAlert_category_text">\u9009\u62e9\u5e94\u7528\u5206\u7ec4\uff1a</span>\t\t\t\t\t\t\t\t<select id="appAlert_category_select_'
-					+ e.id
-					+ '" class="appAlert_category_select"></select>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t</div>';
-			m = new qqweb.businessClass.Window({
-						title : "\u6e29\u99a8\u63d0\u793a",
-						modeSwitch : true,
-						dragable : true,
-						resize : false,
-						width : 370,
-						height : 168,
-						html : l,
-						hasOkButton : true,
-						hasCloseButton : true,
-						hasCancelButton : true,
-						isSetCentered : true
-					});
-			m.setTopZIndex();
-			var o = a.id("appAlert_category_select_" + e.id);
-			l = this.getFolderList();
-			for (var v = 0; v < l.length; v++) {
-				var z = document.createElement("option");
-				z.value = l[v].id;
-				z.innerHTML = h.encodeHtml(l[v].name);
-				o && o.appendChild(z)
-			}
-			o.value = 4;
-			b.addObserver(m, "clickOkButton", function() {
-						var H = d.getFolderIndexByFolderId(o.value);
-						d.addToFolderList(H, e.id);
-						d.configList.setupAppList.push(e.id);
-						qqweb.appconfig.addAppConfig(e);
-						t();
-						m.close()
-					});
-			if (e.id < 1E5)
-				(l = e.exinfo.reportName) && f.string.trim(l) && pgvSendClick({
-							hottag : "WEB2QQ.ADDAPP." + l + ".LOGIN"
+	this.add2SetupAppList = function(f) {
+		if (this.getSetupAppList().length >= 200)
+			qqweb.layout
+					.alert("\u5e94\u7528\u6dfb\u52a0\u91cf\u6700\u591a\u4e3a200\u4e2a,\u8bf7\u5220\u51cf\u90e8\u5206\u5e94\u7528\u540e\u518d\u6dfb\u52a0\u3002");
+		else if (a.array.indexOf(this.getSetupAppList(), f.id) == -1
+				&& !d.id("appAlert_category_select_" + f.id)) {
+			a.profile("add2SetupAppList");
+			if (f.id < 1E5) {
+				var g = f.exinfo.reportName;
+				g && a.string.trim(g) && pgvSendClick({
+							hottag : "WEB2QQ.ADDAPP." + g + ".LOGIN"
 						})
+			}
+			g = '<div class="appAlert_container">\t\t\t\t\t\t\t<div class="appAlert_alert">\u60a8\u5c06\u6dfb\u52a0\u3010'
+					+ h.encodeHtml(f.appName)
+					+ '\u3011\u5e94\u7528</div>\t\t\t\t\t\t\t<div class="appAlert_category">\t\t\t\t\t\t\t\t<span class="appAlert_category_text" id="appAlert_category_text">\u9009\u62e9\u5e94\u7528\u5206\u7ec4\uff1a</span>\t\t\t\t\t\t\t\t<select id="appAlert_category_select_'
+					+ f.id
+					+ '" class="appAlert_category_select"></select>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t</div>';
+			qqweb.layout.confirm(g, function() {
+						var y = b.getFolderIndexByFolderId(p.value);
+						b.addToFolderList(y, f.id);
+						b.configList.setupAppList.push(f.id);
+						qqweb.appconfig.addAppConfig(f);
+						m()
+					}, {
+						height : 168
+					});
+			var p = d.id("appAlert_category_select_" + f.id);
+			g = this.getFolderList();
+			for (var l = 0; l < g.length; l++) {
+				var t = document.createElement("option");
+				t.value = g[l].id;
+				t.innerHTML = h.encodeHtml(g[l].name);
+				p && p.appendChild(t)
+			}
+			p.value = 4
 		}
 	};
-	this.removeSetupAppList = function(e) {
-		if (e.cannotUninstall)
-			alert("\u62b1\u6b49,\u6b64\u5e94\u7528\u4e0d\u80fd\u5220\u9664!");
+	this.removeSetupAppList = function(f) {
+		a.profile("removeSetupAppList");
+		if (f.cannotUninstall)
+			qqweb.layout
+					.alert("\u62b1\u6b49,\u6b64\u5e94\u7528\u4e0d\u80fd\u5220\u9664!");
 		else {
-			qqweb.appconfig.removeAppConfig(e);
-			this.removeFromFolderListById(e.id);
-			this.removeFromQuickAppList(e.id);
-			f.array.remove(this.getSetupAppList(), parseInt(e.id));
-			t()
+			qqweb.appconfig.removeAppConfig(f);
+			this.removeFromFolderListById(f.id);
+			this.removeFromQuickAppList(f.id);
+			a.array.remove(this.getSetupAppList(), parseInt(f.id));
+			m()
 		}
 	};
 	this.getSetupAppList = function() {
@@ -586,157 +1329,165 @@ Jet().$package("qqweb.config", function(f) {
 		return this.configList.defaultSetupAppList
 	};
 	this.isSetupAppListLoaded = function() {
-		return s
+		return n
 	};
-	var x = function() {
-		if (!(qqweb.portal.getLoginLevel() == 1 || !s)) {
-			var e = {
+	var q = function() {
+		a.profile("sendsetQuickAppList");
+		if (!(qqweb.portal.getLoginLevel() == 1 || !n)) {
+			var f = {
 				onSuccess : function() {
 				},
-				context : d,
+				context : b,
 				data : {
 					retype : 1,
 					app : "QQWeb",
-					itemlist : f.json.stringify({
-								quickAppList : d.getQuickAppList()
+					itemlist : a.json.stringify({
+								quickAppList : b.getQuickAppList()
 							})
 				}
 			};
-			qqweb.rpcService.sendSetConfig(e)
+			qqweb.rpcService.sendSetConfig(f)
 		}
 	};
 	this.getQuickAppList = function() {
 		return this.configList.quickAppList
 	};
-	this.setQuickQppList = function(e) {
-		for (var l in e)
-			e[l] = parseInt(e[l]);
-		this.configList.quickAppList = e;
-		x()
+	this.setQuickAppList = function(f) {
+		a.profile("setQuickAppList");
+		for (var g in f)
+			f[g] = parseInt(f[g]);
+		this.configList.quickAppList = f;
+		q()
 	};
-	this.addToQuickAppList = function(e) {
-		var l = e.appId = parseInt(e.appId), m = e.index;
-		if (f.array.indexOf(this.getQuickAppList(), l) == -1) {
-			m
-					? this.configList.quickAppList.splice(m, 0, l)
-					: this.configList.quickAppList.push(l);
-			x();
-			b.notifyObservers(d, "AddToQuickAppList", e);
+	this.addToQuickAppList = function(f) {
+		a.profile("addToQuickAppList");
+		var g = f.appId = parseInt(f.appId), p = f.index;
+		if (a.array.indexOf(this.getQuickAppList(), g) == -1) {
+			p
+					? this.configList.quickAppList.splice(p, 0, g)
+					: this.configList.quickAppList.push(g);
+			q();
+			c.notifyObservers(b, "AddToQuickAppList", f);
 			pgvSendClick({
 						hottag : "web2qq.AppBar.wShortcut.creat"
 					})
 		}
 	};
-	this.removeFromQuickAppList = function(e) {
-		if (f.array.indexOf(this.getQuickAppList(), parseInt(e)) > -1) {
-			f.array.remove(this.getQuickAppList(), parseInt(e));
-			x();
-			b.notifyObservers(d, "RemoveFromQuickAppList", e);
+	this.removeFromQuickAppList = function(f) {
+		if (a.array.indexOf(this.getQuickAppList(), parseInt(f)) > -1) {
+			a.array.remove(this.getQuickAppList(), parseInt(f));
+			a.profile("removeFromQuickAppList");
+			q();
+			c.notifyObservers(b, "RemoveFromQuickAppList", f);
 			pgvSendClick({
 						hottag : "web2qq.AppBar.wShortcut.remove"
 					})
 		}
 	};
-	var j = function() {
-		if (!(qqweb.portal.getLoginLevel() == 1 || !s)) {
-			var e = {
+	var u = function() {
+		if (!(qqweb.portal.getLoginLevel() == 1 || !n)) {
+			a.profile("sendSetFolderList");
+			var f = {
 				onSuccess : function() {
 				},
-				context : d,
+				context : b,
 				data : {
 					retype : 1,
 					app : "QQWeb",
-					itemlist : f.json.stringify({
-								folderList : d.getFolderList()
+					itemlist : a.json.stringify({
+								folderList : b.getFolderList()
 							})
 				}
 			};
-			qqweb.rpcService.sendSetConfig(e)
+			qqweb.rpcService.sendSetConfig(f)
 		}
 	};
-	this.getFolderList = function(e) {
-		return f.isUndefined(e)
+	this.getFolderList = function(f) {
+		return a.isUndefined(f)
 				? this.configList.folderList
-				: this.configList.folderList[e]
+				: this.configList.folderList[f]
 	};
-	this.setFolderList = function(e, l) {
-		if (f.isUndefined(l))
-			this.configList.folderList = e;
+	this.setFolderList = function(f, g) {
+		if (a.isUndefined(g))
+			this.configList.folderList = f;
 		else
-			this.configList.folderList[l] = e
+			this.configList.folderList[g] = f
 	};
-	this.getFolderIdById = function(e) {
-		var l, m = this.getFolderList();
-		e = parseInt(e);
-		for (var o in m)
-			if (f.array.indexOf(m[o].list, e) > -1) {
-				l = m[o].id;
+	this.getFolderIdById = function(f) {
+		var g, p = this.getFolderList();
+		f = parseInt(f);
+		for (var l in p)
+			if (a.array.indexOf(p[l].list, f) > -1) {
+				g = p[l].id;
 				break
 			}
-		return parseInt(l)
+		return parseInt(g)
 	};
-	this.getFolderIndexByFolderId = function(e) {
-		var l, m = this.getFolderList();
-		for (var o in m)
-			if (m[o].id == e) {
-				l = o;
+	this.getFolderIndexByFolderId = function(f) {
+		var g, p = this.getFolderList();
+		for (var l in p)
+			if (p[l].id == f) {
+				g = l;
 				break
 			}
-		return parseInt(l)
+		return parseInt(g)
 	};
-	this.getFolderById = function(e) {
-		var l, m = this.getFolderList();
-		for (var o in m)
-			if (m[o].id == e)
-				l = m[o];
-		return l
+	this.getFolderById = function(f) {
+		var g, p = this.getFolderList();
+		for (var l in p)
+			if (p[l].id == f)
+				g = p[l];
+		return g
 	};
-	this.removeFromFolderListById = function(e) {
-		var l = this.getFolderList();
-		for (var m in l) {
-			var o = l[m].list;
-			f.array.indexOf(o, e) > -1 && f.array.remove(o, parseInt(e))
+	this.removeFromFolderListById = function(f) {
+		a.profile("removeFromFolderListById");
+		var g = this.getFolderList();
+		for (var p in g) {
+			var l = g[p].list;
+			a.array.indexOf(l, f) > -1 && a.array.remove(l, parseInt(f))
 		}
-		j()
+		u()
 	};
-	this.removeFolderByFolderId = function(e) {
-		if (e == 4)
-			alert("\u62b1\u6b49,\u6b64\u6587\u4ef6\u5939\u4e0d\u5141\u8bb8\u5220\u9664!");
+	this.removeFolderByFolderId = function(f) {
+		if (f == 4)
+			qqweb.layout
+					.alert("\u62b1\u6b49,\u6b64\u6587\u4ef6\u5939\u4e0d\u5141\u8bb8\u5220\u9664!");
 		else {
-			var l = this.getFolderById(e), m = l.list;
-			for (var o in m) {
-				f.array.remove(this.getSetupAppList(), parseInt(m[o]));
-				f.array.remove(this.getQuickAppList(), parseInt(m[o]));
-				var v = qqweb.appconfig.getAppConfig(parseInt(m[o]));
-				qqweb.appconfig.removeAppConfig(v)
+			a.profile("removeFolderByFolderId");
+			var g = this.getFolderById(f), p = g.list;
+			for (var l in p) {
+				a.array.remove(this.getSetupAppList(), parseInt(p[l]));
+				a.array.remove(this.getQuickAppList(), parseInt(p[l]));
+				var t = qqweb.appconfig.getAppConfig(parseInt(p[l]));
+				qqweb.appconfig.removeAppConfig(t)
 			}
-			f.array.remove(this.getFolderList(), l);
-			t();
-			x();
-			j();
-			b.notifyObservers(d, "RemoveFolderByFolderId", e)
+			a.array.remove(this.getFolderList(), g);
+			m();
+			q();
+			u();
+			c.notifyObservers(b, "RemoveFolderByFolderId", f)
 		}
 	};
-	this.updateFloderName = function(e, l) {
-		var m = this.getFolderList();
-		for (var o in m)
-			if (m[o].id == e)
-				m[o].name = l;
-		j()
+	this.updateFloderName = function(f, g) {
+		var p = this.getFolderList();
+		for (var l in p)
+			if (p[l].id == f)
+				p[l].name = g;
+		u()
 	};
-	this.updateFolderList = function(e) {
-		for (var l in e) {
-			for (var m in e[l])
-				e[l][m] = parseInt(e[l][m]);
-			this.getFolderList(l).list = e[l]
+	this.updateFolderList = function(f) {
+		for (var g in f) {
+			for (var p in f[g])
+				f[g][p] = parseInt(f[g][p]);
+			this.getFolderList(g).list = f[g]
 		}
-		j()
+		u()
 	};
-	this.addToFolderList = function(e, l) {
-		e = this.getFolderList(e).list;
-		if (f.array.indexOf(e, l) == -1) {
-			e.push(l);
-			j()
+	this.addToFolderList = function(f, g) {
+		f = this.getFolderList(f).list;
+		if (a.array.indexOf(f, g) == -1) {
+			f.push(g);
+			u()
 		}
 	};
 	this.restoreConfig = function() {
@@ -744,89 +1495,95 @@ Jet().$package("qqweb.config", function(f) {
 	this.getTheme = function() {
 		return this.configList.theme
 	};
-	this.setTheme = function(e) {
-		if (e) {
-			var l = {};
-			l.data = {
+	this.setTheme = function(f) {
+		a.profile("setTheme");
+		if (f) {
+			var g = {};
+			g.data = {
 				retype : 1,
 				app : "QQWeb",
-				itemlist : f.json.stringify({
-							theme : e
+				itemlist : a.json.stringify({
+							theme : f
 						})
 			};
-			qqweb.rpcService.sendSetConfig(l);
-			this.configList.theme.id = e
+			qqweb.rpcService.sendSetConfig(g);
+			this.configList.theme.id = f
 		}
 	};
 	this.getWallpaper = function() {
 		return this.configList.wallpaper
 	};
-	this.setWallpaper = function(e) {
-		if (e) {
-			var l = {};
-			l.data = {
+	this.setWallpaper = function(f) {
+		a.profile("setWallpaper");
+		if (f) {
+			var g = {};
+			g.data = {
 				retype : 1,
 				app : "QQWeb",
-				itemlist : f.json.stringify({
-							wallpaper : e
+				itemlist : a.json.stringify({
+							wallpaper : f
 						})
 			};
-			qqweb.rpcService.sendSetConfig(l);
-			this.configList.wallpaper = e
+			qqweb.rpcService.sendSetConfig(g);
+			this.configList.wallpaper = f
 		}
 	};
 	this.getWallpaperList = function() {
 		return this.configList.wallpaperList
 	};
-	this.addWallpaper = function(e) {
-		f.array.indexOf(this.configList.setupAppList, e.id) == -1
-				&& this.configList.wallpaperList.push(e.fileId)
+	this.addWallpaper = function(f) {
+		a.array.indexOf(this.configList.setupAppList, f.id) == -1
+				&& this.configList.wallpaperList.push(f.fileId)
 	};
-	this.removeWallpaper = function(e) {
-		f.array.remove(this.getWallpaperList(), e.fileId)
+	this.removeWallpaper = function(f) {
+		a.array.remove(this.getWallpaperList(), f.fileId)
 	};
 	this.getAppearance = function() {
 		return this.configList.appearance
 	};
-	this.setAppearance = function(e) {
-		if (e) {
-			var l = {};
-			l.data = {
+	this.setAppearance = function(f) {
+		a.profile("setAppearance");
+		if (f) {
+			var g = {};
+			g.data = {
 				retype : 1,
 				app : "QQWeb",
-				itemlist : f.json.stringify({
-							appearance : e
+				itemlist : a.json.stringify({
+							appearance : f
 						})
 			};
-			qqweb.rpcService.sendSetConfig(l);
-			this.configList.appearance.id = e
+			qqweb.rpcService.sendSetConfig(g);
+			this.configList.appearance.id = f
 		}
 	};
-	this.setCustomTheme = function(e, l) {
-		if (e) {
-			l = l || "";
-			var m = {};
-			m.data = {
+	this.setCustomTheme = function(f, g) {
+		a.profile("setCustomTheme");
+		if (f) {
+			g = g || "";
+			var p = {};
+			p.data = {
 				retype : 1,
 				app : "QQWeb",
-				itemlist : f.json.stringify({
-							appearance : l,
-							wallpaper : e
+				itemlist : a.json.stringify({
+							appearance : g,
+							wallpaper : f
 						})
 			};
-			qqweb.rpcService.sendSetConfig(m);
-			this.configList.appearance.id = l;
-			this.configList.wallpaper = e
+			qqweb.rpcService.sendSetConfig(p);
+			this.configList.appearance.id = g;
+			this.configList.wallpaper = f
 		}
 	};
-	this.initQQWeb = function() {
-		var e = {
+	this.init = function() {
+		qqweb.util.report2h("get_custom", "start");
+		a.profile("getCustom");
+		var f = {
 			onSuccess : qqweb.config.onConfigGetSuc,
 			action : "get_custom",
 			context : this,
 			data : {
 				retype : 1,
-				itemlist : f.json.stringify({
+				itemlist : a.json.stringify({
 							QQWeb : ["theme", "wallpaper", "wallpaperList",
 									"appearance", "appBarSetting",
 									"setupAppList", "isShowTip",
@@ -837,90 +1594,521 @@ Jet().$package("qqweb.config", function(f) {
 						})
 			}
 		};
-		qqweb.rpcService.sendGetConfig(e)
+		qqweb.rpcService.sendGetConfig(f)
 	};
-	d.__eqqid = "50"
+	b.__eqqid = 50
 });
-Jet().$package("qqweb.businessClass", function(f) {
-	var d = f.dom, b = f.event;
-	this.App = new f.Class({
-		init : function(a) {
-			a.id || f.out("App: [" + a.appName + "] \u7f3a\u5c11 id !!!");
+Jet().$package("qqweb.businessClass", function(a) {
+	var b = a.dom, c = a.event;
+	this.WindowManager = new a.Class({
+		_windowArr : [],
+		_id2Window : {},
+		_currentWindow : null,
+		_windowId : 0,
+		_windowType : {},
+		_isDragProxy : false,
+		_isGlobalProxy : false,
+		_useGlobalProxySetting : false,
+		init : function(d) {
+			d = d || {};
+			this._defaultContainer = d.defaultContainer;
+			c.addObserver(qqweb.layout, "desktopResize", a.bind(
+							this.observer.onWindowResize, this))
+		},
+		observer : {
+			onWindowResize : function() {
+				var d;
+				for (var h in this._windowArr) {
+					d = this._windowArr[h];
+					var n = d.getBoxStatus();
+					n == "max" || n == "fullscreen" ? this.adjustSize(d) : this
+							.adjustPosition(d)
+				}
+			}
+		},
+		createWindow : function(d, h) {
+			var n = this._windowType[d];
+			h.level = h.level ? parseInt(h.level) : 0;
+			h.dragProxy = h.dragProxy || this.getWindowDragProxy();
+			h.zIndex = h.zIndex || qqweb.layout.getTopZIndex();
+			h.topMargin = h.topMargin || qqweb.layout.getAreaHeight("top");
+			h.bottomMargin = h.bottomMargin
+					|| qqweb.layout.getAreaHeight("bottom");
+			if (n) {
+				if (!h.appendTo && this._defaultContainer)
+					h.appendTo = this._defaultContainer;
+				h.windowId = this.getWindowId();
+				d = new n(h);
+				d.setZIndexLevel(h.level);
+				if (!h.x && !h.y) {
+					h = this.getDefaultPosition(d, 0, 0);
+					d.setXY(h.x, h.y)
+				} else
+					this.adjustPosition(d);
+				this.addWindow(d);
+				h = d.option;
+				h.isSetCurrent ? d.setCurrent() : d.setNotCurrent();
+				h.isSetCentered && d.setWindowCentered();
+				switch (h.defaultMode) {
+					case "max" :
+						d.max();
+						break;
+					case "restore" :
+						d.restore();
+						break;
+					case "min" :
+						d.min();
+						break
+				}
+				return d
+			} else
+				throw new Error('WindowManager: class "' + d
+						+ '" has not register!');
+		},
+		registerWindow : function(d, h) {
+			this._windowType[d] = h
+		},
+		addWindow : function(d) {
+			this._addObserversToWindow(d);
+			this._windowArr.push(d);
+			this._id2Window[d.getId()] = d
+		},
+		removeWindow : function(d) {
+			d == this.getCurrentWindow() && this.setCurrentWindow(null);
+			a.array.remove(this._windowArr, d);
+			this._id2Window[d.getId()] = null;
+			delete this._id2Window[d.getId()]
+		},
+		getWindow : function(d) {
+			return this._id2Window[d]
+		},
+		getWindowList : function() {
+			return this._windowArr
+		},
+		setCurrentWindow : function(d) {
+			d && this._currentWindow && this._currentWindow != d
+					&& this._currentWindow.setNotCurrent();
+			this._currentWindow = d
+		},
+		getCurrentWindow : function() {
+			return this._currentWindow
+		},
+		getTopZIndex : function(d) {
+			return qqweb.layout.getTopZIndex(d || 0)
+		},
+		setWindowZIndex : function(d) {
+			var h = this.getTopZIndex(d.getZIndexLevel() || 0);
+			d.setZIndex(h)
+		},
+		getWindowId : function() {
+			return this._windowId++
+		},
+		getWindowZIndexLevel : function(d) {
+			return d.getZIndexLevel()
+		},
+		setWindowZIndexLevel : function(d, h) {
+			d.setZIndexLevel(h)
+		},
+		adjustPosition : function(d) {
+			var h = qqweb.layout.getClientWidth(), n = qqweb.layout
+					.getClientHeight(), r = qqweb.layout.getAreaHeight("top"), w = qqweb.layout
+					.getAreaHeight("bottom"), i = d.getX() || 0, j = d.getY()
+					|| 0;
+			if (i + d._width > h) {
+				h = h - d._width;
+				i = h < 0 ? 0 : h;
+				d.setX(i)
+			}
+			if (j + d._height > n - r - w) {
+				n = n - d._height - w;
+				j = n < r ? r : n;
+				d.setY(j)
+			}
+		},
+		adjustSize : function(d, h, n) {
+			h = h || 0;
+			n = n || 0;
+			var r = qqweb.layout.getClientWidth(), w = qqweb.layout
+					.getClientHeight(), i = 0;
+			if (d.getBoxStatus() == "max") {
+				r = qqweb.layout.getAvailableWidth();
+				w = qqweb.layout.getAvailableHeight();
+				i = qqweb.layout.getAreaHeight("top")
+			}
+			if (d.windowType == "window" || d.windowType == "chatbox")
+				d.adjustSize(h, n, r, w, 0, i)
+		},
+		getDefaultPosition : function(d, h, n) {
+			h = h || 0;
+			n = n || 0;
+			var r = d.option.clientWidth || qqweb.layout.getAvailableWidth(), w = d.option.clientHeight
+					|| qqweb.layout.getAvailableHeight();
+			qqweb.layout.getAreaWidth("left");
+			qqweb.layout.getAreaWidth("right");
+			var i = qqweb.layout.getAreaHeight("top");
+			qqweb.layout.getAreaHeight("bottom");
+			var j = r - d._width, m = w - d._height;
+			w2 = j > 0 ? j / 2 : 0;
+			h2 = m > 0 ? m / 2 : 0;
+			var q = d.getId();
+			q = q < 0 ? 0 : q;
+			var u = (w2 + q * 25) % j + h;
+			q = (h2 + q * 25) % m + n;
+			u = u > 0 ? u : 0;
+			q = q > 0 ? q : 0;
+			u = u + parseInt(d._width) >= r ? 0 : u;
+			q = q + parseInt(d._height) >= w ? 0 : q;
+			q += i;
+			a.debug("w:" + j + ", h:" + m + ", w2:" + w2 + ", h2:" + h2
+					+ ", offsetX:" + h + ", offsetY:" + n);
+			return {
+				x : u,
+				y : q
+			}
+		},
+		getWindowDragProxy : function() {
+			return this._isDragProxy
+		},
+		setGlobalDragProxyEnabled : function(d, h) {
+			this._useGlobalProxySetting = d;
+			this._isGlobalProxy = !!h
+		},
+		getGlobalDragProxyEnabled : function() {
+			return {
+				useGlobal : this._useGlobalProxySetting,
+				isGlobalProxy : this._isGlobalProxy
+			}
+		},
+		_windowObserver : {
+			onWindowSetCenter : function() {
+				var d = qqweb.layout.getAvailableWidth(), h = qqweb.layout
+						.getAvailableHeight(), n = qqweb.layout
+						.getAreaHeight("top");
+				d = d > this._width ? (d - this._width) / 2 : 0;
+				h = h > this._height ? (h - this._height) / 2 : 0;
+				h = h < n ? n : h;
+				this.setXY(d, h)
+			},
+			onWindowSetCurrent : function(d) {
+				if (d.getCurrentWindow() != this) {
+					d.setCurrentWindow(this);
+					d.setWindowZIndex(this)
+				}
+			},
+			onWindowDestroy : function(d) {
+				d.removeWindow(this)
+			},
+			onWindowMax : function() {
+				var d = qqweb.layout.getAvailableWidth(), h = qqweb.layout
+						.getAvailableHeight();
+				this.setXY(0, qqweb.layout.getAreaHeight("top"));
+				this.setWidth(d);
+				this.setHeight(h)
+			},
+			onWindowRestore : function() {
+			},
+			onWindowFullscreen : function(d) {
+				var h = qqweb.layout.getClientWidth(), n = qqweb.layout
+						.getClientHeight();
+				this.setXY(0, 0);
+				this.setWidth(h);
+				this.setHeight(n);
+				var r = null;
+				this.setZIndexLevel(3);
+				d.setWindowZIndex(this);
+				r = b.id("fullscreen_tip");
+				if (!r) {
+					r = b.node("div", {
+								id : "fullscreen_tip",
+								"class" : "fullscreen_tip"
+							});
+					document.body.appendChild(r)
+				}
+				b.setStyle(r, "zIndex", qqweb.layout.getTopZIndex(3));
+				b.show(r);
+				setTimeout(function() {
+							b.hide(r)
+						}, 3E3)
+			},
+			onWindowRestoreFull : function(d) {
+				this.setZIndexLevel(0);
+				d.setWindowZIndex(this)
+			},
+			onWindowPin : function(d) {
+				this.setZIndexLevel(1);
+				d.setWindowZIndex(this)
+			},
+			onWindowPinOff : function(d) {
+				this.setZIndexLevel(0);
+				d.setWindowZIndex(this)
+			}
+		},
+		_addObserversToWindow : function(d) {
+			c.addObserver(d, "setCenter", a.bind(
+							this._windowObserver.onWindowSetCenter, d, this));
+			c.addObserver(d, "setCurrent", a.bind(
+							this._windowObserver.onWindowSetCurrent, d, this));
+			c.addObserver(d, "destroy", a.bind(
+							this._windowObserver.onWindowDestroy, d, this));
+			if (d.windowType == "window" || d.windowType == "chatbox") {
+				c.addObserver(d, "max", a.bind(
+								this._windowObserver.onWindowMax, d, this));
+				c.addObserver(d, "fullscreen", a.bind(
+								this._windowObserver.onWindowFullscreen, d,
+								this));
+				c.addObserver(d, "restorefull", a.bind(
+								this._windowObserver.onWindowRestoreFull, d,
+								this))
+			}
+			if (d.windowType == "widget") {
+				c.addObserver(d, "clickPinUpButton", a.bind(
+								this._windowObserver.onWindowPin, d, this));
+				c.addObserver(d, "clickPinDownButton", a.bind(
+								this._windowObserver.onWindowPinOff, d, this))
+			}
+		},
+		_removeObserversFromWindow : function(d) {
+			c.removeObserver(d, "setCenter");
+			c.removeObserver(d, "setCurrent");
+			c.removeObserver(d, "destroy");
+			c.removeObserver(d, "max");
+			c.removeObserver(d, "fullscreen")
+		}
+	})
+});
+Jet().$package("qqweb.businessClass", function(a) {
+	var b = a.dom, c = a.event, d = [], h = {
+		onWindowClose : function() {
+			n._globalMask && n._globalMask.hide();
+			d.length > 0 && d.shift().show()
+		}
+	}, n = new a.Class({
+				_className : "ui_messageBox",
+				init : function(i) {
+					i = i || {};
+					var j = {
+						title : "\u6e29\u99a8\u63d0\u793a",
+						modeSwitch : true,
+						dragable : true,
+						resize : false,
+						width : 370,
+						height : 127,
+						innerHtml : "",
+						hasCloseButton : true,
+						isSetCentered : true,
+						modal : false,
+						bodyBorder : 1,
+						lineHeight : "inherit",
+						background : "none repeat scroll 0 0 #FFFFFF",
+						level : 3
+					};
+					a.extend(j, i);
+					this.Window = qqweb.layout.getWindowManager().createWindow(
+							"Window", j);
+					i = this.Window.getId();
+					var m = "text-align: center;line-height: " + j.lineHeight
+							+ ";background:" + j.background + ";";
+					if (j.bodyBorder)
+						m += "border:" + j.bodyBorder + "px solid #AAAAAA;";
+					this.Window.setHtml('<div class="' + this._className
+							+ '" id="ui_messageBox_' + i + '" style="' + m
+							+ '"></div>');
+					this._uiMessageBox = b.id("ui_messageBox_" + i);
+					this._uiMessageBox.innerHTML = j.innerHtml;
+					b.setStyle(this._uiMessageBox, "height", this.Window
+									.getBodyHeight()
+									- j.bodyBorder * 2 + "px");
+					c.addObserver(this.Window, "close", h.onWindowClose);
+					if (j.modal) {
+						this.modal = true;
+						if (d.length > 0) {
+							this.Window.hide();
+							d.push(this.Window)
+						} else
+							this.show()
+					} else
+						this.show()
+				},
+				show : function() {
+					var i = this.Window.getZIndexLevel();
+					if (this.modal) {
+						if (!n._globalMask)
+							n._globalMask = qqweb.layout.getMaskLayer();
+						n._globalMask.setZIndex(qqweb.layout.getTopZIndex(i));
+						n._globalMask.show()
+					}
+					this.Window.setZIndex(qqweb.layout.getTopZIndex(i));
+					this.Window.show()
+				}
+			}), r = new a.Class({
+				extend : n
+			}, {
+				init : function(i) {
+					var j = {
+						lineHeight : "50px",
+						hasOkButton : true,
+						autoClose : true
+					};
+					if (i.innerHtml.length > 34)
+						i.lineHeight = "25px";
+					a.extend(j, i);
+					r.superClass.init(j);
+					j.onAccept
+							&& c.addObserver(this.Window, "clickOkButton",
+									function() {
+										j.onAccept.apply(this);
+										j.autoClose && this.close()
+									})
+				}
+			}), w = new a.Class({
+				extend : n
+			}, {
+				init : function(i) {
+					var j = {
+						lineHeight : "50px",
+						hasOkButton : true,
+						hasCancelButton : true,
+						autoClose : true
+					};
+					if (i.innerHtml.length > 34)
+						i.lineHeight = "25px";
+					a.extend(j, i);
+					w.superClass.init(j);
+					var m = false;
+					j.onAccept
+							&& c.addObserver(this.Window, "clickOkButton",
+									function() {
+										j.onAccept.apply(this);
+										m = true;
+										j.autoClose && this.close()
+									});
+					j.onCancel
+							&& c.addObserver(this.Window, "close", function() {
+										m || j.onCancel.apply(this)
+									})
+				}
+			});
+	this.MessageBox = n;
+	this.MessageBox.Alert = r;
+	this.MessageBox.Confirm = w
+});
+Jet().$package("qqweb.businessClass", function(a) {
+	var b = a.dom, c = a.event, d, h, n = function() {
+		d = null
+	}, r = function(i) {
+		i.preventDefault();
+		qqweb.portal.setReRunAppList([h.id]);
+		h.loginLevel > 2
+				? qqweb.layout.showLoginWindow(h.id, true)
+				: qqweb.layout.showLoginWindow(h.id, false);
+		d.close()
+	}, w = function(i) {
+		var j = qqweb.appconfig.getAllConfig(i);
+		h = j;
+		var m = 'Hi\uff0c\u60a8\u8fd8\u6ca1\u6709\u767b\u5f55\u54e6\uff0c\u8d76\u5feb<a id="portal_login_btn" style="font-size:14px;font-weight:bold;" href="###">\u767b\u5f55</a>\u5c1d\u8bd5\u4e00\u4e0b\u5427\uff01';
+		if (i == "messageBox" || i == "buddyManager")
+			m = 'Hi\uff0c\u6b64\u5e94\u7528\u9700\u8981\u767b\u5f55QQ\uff0c\u8d76\u5feb<a id="portal_login_btn" style="font-size:14px;font-weight:bold;" href="###">\u767b\u5f55</a>\u5c1d\u8bd5\u4e00\u4e0b\u5427\uff01';
+		i = '<div class="content_area" style="_height:406px"><div class="intro_window_wrap">        <div id="intro_window_area" class="intro_window_area" title="'
+				+ a.string.encodeHtmlAttributeSimple(String(j.appDesc))
+				+ '">            <h3>'
+				+ a.string.encodeHtmlSimple(String(j.appName))
+				+ '</h3><span style="text-align:left;">'
+				+ a.string.encodeHtmlSimple(String(j.appDesc))
+				+ '</span></div>        <div style="margin-top:50px; text-align: center; font-weight: bold; font-size:14px;">'
+				+ m + "</div>        </div></div>";
+		m = {
+			title : j.appName,
+			width : 545,
+			height : 450,
+			level : 0,
+			setCenter : 1
+		};
+		d && d.close();
+		d = qqweb.layout.messagebox(i, m);
+		i = b.id("intro_window_area");
+		b.setStyle(i, "backgroundImage", "url(./module/appmarket/images/thumb_"
+						+ j.id + ".png)");
+		j = b.id("portal_login_btn");
+		c.on(j, "click", r);
+		c.addObserver(d, "close", n)
+	};
+	this.App = new a.Class({
+		init : function(i) {
+			i.id || a.out("App: [" + i.appName + "] \u7f3a\u5c11 id !!!");
 			this.option = {
-				id : a.id,
-				title : a.appName || "\u672a\u547d\u540d\u5e94\u7528",
-				appType : a.appType || 1,
-				appUrl : a.appUrl || null,
-				windowMode : a.windowMode || "single",
-				x : a.x,
-				y : a.y,
-				width : a.width || 600,
-				height : a.height || 500,
-				hasCloseButton : f.isUndefined(a.hasCloseButton)
+				id : i.id,
+				title : i.appName || "\u672a\u547d\u540d\u5e94\u7528",
+				appType : i.appType || 1,
+				appUrl : i.appUrl || null,
+				windowMode : i.windowMode || "single",
+				x : i.x,
+				y : i.y,
+				width : i.width || 600,
+				height : i.height || 500,
+				hasCloseButton : a.isUndefined(i.hasCloseButton)
 						? true
-						: a.hasCloseButton,
-				hasMaxButton : f.isUndefined(a.hasMaxButton)
+						: i.hasCloseButton,
+				hasMaxButton : a.isUndefined(i.hasMaxButton)
 						? true
-						: a.hasMaxButton,
-				hasMinButton : f.isUndefined(a.hasMinButton)
+						: i.hasMaxButton,
+				hasMinButton : a.isUndefined(i.hasMinButton)
 						? true
-						: a.hasMinButton,
-				hasOkButton : a.hasOkButton || false,
-				hasCancelButton : a.hasCancelButton || false,
-				modeSwitch : f.isUndefined(a.modeSwitch) ? true : a.modeSwitch,
-				dragable : f.isUndefined(a.dragable) ? true : a.dragable,
-				dragProxy : f.isUndefined(a.dragProxy) ? qqweb.layout
-						.getWindowDragProxy() : a.dragProxy,
-				resize : f.isUndefined(a.resize) ? true : a.resize,
-				defaultMode : f.isUndefined(a.defaultMode)
+						: i.hasMinButton,
+				hasOkButton : i.hasOkButton || false,
+				hasCancelButton : i.hasCancelButton || false,
+				hasRefreshButton : i.hasRefreshButton ? true : false,
+				modeSwitch : a.isUndefined(i.modeSwitch) ? true : i.modeSwitch,
+				dragable : a.isUndefined(i.dragable) ? true : i.dragable,
+				dragProxy : a.isUndefined(i.dragProxy) ? qqweb.layout
+						.getWindowManager().getWindowDragProxy() : i.dragProxy,
+				resize : a.isUndefined(i.resize) ? true : i.resize,
+				defaultMode : a.isUndefined(i.defaultMode)
 						? "restore"
-						: a.defaultMode,
-				flashMode : f.isUndefined(a.flashMode) ? false : a.flashMode,
-				loginLevel : f.isUndefined(a.loginLevel)
+						: i.defaultMode,
+				flashMode : a.isUndefined(i.flashMode) ? false : i.flashMode,
+				loginLevel : a.isUndefined(i.loginLevel)
 						? qqweb.CONST.LOGIN_LEVEL_NONE
-						: a.loginLevel,
-				customLoginValidate : a.customLoginValidate,
-				alterMode : f.isUndefined(a.alterMode) ? false : a.alterMode,
-				ieOnly : f.isUndefined(a.ieOnly) ? false : a.ieOnly
+						: i.loginLevel,
+				customLoginValidate : i.customLoginValidate,
+				alterMode : a.isUndefined(i.alterMode) ? false : i.alterMode,
+				ieOnly : a.isUndefined(i.ieOnly) ? false : i.ieOnly
 			};
-			if (f.platform.iPad && this.option.id === 15)
+			if (a.browser.mobileSafari && this.option.id === 15)
 				this.option.appUrl = "http://live.qq.com/ipad/";
-			f.out("id:" + this.option.id + ", hasCloseButton:"
+			a.out("id:" + this.option.id + ", hasCloseButton:"
 					+ this.option.hasCloseButton);
 			this._isRunning = false;
-			b.notifyObservers(this, "init", this)
+			c.notifyObservers(this, "init", this)
 		},
 		detectActiveX : function() {
-			var a = null;
+			var i = null;
 			try {
-				a = new ActiveXObject("TXFTNActiveX.FTNUpload")
-			} catch (h) {
+				i = new ActiveXObject("TXFTNActiveX.FTNUpload")
+			} catch (j) {
 				return false
 			}
-			if (a) {
-				var s = "";
+			if (i) {
+				var m = "";
 				try {
-					s = a && (a.version ? a.version : "1.0.0.8") || ""
-				} catch (w) {
+					m = i && (i.version ? i.version : "1.0.0.8") || ""
+				} catch (q) {
 				}
-				if (!s)
+				if (!m)
 					return false;
-				return parseInt(s.split(".").join("")) > 1007 ? true : false
+				return parseInt(m.split(".").join("")) > 1007 ? true : false
 			} else
 				return false
 		},
-		run : function(a) {
-			var h = this;
-			a = a || {};
-			f.extend(this.option, a);
-			if (f.platform.iPad)
+		run : function(i) {
+			var j = this;
+			i = i || {};
+			a.extend(this.option, i);
+			if (a.platform.iPad)
 				switch (parseInt(this.option.id)) {
 					case 5 :
 					case 9 :
 					case 11 :
-					case 12 :
 					case 13 :
-					case 20 :
 					case 24 :
 					case 26 :
 					case 27 :
@@ -929,43 +2117,57 @@ Jet().$package("qqweb.businessClass", function(f) {
 					case 36 :
 					case 37 :
 					case 39 :
-						qqweb.portal.showUnsupportIPadWindow(this.option.id);
+						qqweb.layout
+								.alert("\u5f88\u62b1\u6b49\uff0c\u6b64\u5e94\u7528\u6682\u4e0d\u652f\u6301iPad\u3002");
 						return
 				}
-			var s = qqweb.portal.getLoginLevel();
-			if (!a.noValidateLogin && this.option.loginLevel > s)
-				this.option.customLoginValidate ? b.notifyObservers(this,
+			var m = qqweb.portal.getLoginLevel();
+			if (!i.noValidateLogin && this.option.loginLevel > m)
+				this.option.customLoginValidate ? c.notifyObservers(this,
 						"needLogin", {
 							has : this.option.loginLevel,
-							need : s
-						}) : qqweb.portal.showIntroduceWindow(this.option.id);
-			else if (this.option.id == "56" && !f.browser.mobileSafari)
-				qqweb.portal.showNotSupportWindow(this.option.id);
-			else if (f.browser.ie && this.option.id == "13"
+							need : m
+						}) : w(this.option.id);
+			else if (this.option.id == "56" && !a.browser.mobileSafari
+					&& a.browser.ie != 9)
+				qqweb.layout
+						.alert("\u5f88\u62b1\u6b49\uff0c\u6b64\u5e94\u7528\u6682\u65f6\u4e0d\u652f\u6301\u8be5\u6d4f\u89c8\u5668\u3002");
+			else if (a.browser.ie && this.option.id == "13"
 					&& !this.detectActiveX())
-				qqweb.portal.showWarningWindow(this.option.id);
+				qqweb.layout
+						.alert(
+								"\u6b64\u5e94\u7528\u9700\u8981\u63d2\u4ef6\u652f\u6301\uff0c\u70b9\u51fb\u786e\u5b9a\u83b7\u53d6\u5b89\u88c5",
+								function() {
+									this.body.innerHTML += '<div><object classid="clsid:BDEACC50-F56D-4D60-860F-CF6ED1766D65" codebase="http://res.qqmail.com/zh_CN/activex/TencentMailActiveX.cab#version=1,0,1,32"></object></div>';
+									this.close()
+								}, {
+									autoClose : false
+								});
 			else if (this.option.id == "25")
-				qqweb.portal.showComingSoonWindow(this.option.id);
-			else if (this.option.ieOnly && !f.browser.ie || f.browser.ie
+				qqweb.layout
+						.messagebox(
+								"<div class='flash_alt' style='display: block;'><div class='appIframeAlter'></div><div class='appComingSoon'></div></div>",
+								{
+									title : this.option.title,
+									width : 600,
+									height : 450
+								});
+			else if (this.option.ieOnly && !a.browser.ie || a.browser.ie
 					&& this.option.id == "13" && !this.detectActiveX())
-				qqweb.portal.showIeOnlyWindow(this.option.id);
+				qqweb.layout
+						.alert("\u5f88\u62b1\u6b49\uff0c\u6b64\u5e94\u7528\u4ec5\u652f\u6301ie\u6d4f\u89c8\u5668\u3002");
 			else {
 				if (this.isRunning())
-					b.notifyObservers(this, "runAgain", a);
+					c.notifyObservers(this, "runAgain", i);
 				else {
 					this._isRunning = true;
-					if (this.option.windowMode !== "none") {
-						this.createWindow(a);
-						f.browser.ie
-								&& this.option.id == "13"
-								&& !this.detectActiveX()
-								&& this.window.createNoActiveXDom(this.window
-										.getId())
-					}
+					this.option.windowMode !== "none" && this.createWindow(i);
 					if (this.option.appType !== 1)
 						if (this.option.appType === 2) {
-							if ((!this.option.ieOnly || f.browser.ie)
-									&& (!f.browser.ie || this.option.id != "13" || this
+							var q = qqweb.layout.getWindowManager()
+									.getCurrentWindow();
+							if ((!this.option.ieOnly || a.browser.ie)
+									&& (!a.browser.ie || this.option.id != "13" || this
 											.detectActiveX())) {
 								this.window
 										.setHtml('\t\t\t\t\t\t\t<div id="container_iframeApp_'
@@ -976,155 +2178,180 @@ Jet().$package("qqweb.businessClass", function(f) {
 												+ this.window.getId()
 												+ '" class="iframeDragResizeMask"></div>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t');
 								this._contenty = this._contentx = 0;
-								this._iframe = d.id("iframeApp_"
+								this._iframe = b.id("iframeApp_"
 										+ this.window.getId());
-								this._iframeDragResizeMask = d
+								this._iframeDragResizeMask = b
 										.id("iframeApp_dragResizeMask_"
 												+ this.window.getId());
-								this._containerIframe = d
+								this._containerIframe = b
 										.id("container_iframeApp_"
 												+ this.window.getId());
-								f.platform.iPad
-										&& d.addClass(this._containerIframe,
+								a.platform.iPad
+										&& b.addClass(this._containerIframe,
 												"ipad");
-								b.on(this._iframe, "load", function() {
-											b.notifyObservers(h, "load")
+								if (this.option.alterMode) {
+									j.alterDom = b.node("div", {
+												"class" : "flash_alt"
+											});
+									j.alterDom.innerHTML = "<div class='appIframeAlter'></div><div  class='appIframeAlterTxt'>\u8fd0\u884c\u4e2d\uff0c\u70b9\u51fb\u6062\u590d\u663e\u793a :)</div>";
+									this.window.body.appendChild(j.alterDom)
+								}
+								c.on(this._iframe, "load", function() {
+											c.notifyObservers(j, "load")
 										});
-								this._iframe.src = a && a.appUrl
+								this._iframe.src = i && i.appUrl
 										|| this.option.appUrl;
-								s = function(i) {
-									i = h.window.getBodySize();
-									h._resizeIframe(i)
-								};
-								this._resizeIframe = function(i) {
-									if (!f.platform.iPad) {
-										d.setStyle(this._iframe, "width",
-												i.width - 2 + "px");
-										d.setStyle(this._iframe, "height",
-												i.height - 2 + "px")
+								var u = {
+									onWindowResize : function(p) {
+										j.option.flashMode && j.window != q
+												|| j._resizeIframe(p)
+									},
+									onWindowShow : function(p) {
+										if (!a.isUndefined(j.window._x)) {
+											j.window.setX(j.window._x);
+											delete j.window._x
+										}
+										p = j.window.getBodySize();
+										j._resizeIframe(p)
+									},
+									onWindowDragStart : function() {
+										a.platform.iPad
+												|| b
+														.show(j._iframeDragResizeMask)
+									},
+									onWindowDragEnd : function() {
+										b.hide(j._iframeDragResizeMask)
+									},
+									onSetCurrent : function() {
+										b.setStyle(j._containerIframe,
+												"height", "99%");
+										b.setStyle(j._containerIframe, "width",
+												"100%");
+										u.onWindowShow();
+										b.hide(j.alterDom)
+									},
+									onSetNotCurrent : function() {
+										if (!a.platform.iPad) {
+											b.setStyle(j._iframe, "width",
+													"1px");
+											b.setStyle(j._iframe, "height",
+													"1px");
+											b.setStyle(j._containerIframe,
+													"width", "1px");
+											b.setStyle(j._containerIframe,
+													"height", "1px");
+											b.show(j.alterDom)
+										}
+									},
+									onWindowMin : function() {
+										if (j.option.flashMode) {
+											var p = j.window.getX();
+											j.window._x = p;
+											j.window.setX(-10000);
+											j.window._x = p
+										}
 									}
 								};
-								s();
-								b.addObserver(this.window, "resize",
-										function(i) {
-											h.option.flashMode
-													&& h.window != qqweb.layout
-															.getCurrentWindow()
-													|| h._resizeIframe(i)
-										});
-								b.addObserver(this.window, "show", s);
-								b.addObserver(this.window, "dragStart",
-										function() {
-											f.platform.iPad
-													|| d
-															.show(h._iframeDragResizeMask)
-										});
-								b.addObserver(this.window, "dragEnd",
-										function() {
-											d.hide(h._iframeDragResizeMask)
-										})
+								this._resizeIframe = function(p) {
+									if (!a.platform.iPad) {
+										b.setStyle(this._iframe, "width",
+												p.width - 2 + "px");
+										b.setStyle(this._iframe, "height",
+												p.height - 2 + "px")
+									}
+								};
+								if (this.option.alterMode) {
+									c.addObserver(this.window, "setCurrent",
+											u.onSetCurrent);
+									c.addObserver(this.window, "setNotCurrent",
+											u.onSetNotCurrent);
+									c.addObserver(this.window, "dragStart",
+											u.onSetNotCurrent);
+									c.addObserver(this.window, "dragEnd",
+											u.onSetCurrent)
+								} else {
+									c.addObserver(this.window, "setNotCurrent",
+											u.onWindowDragStart);
+									c.addObserver(this.window, "setCurrent",
+											u.onWindowDragEnd)
+								}
+								this.option.flashMode
+										&& c.addObserver(this.window, "min",
+												u.onWindowMin);
+								c.addObserver(this.window, "resize",
+										u.onWindowResize);
+								c.addObserver(this.window, "show",
+										u.onWindowShow)
 							}
-							s = qqweb.layout.getCurrentWindow();
-							s = document.getElementById("iframeApp_"
-									+ s.getId());
-							var w = false;
+							m = document.getElementById("iframeApp_"
+									+ q.getId());
+							var f = false;
 							try {
-								w = s
-										&& typeof s.contentWindow.padEventProxy == "function"
+								f = m
+										&& typeof m.contentWindow.padEventProxy == "function"
 										? true
 										: false
-							} catch (c) {
+							} catch (g) {
 							}
-							f.platform.iPad && !w
-									&& new f.ui.IframeScroller(this._iframe)
+							a.platform.iPad && !f
+									&& new a.ui.IframeScroller(this._iframe)
 						}
-					s = function() {
-						h.window.setCurrent()
+					m = function() {
+						j.window.setCurrent()
 					};
 					this.option.windowMode === "single"
-							&& b.addObserver(this, "runAgain", s);
-					b.notifyObservers(this, "runFirst", a);
-					b.addObserver(this, "appExit", h.exit)
+							&& c.addObserver(this, "runAgain", m);
+					c.notifyObservers(this, "runFirst", i);
+					c.addObserver(this, "appExit", j.exit)
 				}
-				b.notifyObservers(qqweb.portal, "appRun", this.option.id);
-				b.notifyObservers(this, "run", a)
+				c.notifyObservers(qqweb.portal, "appRun", this.option.id);
+				c.notifyObservers(this, "run", i)
 			}
 		},
-		createWindow : function(a) {
-			var h = this;
-			a = a || {};
-			var s = new qqweb.businessClass.Window({
-						appId : h.option.id,
-						flashMode : h.option.flashMode,
-						loginLevel : h.option.loginLevel,
-						title : h.option.title,
-						modeSwitch : h.option.modeSwitch,
-						dragProxy : h.option.dragProxy,
-						dragable : h.option.dragable,
-						resize : h.option.resize,
-						x : a.x || h.option.x,
-						y : a.y || h.option.y,
-						width : a.width || h.option.width,
-						height : a.height || h.option.height,
-						defaultMode : h.option.defaultMode,
-						hasCloseButton : h.option.hasCloseButton,
-						hasMaxButton : h.option.hasMaxButton,
-						hasMinButton : h.option.hasMinButton,
-						hasOkButton : h.option.hasOkButton,
-						hasCancelButton : h.option.hasCancelButton,
-						alterMode : h.option.alterMode,
-						ieOnly : h.option.ieOnly,
-						appType : h.option.appType
+		createWindow : function(i) {
+			var j = this;
+			i = i || {};
+			var m = qqweb.layout.getWindowManager().createWindow("Window", {
+						appId : j.option.id,
+						flashMode : j.option.flashMode,
+						loginLevel : j.option.loginLevel,
+						title : j.option.title,
+						modeSwitch : j.option.modeSwitch,
+						dragProxy : j.option.dragProxy,
+						dragable : j.option.dragable,
+						resize : j.option.resize,
+						x : i.x || j.option.x,
+						y : i.y || j.option.y,
+						width : i.width || j.option.width,
+						height : i.height || j.option.height,
+						defaultMode : j.option.defaultMode,
+						hasRefreshButton : j.option.hasRefreshButton,
+						hasCloseButton : j.option.hasCloseButton,
+						hasMaxButton : j.option.hasMaxButton,
+						hasMinButton : j.option.hasMinButton,
+						hasOkButton : j.option.hasOkButton,
+						hasCancelButton : j.option.hasCancelButton,
+						alterMode : j.option.alterMode,
+						ieOnly : j.option.ieOnly,
+						appType : j.option.appType
 					});
-			this.window = s;
-			a = {
+			this.window = m;
+			i = {
 				onWindowClose : function() {
-					if (h._iframe)
-						h._iframe.src = "about:blank";
-					h.destroy()
+					if (j._iframe)
+						j._iframe.src = "about:blank";
+					j.destroy()
 				},
 				onExit : function() {
-					b.notifyObservers(s, "closeWindow", s)
-				},
-				onSetCurrent : function() {
-					s.setX(s._x);
-					d.setStyle(h._containerIframe, "height", "99%");
-					d.setStyle(h._containerIframe, "width", "100%");
-					s.hideAlterDom()
-				},
-				onSetNotCurrent : function() {
-					if (!f.platform.iPad) {
-						d.setStyle(h._iframe, "width", "1px");
-						d.setStyle(h._iframe, "height", "1px");
-						d.setStyle(h._containerIframe, "width", "1px");
-						d.setStyle(h._containerIframe, "height", "1px");
-						s.showAlterDom()
-					}
-				},
-				onWindowMin : function() {
-					if (h.option.flashMode) {
-						var w = s.getX();
-						s._x = w;
-						s.setX(-10000);
-						s._x = w
-					}
+					c.notifyObservers(m, "closeWindow", m)
 				}
 			};
-			b.addObserver(this.window, "min", a.onWindowMin);
-			this.option.alterMode
-					&& !f.browser.ie
-					&& b.addObserver(this.window, "setNotCurrent",
-							a.onSetNotCurrent);
-			if (this.option.flashMode && (f.browser.ie || !this.option.ieOnly)) {
-				b.addObserver(this.window, "setCurrent", a.onSetCurrent);
-				b.addObserver(this.window, "min", a.onWindowMin)
-			}
-			b.addObserver(s, "close", a.onWindowClose);
-			b.addObserver(this, "exit", a.onExit);
-			return s
+			c.addObserver(m, "close", i.onWindowClose);
+			c.addObserver(this, "exit", i.onExit);
+			return m
 		},
 		setCurrent : function() {
-			b.notifyObservers(this, "setCurrent");
+			c.notifyObservers(this, "setCurrent");
 			this.window && this.window.setCurrent()
 		},
 		getCurrent : function() {
@@ -1134,425 +2361,1399 @@ Jet().$package("qqweb.businessClass", function(f) {
 			return this._isRunning
 		},
 		exit : function() {
-			b.notifyObservers(this, "exit");
+			c.notifyObservers(this, "exit");
 			this.destroy()
 		},
 		destroy : function() {
-			b.notifyObservers(this, "destroy");
+			c.notifyObservers(this, "destroy");
 			this._isRunning = false;
-			b.notifyObservers(qqweb.portal, "appExit", this.option.id)
+			c.notifyObservers(qqweb.portal, "appExit", this.option.id)
 		},
-		updateAppConfig : function(a) {
-			var h = this;
-			if (a.id == h.option.id) {
-				f.extend(h.option, a);
-				h._isRunning && a.type == 2 && h.window.setTitle(a.appName)
+		updateAppConfig : function(i) {
+			var j = this;
+			if (i.id == j.option.id) {
+				a.extend(j.option, i);
+				j._isRunning && i.type == 2 && j.window.setTitle(i.appName)
 			}
 		},
 		removeAppConfig : function() {
-			var a = this;
-			if (a._iframe)
-				a._iframe.src = "about:blank";
-			a.exit()
+			var i = this;
+			if (i._iframe)
+				i._iframe.src = "about:blank";
+			i.exit()
 		},
-		touchMoveHandler : function(a) {
-			var h = this._iframe, s = this._containerIframe, w = this._contentx
-					+ a.sx;
-			a = this._contenty + a.sy;
-			var c = d.getWidth(h), i = d.getHeight(h), n = d.getWidth(s);
-			s = d.getHeight(s);
-			if (w > 0)
-				w = 0;
-			else if (w < n - c)
-				w = n - c;
-			if (a > 0)
-				a = 0;
-			else if (a < s - i)
-				a = s - i;
-			d.setStyle(h, "left", w + "px");
-			d.setStyle(h, "top", a + "px");
-			this._contentx = w;
-			this._contenty = a
+		touchMoveHandler : function(i) {
+			var j = this._iframe, m = this._containerIframe, q = this._contentx
+					+ i.sx;
+			i = this._contenty + i.sy;
+			var u = b.getWidth(j), f = b.getHeight(j), g = b.getWidth(m);
+			m = b.getHeight(m);
+			if (q > 0)
+				q = 0;
+			else if (q < g - u)
+				q = g - u;
+			if (i > 0)
+				i = 0;
+			else if (i < m - f)
+				i = m - f;
+			b.setStyle(j, "left", q + "px");
+			b.setStyle(j, "top", i + "px");
+			this._contentx = q;
+			this._contenty = i
 		}
 	})
 });
-function ptlogin2_onResize(f, d) {
-	qqweb.portal.setLoginWindowHeight(d + 90)
-}
-Jet().$package("qqweb.portal", function(f) {
-	var d = this, b = f.dom, a = f.event, h = f.http, s, w = false, c = qqweb.CONST.LOGIN_LEVEL_NONE, i = false, n = false, t = false, x = false, j = "", e = false, l, m, o = null, v = document.title, z = null, H = false, P = false, Y = true;
-	this.speedTest = new (function() {
-		var g = [];
-		this.sRTS = this.setReportTimeStamp = function(k, r, D, F) {
-			g[k] || (g[k] = {});
-			g[k][r] = D.getTime();
-			F == true && this.report([k])
-		};
-		this.gRTS = this.getReportTimeStamp = function(k, r) {
-			if (g[k])
-				return g[k][r];
-			return null
-		};
-		this.report = function(k) {
-			for (var r = false, D = "http://isdspeed.qq.com/cgi-bin/r.cgi?flag1=7723&flag2=2&flag3=1&flag4="
-					+ qqweb.portal.getCookieUin(), F = 0; F < k.length; F++) {
-				var C = k[F];
-				if (g[C].end && g[C].start) {
-					r = true;
-					D += "&" + C + "=" + (g[C].end - g[C].start)
-				}
-			}
-			if (r)
-				(new Image).src = D
-		}
-	});
-	this.setPortalSelf = function(g) {
-		qqweb.portal.self.allow = g.allow;
-		qqweb.portal.self.age = g.age;
-		qqweb.portal.self.nick = g.nick;
-		qqweb.portal.self.htmlNick = f.string.encodeHtml(String(g.nick));
-		qqweb.portal.self.titleNick = String(g.nick);
-		qqweb.portal.self.country = g.country;
-		qqweb.portal.self.province = g.province;
-		qqweb.portal.self.city = g.city;
-		qqweb.portal.self.gender = g.gender;
-		qqweb.portal.self.face = g.face;
-		qqweb.portal.self.phone = g.phone;
-		qqweb.portal.self.mobile = g.mobile;
-		qqweb.portal.self.email = g.email
+Jet().$package("qqweb.portal", function(a) {
+	var b = this, c = a.event, d = a.http, h, n = false, r, w = qqweb.CONST.LOGIN_LEVEL_NOCHAT, i = 1, j, m = false, q = "", u, f, g = "", p = "", l = null, t = 0, y = false, z, D, E, I = true;
+	b.speedTest = qqweb.util.speedTest;
+	this.setPortalSelf = function(k) {
+		b.self.uin = k.uin || b.getUin();
+		b.self.allow = k.allow;
+		b.self.age = k.age;
+		b.self.nick = k.nick;
+		b.self.htmlNick = a.string.encodeHtml(String(k.nick));
+		b.self.titleNick = String(k.nick);
+		b.self.country = k.country;
+		b.self.province = k.province;
+		b.self.city = k.city;
+		b.self.gender = k.gender;
+		b.self.face = k.face;
+		b.self.phone = k.phone;
+		b.self.mobile = k.mobile;
+		b.self.email = k.email
 	};
-	this.setPortalSelfItem = function(g, k) {
-		qqweb.portal.self[g] = k
+	this.setPortalSelfItem = function(k, v) {
+		b.self[k] = v
 	};
-	this.getPortalSelf = function(g) {
-		return typeof qqweb.portal.self == "undefined"
-				? {}
-				: typeof g == "undefined"
-						? qqweb.portal.self
-						: qqweb.portal.self[g]
+	this.getPortalSelf = function(k) {
+		return typeof b.self == "undefined" ? {} : typeof k == "undefined"
+				? b.self
+				: b.self[k]
 	};
-	var ia = function(g) {
-		d.runApp("appBar", {
+	var M = function() {
+		a.profile("runCoreApps Start!", "portal!");
+		b.runApp("myPanel", {
 					callback : function() {
-						d.runApp("appBar", {
-									callback : function() {
-										g();
-										f.out("tipsAction");
-										d.runApp("tips");
-										f.out("tipsEnd");
-										d.runApp("messageCenter");
-										d.runApp("bubbleTip")
-									}
+						qqweb.app.taskBar.run();
+						qqweb.app.appBar.run();
+						qqweb.app.tips.run();
+						b.runApp("bubbleTip");
+						O();
+						T()
+					}
+				});
+		a.profile("runCoreApps Finish!", "portal!")
+	}, L = function() {
+		var k = b.getLoginLevel(), v;
+		if (k == 1)
+			v = "panel";
+		else if (k == 2)
+			v = "go";
+		else if (k == 3)
+			v = "logined";
+		return v
+	}, J = function() {
+		a.profile("runDefaultApps Start!", "portal!");
+		for (var k = Q(), v = b.getLoginLevel(), A = 0; A < k.length; ++A)
+			if (k[A] == qqweb.config.__eqqid) {
+				if (v != 3) {
+					var B = L();
+					a
+							.debug(	"run EQQ in [runDefaultApps],level:" + v
+											+ ": " + B, "_plogin");
+					b.runApp(qqweb.config.__eqqid, {
+								loginMode : B
+							})
+				}
+			} else
+				b.runApp(k[A]);
+		a.profile("runDefaultApps Finish!", "portal!")
+	}, P = function() {
+		a.profile("runAppsInRunStatus Start!", "portal!");
+		for (var k = qqweb.config.configList.runStatus, v = b.getLoginLevel(), A = 0; A < k.appList.length; A++) {
+			var B = k.appList[A];
+			if (B.appId == qqweb.config.__eqqid)
+				if (v == 2) {
+					var F = L();
+					a.debug("run EQQ in [runAppsInRunStatus],level:" + v + ": "
+									+ F, "_plogin");
+					qqweb.portal.runApp(qqweb.config.__eqqid, {
+								defaultMode : B.defaultMode,
+								x : B.x,
+								y : B.y,
+								width : B.width,
+								height : B.height,
+								loginMode : F
+							})
+				} else {
+					if (v == 3) {
+						F = "update";
+						a.debug("run EQQ in [runAppsInRunStatus],level:" + v
+										+ ": " + F, "_plogin");
+						qqweb.portal.runApp(qqweb.config.__eqqid, {
+									defaultMode : B.defaultMode,
+									x : B.x,
+									y : B.y,
+									width : B.width,
+									height : B.height,
+									loginMode : F
 								})
 					}
-				})
-	}, ja = function() {
-		for (var g = d.getDefaultApps(), k = 0; k < g.length; ++k)
-			if (!(d.getLoginLevel() > 1 && g[k] == qqweb.config.__eqqid))
-				if (f.browser.safari)
-					switch (g[k]) {
-						case "20" :
-							break;
-						default :
-							d.runApp(g[k])
-					}
-				else
-					d.runApp(g[k])
+				}
+			else
+				qqweb.portal.runApp(B.appId, {
+							defaultMode : B.defaultMode,
+							x : B.x,
+							y : B.y,
+							width : B.width,
+							height : B.height
+						})
+		}
+		k.currentApp && b.runApp(k.currentApp);
+		a.profile("runAppsInRunStatus Finish!", "portal!")
 	};
-	this.getDefaultApps = function() {
-		return ["18", "19", "20", qqweb.config.__eqqid]
+	this.setReRunAppList = function(k) {
+		E = k
 	};
 	var N = function() {
+		a.profile("reRunBeforeLoginApps Start!", "portal!");
+		if (E) {
+			for (var k = 0; k < E.length; ++k) {
+				var v = E[k], A = b.getApp(v);
+				if (A && !A.isRunning())
+					if (v == qqweb.config.__eqqid) {
+						v = L();
+						a.debug("run EQQ in [reRunBeforeLoginApps],level:"
+										+ b.getLoginLevel() + ": " + v,
+								"_plogin");
+						b.runApp(qqweb.config.__eqqid, {
+									loginMode : v
+								})
+					} else
+						b.runApp(v)
+			}
+			b.setReRunAppList([])
+		}
+		a.profile("reRunBeforeLoginApps Finish!", "portal!")
+	}, Q = function() {
+		return ["18", "19", "20", qqweb.config.__eqqid]
+	}, R = function() {
 		return ["56"]
-	}, da = function() {
-		for (var g = N(), k = 0; k < g.length; ++k)
-			switch (g[k]) {
+	}, s = function() {
+		a.profile("runPopApps Start!", "portal!");
+		for (var k = R(), v = 0; v < k.length; ++v)
+			switch (k[v]) {
 				case "56" :
-					f.browser.mobileSafari && d.runApp(g[k]);
+					if (a.browser.mobileSafari || a.browser.ie == 9)
+						b.runApp(k[v], {
+									x : 230,
+									y : 60
+								});
 					break;
 				default :
 					break
 			}
-	}, ea = function() {
-		var g = f.string.mapQuery(window.location.search).run || "";
-		if (g)
-			return f.json.parse(g)
-	}, Z = function() {
-		var g = ea();
-		for (var k in g) {
-			g[k].runFrom = "url";
-			qqweb.portal.runApp(k, g[k])
-		}
-	}, T = this.setLoginLevel = function(g) {
-		c = g;
-		a.notifyObservers(qqweb.portal, "loginLevelChanged", g)
-	}, G = {
-		isUserAppListReady : false,
-		isAppbarReady : false
-	}, Q = function() {
-		var g = true;
-		for (var k in G)
-			G[k] || (g = false);
-		if (g) {
-			f.out("\u7cfb\u7edf\u6a21\u5757Ready");
-			a.notifyObservers(d, "systemAppReady")
-		}
-	};
-	this.getIsUserAppListReady = function() {
-		return G.isUserAppListReady
-	};
-	var K = {
-		onUserAppListReady : function() {
-			G.isUserAppListReady = true;
-			f.out("onUserAppListReady");
-			Q()
-		},
-		onAppbarReady : function() {
-			G.isAppbarReady = true;
-			f.out("onAppbarReady");
-			Q()
-		},
-		onPortalReady : function() {
-			var g = this.getQQWebStatus();
-			if (g)
-				for (var k = 0; k < g.appList.length; k++) {
-					var r = g.appList[k];
-					r = r.appId;
-					if (~~r)
-						r = "app" + r;
-					(r = qqweb.app[r]) && r.isRunning() && r.exit()
-				}
-			if (window.location.search.indexOf("nodefault") === -1) {
-				if (g = qqweb.config.configList.runStatus) {
-					for (k = 0; k < g.appList.length; k++) {
-						r = g.appList[k];
-						if (r.appId == qqweb.config.__eqqid)
-							r.width ? qqweb.portal.runApp(r.appId, {
-										defaultMode : r.defaultMode,
-										x : r.x,
-										y : r.y,
-										width : r.width,
-										height : r.height,
-										systemRun : true
-									}) : qqweb.portal.runApp(r.appId, {
-										x : r.x,
-										y : r.y,
-										systemRun : true
-									});
-						else
-							r.width ? qqweb.portal.runApp(r.appId, {
-										defaultMode : r.defaultMode,
-										x : r.x,
-										y : r.y,
-										width : r.width,
-										height : r.height
-									}) : qqweb.portal.runApp(r.appId, {
-										x : r.x,
-										y : r.y
-									})
-					}
-					g.currentApp && qqweb.portal.runApp(g.currentApp)
-				} else
-					ja();
-				da()
+		a.profile("runPopApps Finish!", "portal!")
+	}, o = function() {
+		var k = a.string.mapQuery(window.location.search).run || "";
+		if (k)
+			return a.json.parse(k)
+	}, x = function() {
+		var k = o();
+		if (a.isObject(k))
+			for (var v in k) {
+				k[v].runFrom = "url";
+				qqweb.portal.runApp(v, k[v])
 			}
-			if (m)
-				for (k = 0; k < m.length; ++k)
-					qqweb.portal.runApp(m[k], {
-								noValidateLogin : true
-							});
-			V(P);
-			Z();
-			qqweb.portal.speedTest.sRTS(8, "end", new Date, true);
-			if (typeof pgvMain == "function") {
-				pvRepeatCount = 1;
-				pgvMain("", {
-							virtualURL : qqweb.CONST.DOMAIN
-						})
+	}, C = function() {
+		a.cookie.remove("ptwebqq", qqweb.CONST.MAIN_DOMAIN);
+		a.cookie.remove("skey", qqweb.CONST.MAIN_DOMAIN);
+		a.cookie.remove("uin", qqweb.CONST.MAIN_DOMAIN);
+		a.cookie.remove("vfwebqq", qqweb.CONST.MAIN_DOMAIN)
+	}, H = function() {
+		a.profile("reset start!", "portal!");
+		aa();
+		c.notifyObservers(qqweb.portal, "reset", b.getLoginLevel());
+		a.profile("reset finish!", "portal!")
+	}, G = function() {
+		w = b.getUin() && b.getSkey() ? 2 : 1
+	}, O = function() {
+		a.profile("initAccount start!", "portal!");
+		q = b.getOriginalCookieUin();
+		p = b.getCookieSkey();
+		g = b.getCookiePtwebqq();
+		u = b.getCookieUin();
+		G();
+		a.profile("initAccount finish!", "portal!")
+	}, ba = function() {
+		q = b.getOriginalCookieUin();
+		p = b.getCookieSkey();
+		g = b.getCookiePtwebqq();
+		b.setUin(b.getCookieUin())
+	}, T = function() {
+		D = j = true;
+		a.profile("tryLogin start, tryLoginLevel:" + w, "portal!");
+		if (w == qqweb.CONST.LOGIN_LEVEL_ALL) {
+			b.setLoginLevel(qqweb.CONST.LOGIN_LEVEL_ALL);
+			if (U())
+				H();
+			else
+				D = false;
+			a.debug("run EQQ in [tryLogin],tryLoginLevel:" + w + ": logined",
+					"_plogin");
+			b.runApp(qqweb.config.__eqqid, {
+						loginMode : "logined"
+					})
+		} else if (w == qqweb.CONST.LOGIN_LEVEL_NOCHAT) {
+			qqweb.util.report2h("get_vfwebqq", "start");
+			qqweb.rpcService.sendGetVfWebQQ(b.getUin())
+		} else
+			V();
+		a.profile("tryLogin finish!", "portal!")
+	}, V = function() {
+		c.notifyObservers(b, "UACReady")
+	}, aa = function() {
+		var k = b.getRunningAppStatus();
+		if (k)
+			for (var v = 0; v < k.appList.length; v++) {
+				var A = k.appList[v].appId;
+				if (~~A)
+					A = "app" + A;
+				(A = qqweb.app[A]) && A.isRunning() && A.exit()
+			}
+	}, ca = function() {
+		t == 1 && x();
+		qqweb.config.configList.runStatus ? P() : J();
+		N();
+		s()
+	}, U = function() {
+		if (b.getUin() === b.getOldUin()) {
+			a.debug("uin not change: " + b.getUin(), "_plogin");
+			return false
+		} else {
+			a.debug("uin change: " + b.getOldUin() + " -> " + b.getUin(),
+					"_plogin");
+			return true
+		}
+	}, W = function() {
+		if (i === r) {
+			a.debug("loginLevel not change: " + i, "_plogin");
+			return false
+		} else {
+			a.debug("loginLevel change: " + r + " -> " + i, "_plogin");
+			return true
+		}
+	}, X = function() {
+		n || qqweb.portal.recoverCookie()
+	}, K = {
+		onPortalReady : function(k) {
+			m = true;
+			t++;
+			a.profile("onPortalReady, portalReadyCount:" + t + ", level:" + k,
+					"portal!");
+			if (U() || t == 1)
+				ca();
+			if (t == 1) {
+				setTimeout(function() {
+							qqweb.layout.hideStartingCover()
+						}, 1E3);
+				try {
+					if (typeof pgvMain == "function") {
+						pvRepeatCount = 1;
+						pgvMain("", {
+									virtualURL : qqweb.CONST.DOMAIN
+								})
+					}
+					qqweb.util.report2h("portal", "end");
+					qqweb.portal.speedTest.sRTS(8, "end", new Date, true)
+				} catch (v) {
+				}
 			}
 		},
 		onExitSuccess : function() {
 			location.reload()
 		},
 		onGetVfWebQQError : function() {
-			var g = d.getLoginLevel();
-			g < qqweb.CONST.LOGIN_LEVEL_NONE && T(qqweb.CONST.LOGIN_LEVEL_NONE);
-			g = d.getLoginLevel();
-			f.out("logininfoError");
-			a.notifyObservers(qqweb.portal, "UserAppListReady", g)
+			a.profile("onGetVfWebQQError", "portal!");
+			qqweb.util.report2h("get_vfwebqq_error", "start");
+			b.setLoginLevel(qqweb.CONST.LOGIN_LEVEL_NONE);
+			V()
 		},
-		onGetVfWebQQSuccess : function(g) {
-			d.addExitConfirm();
-			d.getLoginLevel() < qqweb.CONST.LOGIN_LEVEL_NOCHAT
-					&& T(qqweb.CONST.LOGIN_LEVEL_NOCHAT);
-			d.getLoginLevel();
-			o = g.result && g.result.length === 2 && g.result[0] == "vfwebqq"
-					? g.result[1]
+		onGetVfWebQQSuccess : function(k) {
+			b.setLoginLevel(qqweb.CONST.LOGIN_LEVEL_NOCHAT);
+			l = k.result && k.result.length === 2 && k.result[0] == "vfwebqq"
+					? k.result[1]
 					: null;
-			a.notifyObservers(qqweb.portal, "GetLoginInfoSuccess")
+			a.profile("onGetVfWebQQSuccess, vfwebqq:" + l, "portal!");
+			qqweb.util.report2h("get_vfwebqq", "end");
+			H();
+			c.notifyObservers(qqweb.portal, "GetLoginInfoSuccess")
 		},
 		onGetLoginInfoSuccess : function() {
-			if (!$()) {
-				j = d.uin;
-				qqweb.config.initQQWeb();
-				d.runApp("myPanel");
-				a.notifyObservers(qqweb.portal, "uinChange")
+			qqweb.util.report2h("pass_ptlogin", "end")
+		},
+		onSelfInfoReady : function() {
+			a.profile("onSelfInfoReady", "portal!");
+			if (j) {
+				j = false;
+				if (D) {
+					D = false;
+					qqweb.config.init()
+				} else
+					W() && N()
 			}
 		},
+		onReset : function() {
+		},
 		onGetAppConfigComplete : function() {
-			var g = d.getLoginLevel();
-			a.notifyObservers(qqweb.portal, "portalReady", g)
+			var k = b.getLoginLevel();
+			a.profile("onGetAppConfigComplete", "portal!");
+			try {
+				c.notifyObservers(qqweb.portal, "portalReady", k)
+			} catch (v) {
+				a.error("portalReady, but [portalReady notify] error, level:"
+						+ k)
+			}
 		},
-		onUpdateAppConfig : function(g) {
-			var k = d.getApp(g.id);
-			k && k.updateAppConfig(g)
+		onUpdateAppConfig : function(k) {
+			var v = b.getApp(k.id);
+			v && v.updateAppConfig(k)
 		},
-		onRemoveAppConfig : function(g) {
-			var k = d.getApp(g.id);
-			k && k.removeAppConfig(g);
-			delete qqweb.app["app" + g.id];
-			d.setAppLoading(g.id, false)
-		}
-	}, $ = function() {
-		return j == d.uin ? true : false
-	}, W = function() {
-		if (!w) {
-			f.out(">>>>> onDesktopClick");
-			qqweb.portal.recoverCookie()
+		onRemoveAppConfig : function(k) {
+			var v = b.getApp(k.id);
+			v && v.removeAppConfig(k);
+			delete qqweb.app["app" + k.id];
+			b.setAppLoading(k.id, false)
 		}
 	};
-	this.init = function(g) {
-		g = {};
-		s = {};
-		l = 0;
-		a.addObserver(qqweb.portal, "exitSuccess", K.onExitSuccess);
-		a.addObserver(qqweb.rpcService, "GetVfWebQQError", K.onGetVfWebQQError);
-		a.addObserver(qqweb.rpcService, "GetVfWebQQSuccess",
+	this.init = function() {
+		h = {};
+		z = 0;
+		c.addObserver(qqweb.portal, "exitSuccess", K.onExitSuccess);
+		c.addObserver(qqweb.rpcService, "GetVfWebQQError", K.onGetVfWebQQError);
+		c.addObserver(qqweb.rpcService, "GetVfWebQQSuccess",
 				K.onGetVfWebQQSuccess);
-		a.addObserver(qqweb.portal, "GetLoginInfoSuccess",
+		c.addObserver(qqweb.portal, "GetLoginInfoSuccess",
 				K.onGetLoginInfoSuccess);
-		a.addObserver(qqweb.appconfig, "GetAppConfigComplete",
+		c.addObserver(qqweb.portal, "selfInfoReady", K.onSelfInfoReady);
+		c.addObserver(qqweb.portal, "reset", K.onReset);
+		c.addObserver(qqweb.appconfig, "GetAppConfigComplete",
 				K.onGetAppConfigComplete);
-		a.addObserver(qqweb.appconfig, "GetDefaultAppConfigComplete",
+		c.addObserver(qqweb.appconfig, "GetDefaultAppConfigComplete",
 				K.onGetAppConfigComplete);
-		a.addObserver(qqweb.appconfig, "UpdateAppConfig", K.onUpdateAppConfig);
-		a.addObserver(qqweb.appconfig, "RemoveAppConfig", K.onRemoveAppConfig);
-		a.addObserver(qqweb.portal, "portalReady", K.onPortalReady);
-		a.addObserver(qqweb.portal, "UserAppListReady", K.onUserAppListReady);
-		a.addObserver(qqweb.portal, "appbarReady", K.onAppbarReady);
+		c.addObserver(qqweb.appconfig, "UpdateAppConfig", K.onUpdateAppConfig);
+		c.addObserver(qqweb.appconfig, "RemoveAppConfig", K.onRemoveAppConfig);
+		c.addObserver(qqweb.portal, "portalReady", K.onPortalReady);
 		qqweb.layout.init();
 		qqweb.sound.init();
-		qqweb.util.initSystem();
-		a.addObserver(qqweb.layout, "clickDesktop", W);
-		a.addObserver(qqweb.layout, "desktopFocus", W);
-		ia(function() {
-					d.start();
-					d.runApp("myPanel");
-					d.runApp("sceneChristmas");
-					qqweb.rpcService.sendGetVfWebQQ(d.uin)
-				})
-	};
-	this.start = function() {
-		this.recordAccount()
-	};
-	this.recordAccount = function() {
-		this.ptwebqq = this.getCookiePtwebqq();
-		this.uin = this.getCookieUin();
-		this.originalUin = this.getOriginalCookieUin();
-		this.skey = this.getCookieSkey()
+		qqweb.layout.themeManager.init();
+		qqweb.portal.messageCenter.init();
+		c.addObserver(qqweb.layout, "clickDesktop", X);
+		c.addObserver(qqweb.layout, "desktopFocus", X);
+		M();
+		qqweb.util.report2h("portal", "end_runCoreApps")
 	};
 	this.getPtwebqq = function() {
-		return this.ptwebqq
+		return g
 	};
-	this.setPtwebqq = function(g) {
-		return this.ptwebqq = g
+	this.setPtwebqq = function(k) {
+		return g = k
+	};
+	this.getOldUin = function() {
+		return f
 	};
 	this.getUin = function() {
-		return this.uin
+		return u
 	};
 	this.getOriginalUin = function() {
-		return this.originalUin
+		return q
 	};
 	this.getSkey = function() {
-		return this.skey
+		return p
 	};
 	this.getLoginLevel = function() {
-		var g = this.getApp("eqq");
-		if (g && g.getIsLogin())
-			return qqweb.CONST.LOGIN_LEVEL_ALL;
-		return c
+		return i
+	};
+	this.setLoginLevel = function(k) {
+		r = i;
+		i = k;
+		W() && c.notifyObservers(qqweb.portal, "loginLevelChange", k)
+	};
+	this.isPortalReady = function() {
+		return m
+	};
+	this.setUin = function(k) {
+		f = u;
+		return u = k
 	};
 	this.recoverCookie = function() {
 	};
-	var V = function(g) {
-		if (H && g) {
-			var k = qqweb.config.__eqqid, r = qqweb.portal.getApp(k);
-			if (r)
-				r.isRunning() ? r.window.show() : r.run({
-							eqqNeeded : true
-						});
-			else
-				d.runApp(qqweb.config.__eqqid, {
-							eqqNeeded : true
-						});
-			if (g) {
-				r && a.notifyObservers(d, "StrongLoginSumited");
-				if (x)
-					EQQ.loginEQQ();
-				else {
-					g = qqweb.CONST.PUB_APP_STATIC_URL + Math.floor(k / 1E3)
-							% 1E3 + "/" + k + "/eqq.all.js";
-					qqweb.portal.speedTest.sRTS(11, "start", new Date);
-					qqweb.portal.speedTest.sRTS(9, "start", new Date);
-					f.http.loadScript(
-							g + "?t=" + qqweb.CONST.UPDATE_TIME_STAMP, {
-								query : "",
-								onSuccess : function() {
-									EQQ.loginEQQ();
-									x = true;
-									qqweb.portal.speedTest.sRTS(9, "end",
-											new Date, true)
-								},
-								onError : function() {
-								}
+	this.validatePTLoginSuccess = function(k) {
+		k = k || {};
+		k = a.string.mapQuery(k.url);
+		w = Number(k.login_level);
+		a.profile("validatePTLoginSuccess, tryLoginLevel:" + w, "portal!");
+		qqweb.util.report2h("pass_ptlogin", "start");
+		ba();
+		T();
+		qqweb.layout.hideLoginWindow()
+	};
+	this.getCookieUin = function() {
+		var k = a.cookie.get("uin", qqweb.CONST.MAIN_DOMAIN);
+		k = k ? parseInt(k.substr(1), 10) : null;
+		a.out("Cookie uin:" + k);
+		return k
+	};
+	this.getOriginalCookieUin = function() {
+		return a.cookie.get("uin", qqweb.CONST.MAIN_DOMAIN)
+	};
+	this.getCookieSkey = function() {
+		return a.cookie.get("skey", qqweb.CONST.MAIN_DOMAIN)
+	};
+	this.getCookiePtwebqq = function() {
+		return a.cookie.get("ptwebqq", qqweb.CONST.MAIN_DOMAIN)
+	};
+	this.runApp = function(k, v) {
+		var A = this.getAllConfig(k);
+		if (A) {
+			var B = this.getApp(k);
+			if (B) {
+				B.run && B.run(v);
+				v && a.isFunction(v.callback) && v.callback()
+			} else if (A)
+				if (A.appType == 1)
+					this.loadApp(A, v);
+				else if (A.appType == 2) {
+					if (~~k > 0)
+						qqweb.app["app" + k] = new qqweb.businessClass.App(A);
+					else
+						qqweb.app[k] = new qqweb.businessClass.App(A);
+					qqweb.portal.runApp(k, v)
+				}
+			if (A)
+				I = false
+		} else
+			a.out("id:" + k)
+	};
+	this.loadApp = function(k, v) {
+		k = k || {};
+		if (!this.getAppLoading(k.id)) {
+			this.setAppLoading(k.id, true);
+			var A = k.id, B = qqweb.util.getAppRoot(A), F = B
+					+ (k.css || "style.css");
+			B = B + (k.js || "main.js");
+			if (k.css || a.isNumber(A))
+				d.loadCss(F + "?" + qqweb.CONST.UPDATE_TIME_STAMP);
+			d.loadScript(B + "?" + qqweb.CONST.UPDATE_TIME_STAMP, {
+						onSuccess : function() {
+							qqweb.portal.runApp(k.id, v)
+						}
+					})
+		}
+	};
+	this.getAppConfigList = function() {
+		return qqweb.appconfig.appConfigList
+	};
+	this.getAppConfig = function(k) {
+		return qqweb.appconfig.getAppConfig(k)
+	};
+	this.getSystemConfig = function(k) {
+		return qqweb.appconfig.getSystemConfig(k)
+	};
+	this.getAllConfig = function(k) {
+		return qqweb.appconfig.getAllConfig(k)
+	};
+	this.getApp = function(k) {
+		return ~~k > 0 ? qqweb.app["app" + k] : qqweb.app[k]
+	};
+	this.setAppLoading = function(k, v) {
+		return h[k] = v
+	};
+	this.getAppLoading = function(k) {
+		return h[k]
+	};
+	this.closeHook = function(k) {
+		WebqCore.api.log("browser-close");
+		var v = "\u60a8\u786e\u8ba4\u8981\u79bb\u5f00 WebQQ \u5417\uff1f";
+		if (b.getLoginLevel() < qqweb.CONST.LOGIN_LEVEL_ALL)
+			v = "\u6267\u884c\u6b64\u64cd\u4f5c\u53ef\u80fd\u4f1a\u4e22\u5931\u9875\u9762\u4e2d\u7684\u4fe1\u606f\uff0c\u786e\u8ba4\u7ee7\u7eed\uff1f";
+		pgvSendClick({
+					hottag : "web2qq.qqpanel.status.exitQQ"
+				});
+		if (a.browser.safari || a.browser.chrome)
+			return v;
+		else if (a.browser.ie > 0)
+			window.event.returnValue = v;
+		else
+			k.returnValue = v
+	};
+	var da = function() {
+		if (EQQ && EQQ.getIsLogin()) {
+			EQQ.logout();
+			WebqCore.api.log("browser-close-ok");
+			EQQ.RPCService._proxy && EQQ.RPCService._proxy.abort();
+			EQQ.View.ChatBox && EQQ.View.ChatBox.scaptureHotkey
+					&& EQQ.View.ChatBox.scaptureHotkey.unstall()
+		}
+	};
+	this.addCloseHook = function() {
+		if (!y) {
+			y = true;
+			c.on(window, "beforeunload", this.closeHook);
+			c.on(window, "unload", da)
+		}
+	};
+	this.removeCloseHook = function() {
+		c.off(window, "beforeunload");
+		y = false
+	};
+	this.getCloseHook = function() {
+		return y
+	};
+	this.addExitConfirm = function(k) {
+		z += k || 1;
+		z > 0 && this.addCloseHook();
+		return z
+	};
+	this.removeExitConfirm = function(k) {
+		z -= k || 1;
+		z < 1 && this.removeCloseHook();
+		return z
+	};
+	this.getExitConfirm = function() {
+		return z
+	};
+	var Y = function() {
+		var k = qqweb.layout.getWindowManager().getCurrentWindow(), v = "";
+		if (k)
+			v = k.getAppId();
+		c.notifyObservers(qqweb.portal, "exit");
+		n = true;
+		C();
+		a.out(">>>>> cookie.remove");
+		qqweb.layout.hideDesktop();
+		setTimeout(function() {
+					c.notifyObservers(qqweb.portal, "exitSuccess")
+				}, 1E3);
+		I && pgvSendClick({
+					hottag : "WEB2QQ.NOAPP.USER.ALL"
+				})
+	};
+	this.exit = function() {
+		this.getExitConfirm() > 0 ? qqweb.layout.confirm(
+				"\u60a8\u786e\u8ba4\u8981\u79bb\u5f00 WebQQ \u5417\uff1f",
+				function() {
+					b.removeCloseHook();
+					pgvSendClick({
+								hottag : "web2qq.qqpanel.status.exitQQ"
+							});
+					Y()
+				}) : Y()
+	};
+	this.getVfWebQQ = function() {
+		return typeof EQQ !== "undefined" && EQQ.getVfWebQQ && EQQ.getVfWebQQ()
+				&& EQQ.getIsLogin() ? EQQ.getVfWebQQ() : l ? l : ""
+	};
+	this.getRunningAppStatus = function() {
+		var k = qqweb.layout.getWindowManager(), v = k.getCurrentWindow(), A = "", B;
+		if (v)
+			A = v.getAppId();
+		v = {
+			currentAppId : A,
+			appList : []
+		};
+		k = k.getWindowList();
+		for (A = 0; A < k.length; A++) {
+			var F = k[A], S = F.getAppId();
+			if (!(S === "eqq--" || S === "sceneChristmas")) {
+				B = F.getX();
+				var Z = F.getY();
+				if (F.windowType === "window") {
+					var $ = F.getBoxStatus();
+					if ($ !== "min") {
+						var ea = F.getWidth();
+						F = F.getHeight();
+						B = {
+							appId : S,
+							defaultMode : $,
+							x : B,
+							y : Z,
+							width : ea,
+							height : F
+						};
+						S && v.appList.push(B)
+					}
+				} else if (F.windowType === "widget") {
+					B = {
+						appId : S,
+						x : B,
+						y : Z
+					};
+					v.appList.push(B)
+				}
+			}
+		}
+		return v
+	};
+	this.openInWebBrowser = function(k) {
+		k = k || {};
+		var v = this.getApp(6);
+		if (a.isUndefined(v) || !v.isRunning()) {
+			k.isOpenNewTab = true;
+			qqweb.portal.runApp("6", k)
+		} else {
+			v.openUrl(k);
+			k.callback && k.callback()
+		}
+	};
+	this.addNotificationSource = function(k, v, A) {
+		qqweb.portal.messageCenter
+				&& qqweb.portal.messageCenter.addNotificationSource(k, v, A)
+	};
+	this.removeNotificationSource = function(k) {
+		qqweb.portal.messageCenter
+				&& qqweb.portal.messageCenter.removeNotificationSource(k)
+	}
+});
+Jet().$package("qqweb.portal.messageCenter", function(a) {
+	var b = a.event, c = this, d = {}, h = [], n = function(i) {
+		return i.uin + i.type
+	}, r = function(i) {
+		for (var j in i) {
+			a.out("MessageCenter MessageReceive!");
+			var m = i[j], q = n(m);
+			if (d[q]) {
+				if (m.resetCount)
+					d[q].count = 1;
+				else if (d[q].msg.resetCount)
+					d[q].count = 1;
+				else
+					d[q].count++;
+				d[q].msg = m
+			} else
+				d[q] = {
+					id : q,
+					msg : m,
+					count : 1
+				};
+			var u = "";
+			switch (m.type) {
+				case "single" :
+					u = "Single";
+					break;
+				case "group" :
+					u = "Group";
+					break;
+				case "system" :
+					u = "System";
+					break;
+				case "mail" :
+					u = "Mail";
+					break;
+				default :
+					u = "Other";
+					break
+			}
+			try {
+				a.out("MessageCenter NotifyMessage! - " + q);
+				b.notifyObservers(c, u + "MessageReceive", d[q])
+			} catch (f) {
+				a.out("MessageCenter NotifyMessageError! - " + q
+						+ "\nErrorInfo: " + f)
+			}
+		}
+	}, w = function(i) {
+		var j = n(i.msg);
+		if (!i.id)
+			i.id = j;
+		if (d[j]) {
+			d[j] = null;
+			delete d[j];
+			for (var m in h)
+				if (!(i.ignoreEvent && i.ignoreEvent == h[m].cbEvent)) {
+					a.out("MessageCenter MessageHasHandled To targetModel - "
+							+ h[m].cbEvent);
+					b.notifyObservers(h[m].target, h[m].cbEvent, i.msg)
+				}
+			try {
+				a.out("MessageCenter MessageHasHandled To View - " + j);
+				b.notifyObservers(c, "MessageHandled", i)
+			} catch (q) {
+				a.out("MessageCenter MessageHasHandled Error! - " + j
+						+ "\nErrorInfo: " + q)
+			}
+		}
+	};
+	this.init = function() {
+	};
+	this.addNotificationSource = function(i, j, m) {
+		m = {
+			target : i,
+			event : j,
+			cbEvent : m
+		};
+		b.addObserver(i, j, r);
+		h.push(m);
+		qqweb.portal.messageCenter.notifier.isInit()
+				|| qqweb.portal.messageCenter.notifier.init()
+	};
+	this.removeNotificationSource = function(i) {
+		if (i) {
+			for (var j in h) {
+				var m = h[j];
+				if (i == m.target) {
+					h.splice(j, 1);
+					b.removeObserver(m.target, m.event, r);
+					break
+				}
+			}
+			for (var q in d) {
+				j = d[q];
+				if (i == j.msg.targetModel) {
+					d[q] = null;
+					delete d[q];
+					b.notifyObservers(c, "MessageHandled", j)
+				}
+			}
+		}
+	};
+	this.handleNotification = function(i) {
+		w.apply(c, [i])
+	}
+});
+Jet().$package("qqweb.portal.messageCenter.notifier", function(a) {
+	var b = a.event, c = a.string, d = false;
+	this.CONST = {
+		ENABLE_TITLE_MARQUEE : 1,
+		ENABLE_MSG_BUBBLE : 2,
+		ENABLE_DESKTOP_NOTIFICATION : 4,
+		ENABLE_SOUND : 8
+	};
+	this.init = function() {
+		if (!d) {
+			d = true;
+			this.soundNotify = new h;
+			this.titleMarquee = new n;
+			qqweb.app.msgBubble.run();
+			this.desktopNotification = new r;
+			if (a.browser.ie == 9)
+				this.desktopNotification2 = new w
+		}
+	};
+	this.isInit = function() {
+		return d
+	};
+	var h = new a.Class({
+				init : function() {
+					b
+							.addObserver(
+									qqweb.portal.messageCenter,
+									"SingleMessageReceive",
+									a
+											.bind(
+													this.observer.onSingleMessageReceive,
+													this));
+					b.addObserver(qqweb.portal.messageCenter,
+							"GroupMessageReceive", a.bind(
+									this.observer.onGroupMessageReceive, this));
+					b
+							.addObserver(
+									qqweb.portal.messageCenter,
+									"SystemMessageReceive",
+									a
+											.bind(
+													this.observer.onSystemMessageReceive,
+													this))
+				},
+				checkIsNeedSound : function(i) {
+					if (!i.msg.isAllow)
+						return false;
+					return true
+				},
+				observer : {
+					onSingleMessageReceive : function(i) {
+						this.checkIsNeedSound(i)
+								&& qqweb.sound.playSound("./sound/msg.mp3",
+										true)
+					},
+					onGroupMessageReceive : function(i) {
+						this.checkIsNeedSound(i)
+								&& qqweb.sound.playSound("./sound/msg.mp3",
+										true)
+					},
+					onSystemMessageReceive : function(i) {
+						this.checkIsNeedSound(i)
+								&& qqweb.sound.playSound("./sound/system.mp3",
+										true)
+					}
+				}
+			}), n = new a.Class({
+		init : function() {
+			this._isFocusOnDesktop = true;
+			this._enableFlag = qqweb.portal.messageCenter.notifier.CONST.ENABLE_TITLE_MARQUEE;
+			b.addObserver(qqweb.portal.messageCenter, "SingleMessageReceive", a
+							.bind(this.observer.onSingleMessageReceive, this));
+			b.addObserver(qqweb.portal.messageCenter, "GroupMessageReceive", a
+							.bind(this.observer.onGroupMessageReceive, this));
+			b.addObserver(qqweb.portal.messageCenter, "SystemMessageReceive", a
+							.bind(this.observer.onSystemMessageReceive, this));
+			b.addObserver(qqweb.layout, "clickDesktop",
+					this.observer.onDesktopFocus);
+			b.addObserver(qqweb.layout, "desktopFocus", a.bind(
+							this.observer.onDesktopFocus, this));
+			b.addObserver(qqweb.layout, "desktopBlur", a.bind(
+							this.observer.onDesktopBlur, this))
+		},
+		checkIsNeedMarquee : function(i) {
+			var j = qqweb.config.configList.notifySetting;
+			if (!a.isUndefined(j) && !(j & this._enableFlag))
+				return false;
+			if (this._isFocusOnDesktop)
+				return false;
+			if (!i.msg.isAllow)
+				return false;
+			return true
+		},
+		observer : {
+			onSingleMessageReceive : function(i) {
+				if (this.checkIsNeedMarquee(i)) {
+					i = i.msg.title || i.uin || "";
+					i = c.decodeHtmlSimple(i);
+					i = i + " - \u6765\u6d88\u606f\u4e86...";
+					qqweb.layout.resetTitle();
+					qqweb.layout.setTitle(i, {
+								roll : true
 							})
 				}
-			} else
-				qqweb.rpcService.sendGetVfWebQQ(d.uin)
+			},
+			onGroupMessageReceive : function(i) {
+				if (this.checkIsNeedMarquee(i)) {
+					i = i.msg.title || i.uin || "";
+					i = c.decodeHtmlSimple(i);
+					i = i + " - \u6765\u6d88\u606f\u4e86...";
+					qqweb.layout.resetTitle();
+					qqweb.layout.setTitle(i, {
+								roll : true
+							})
+				}
+			},
+			onSystemMessageReceive : function(i) {
+				if (this.checkIsNeedMarquee(i)) {
+					qqweb.layout.resetTitle();
+					qqweb.layout
+							.setTitle(
+									"\u60a8\u6709\u65b0\u7684\u7cfb\u7edf\u6d88\u606f...",
+									{
+										roll : true
+									})
+				}
+			},
+			onDesktopFocus : function() {
+				this._isFocusOnDesktop = true;
+				this._currentTitleMsg = null;
+				a.browser.chrome ? setTimeout(function() {
+							qqweb.layout.resetTitle()
+						}, 100) : qqweb.layout.resetTitle()
+			},
+			onDesktopBlur : function() {
+				this._isFocusOnDesktop = false
+			}
 		}
-		H = false
-	};
-	this.reRunApps = function(g) {
-		qqweb.portal.start();
-		(P = g)
-				? T(qqweb.CONST.LOGIN_LEVEL_ALL)
-				: T(qqweb.CONST.LOGIN_LEVEL_NOCHAT);
-		H = true;
-		if ($()) {
-			if (m)
-				for (var k = 0; k < m.length; ++k)
-					qqweb.portal.runApp(m[k], {
-								noValidateLogin : true
+	}), r = new a.Class({
+		init : function() {
+			var i = new a.ui.Notifier;
+			if (i.hasSupport()) {
+				i.requestPermission();
+				this._notifier = i;
+				this._notifierManage = [];
+				this._popupHideTime = 5E3;
+				this._enableFlag = qqweb.portal.messageCenter.notifier.CONST.ENABLE_DESKTOP_NOTIFICATION;
+				b.addObserver(qqweb.portal.messageCenter,
+						"SingleMessageReceive", a.bind(
+								this.observer.onChatMessageReceive, this));
+				b.addObserver(qqweb.portal.messageCenter,
+						"GroupMessageReceive", a.bind(
+								this.observer.onChatMessageReceive, this))
+			}
+		},
+		checkIsNeedNotify : function(i) {
+			var j = qqweb.config.configList.notifySetting;
+			if (!a.isUndefined(j) && !(j & this._enableFlag))
+				return false;
+			if (!i.msg.isAllow)
+				return false;
+			return true
+		},
+		observer : {
+			onChatMessageReceive : function(i) {
+				if (this.checkIsNeedNotify(i)) {
+					var j, m, q;
+					m = i.msg;
+					i = this._notifierManage;
+					for (var u = this._notifier; i.length >= 4;) {
+						j = i.shift();
+						clearTimeout(j.timer);
+						j.popup.cancel()
+					}
+					q = m.type == "single"
+							? qqweb.util.getUserAvatar(m.uin, 1)
+							: qqweb.util.getGroupAvatar(m.uin, 1);
+					j = c.decodeHtmlSimple(m.title);
+					m = c.decodeHtmlSimple(m.content);
+					m = m.replace(/<img.*?\/?>/ig, function() {
+								return "\u3010\u56fe\u7247\u3011"
 							});
-			V(g)
-		} else
-			qqweb.rpcService.sendGetVfWebQQ(this.uin)
+					m = m.replace(/<br\/>/ig, "\u3000").replace(
+							/<([^>]+).*?>/ig, "");
+					var f = u.notify(q, j, m);
+					if (!f) {
+						try {
+							u.requestPermission()
+						} catch (g) {
+						}
+						f = u.notify(q, j, m)
+					}
+					if (f) {
+						var p = setTimeout(function() {
+									f.cancel()
+								}, this._popupHideTime);
+						f.addEventListener("close", function() {
+									clearTimeout(p)
+								});
+						i.push({
+									popup : f,
+									timer : p
+								})
+					}
+				}
+			}
+		}
+	}), w = new a.Class({
+				init : function() {
+					this._totalMsgCount = 0;
+					b.addObserver(qqweb.portal.messageCenter,
+							"SingleMessageReceive", a.bind(
+									this.observer.onMessageReceive, this));
+					b.addObserver(qqweb.portal.messageCenter,
+							"GroupMessageReceive", a.bind(
+									this.observer.onMessageReceive, this));
+					b.addObserver(qqweb.portal.messageCenter, "MessageHandled",
+							a.bind(this.observer.onMessageHandled, this));
+					b.on(window, "beforeunload", this.observer.onWindowUnload)
+				},
+				checkIsNeedNotify : function(i) {
+					i = i.msg;
+					if (i.extraInfo.isChatBoxOpen)
+						return false;
+					else if (!i.isAllow)
+						return false;
+					return true
+				},
+				observer : {
+					onMessageReceive : function(i) {
+						if (this.checkIsNeedNotify(i)) {
+							this._totalMsgCount++;
+							qqweb.layout.setIe9IconOverLay(this._totalMsgCount)
+						}
+					},
+					onMessageHandled : function(i) {
+						i.count = i.count || 0;
+						this._totalMsgCount -= i.count;
+						if (this._totalMsgCount < 0)
+							this._totalMsgCount = 0;
+						qqweb.layout.setIe9IconOverLay(this._totalMsgCount)
+					},
+					onWindowUnload : function() {
+						qqweb.layout.setIe9IconOverLay(0)
+					}
+				}
+			})
+});
+Jet().$package("qqweb.sound", function(a) {
+			var b = false, c, d = [], h = null, n = false;
+			qqweb.sound = {
+				init : function() {
+					a.sound.onload = function() {
+						n = true
+					};
+					a.sound.embedSWF("./swf/swfsound.swf");
+					b = false
+				},
+				playSound : function(r, w) {
+					if (this.isMute())
+						return false;
+					if (r == "")
+						return false;
+					w = w || false;
+					if (typeof d[r] === "undefined") {
+						if (!n)
+							return false;
+						d[r] = h = a.sound.loadSound(r, w,
+								qqweb.sound.playSoundObj)
+					} else {
+						h = d[r];
+						qqweb.sound.playSoundObj()
+					}
+				},
+				playSoundObj : function() {
+					a.sound.startSound(h)
+				},
+				setMute : function(r) {
+					b = r
+				},
+				isMute : function() {
+					return b
+				},
+				setVol : function(r) {
+					c = r
+				},
+				getVol : function() {
+					return c
+				}
+			}
+		});
+Jet().$package("qqweb.layout", function(a) {
+	var b = this, c = a.dom, d = a.event, h = a.fx.transitions, n = c
+			.getDocumentElement(), r = document.body, w = c.id("startingCover"), i = document.title, j = null, m = c
+			.id("desktop"), q, u = false, f = {}, g = [10, 1E5, 2E5, 3E5, 4E5], p, l, t, y, z, D, E, I, M = [], L = null;
+	this.Panel = a.ui.Panel;
+	this.PopupBox = a.ui.PopupBox;
+	var J = {
+		stopPropagation : function(o) {
+			o.stopPropagation()
+		},
+		onClickDesktop : function() {
+			d.notifyObservers(qqweb.layout, "clickDesktop", b.getDesktop())
+		},
+		onFocusDesktop : function() {
+			d.notifyObservers(qqweb.layout, "desktopFocus")
+		},
+		onBlurDesktop : function() {
+			d.notifyObservers(qqweb.layout, "desktopBlur")
+		},
+		onWindowResize : function() {
+			a.out("desktopResize");
+			R();
+			d.notifyObservers(qqweb.layout, "desktopResize")
+		}
+	}, P = new a.fx.Animation({
+				element : w,
+				property : "opacity",
+				from : 1,
+				to : 0,
+				unit : false,
+				duration : 500,
+				fps : 30,
+				transition : h.quartic.easeIn
+			});
+	d.addObserver(P, "end", function() {
+				c.hide(w)
+			});
+	var N = new a.fx.Animation({
+				element : m,
+				property : "opacity",
+				from : 1,
+				to : 0,
+				unit : false,
+				duration : 500,
+				fps : 30,
+				transition : h.quartic.easeIn
+			});
+	d.addObserver(N, "end", function() {
+				c.hide(m)
+			});
+	var Q = function() {
+		a.profile("DesktopCreate");
+		var o = c.id("mainPanel"), x = c.id("topBar"), C = c.id("toolBar"), H = c
+				.id("qqBar");
+		f.topArea = x;
+		f.bottomArea = C;
+		f.mainArea = o;
+		f.leftArea = null;
+		f.rightArea = null;
+		c.setStyle(x, "height", "62px");
+		c.setStyle(x, "overflow", "visible");
+		if (a.browser.mobileSafari) {
+			o = c.id("touchpad");
+			c.show(o);
+			o.src = "./touchpad.html?20101021001";
+			d.on(r, "touchmove", function(G) {
+						G.touches && G.touches.length == 1
+								&& G.preventDefault()
+					}, true)
+		}
+		o = E.createPanel({
+					id : "desktop",
+					name : "desktop",
+					container : b.getBody(),
+					body : m,
+					html : ""
+				});
+		E.createPanel({
+					id : "topBar",
+					name : "topBar",
+					container : x,
+					body : x,
+					html : ""
+				});
+		E.createPanel({
+					id : "qqBar",
+					name : "qqBar",
+					container : H,
+					body : H,
+					html : ""
+				});
+		x = c.id("logo");
+		d.on(x, "mousedown", function() {
+					pgvSendClick({
+								hottag : "web2qq.corner.topleft.logo"
+							})
+				});
+		d.on(window, "resize", J.onWindowResize);
+		d.on(m, "click", J.onClickDesktop);
+		if ("onfocusin" in document) {
+			d.on(document, "focusin", J.onFocusDesktop);
+			d.on(document, "focusout", J.onBlurDesktop)
+		} else {
+			d.on(window, "focus", J.onFocusDesktop);
+			d.on(window, "blur", J.onBlurDesktop)
+		}
+		a.profile("DesktopCreateFinish");
+		return o
+	}, R = function() {
+		var o = c.getClientWidth(), x = c.getClientHeight();
+		if (a.browser.ie == 6) {
+			o = o % 2 + o;
+			x = x % 2 + x
+		}
+		p = o;
+		l = x;
+		var C = false;
+		if (o >= z) {
+			c.setStyle(n, "overflowX", "hidden");
+			c.setStyle(m, "width", "");
+			t = o
+		} else {
+			C = true;
+			c.setStyle(n, "overflowX", "auto");
+			c.setStyle(m, "width", z + "px");
+			t = z
+		}
+		if (x >= D) {
+			c.setStyle(n, "overflowY", "hidden");
+			c.setStyle(m, "height", "");
+			y = x
+		} else {
+			C = true;
+			c.setStyle(n, "overflowY", "auto");
+			c.setStyle(m, "height", D + "px");
+			y = D
+		}
+		C ? c.setStyle(m, "position", "absolute") : c.setStyle(m, "position",
+				"static");
+		c.setStyle(r, "height", y + "px");
+		if (w) {
+			c.setStyle(w, "width", t + "px");
+			c.setStyle(w, "height", y + "px")
+		}
+	}, s = a.Class({
+				init : function() {
+					this.panelList = []
+				},
+				createPanel : function(o) {
+					o = o || {};
+					var x = new a.ui.Panel(o);
+					this.panelList[o.id] = x;
+					a.out("createPanel:" + o.name, "layout");
+					return x
+				},
+				getPanel : function(o) {
+					return this.panelList[o]
+				}
+			});
+	this.init = function() {
+		if (a.browser.mobileSafari) {
+			z = 680;
+			D = 640
+		} else {
+			z = 320;
+			D = 100
+		}
+		E = this.panelManager = new s;
+		Q();
+		a.browser.firefox ? setTimeout(J.onWindowResize, 100) : J
+				.onWindowResize()
+	};
+	this.getArea = function(o) {
+		return f[o + "Area"]
+	};
+	this.getAreaWidth = function(o) {
+		if (o = f[o + "Area"])
+			return c.getWidth(o);
+		return 0
+	};
+	this.getAreaHeight = function(o) {
+		if (o = f[o + "Area"])
+			return c.getHeight(o);
+		return 0
+	};
+	this.getAvailableWidth = function() {
+		return this.getDesktopWidth() - this.getAreaWidth("left")
+				- this.getAreaWidth("right")
+	};
+	this.getAvailableHeight = function() {
+		return this.getDesktopHeight() - this.getAreaHeight("top")
+				- this.getAreaHeight("bottom")
+	};
+	this.setDesktopWidth = function(o) {
+		return t = o
+	};
+	this.setDesktopHeight = function(o) {
+		return y = o
+	};
+	this.getDesktopWidth = function() {
+		return t
+	};
+	this.getDesktopHeight = function() {
+		return y
+	};
+	this.getClientWidth = function() {
+		return p = p || c.getClientWidth()
+	};
+	this.getClientHeight = function() {
+		return l = l || c.getClientHeight()
+	};
+	this.getDesktop = function() {
+		return E.getPanel("desktop")
+	};
+	this.getBody = function() {
+		return r
+	};
+	this.getMaskLayer = function() {
+		q || (q = new a.ui.MaskLayer({
+					appendTo : this.getDesktop().body,
+					zIndex : 1,
+					opacity : 0.5
+				}));
+		q.reset();
+		return q
+	};
+	this.getPanel = function(o) {
+		return E.getPanel(o)
+	};
+	this.getTopZIndex = function(o) {
+		if (a.isUndefined(o) || !g[o])
+			o = 0;
+		return g[o]++
+	};
+	this.getWindowManager = function() {
+		if (!I) {
+			var o = {
+				defaultContainer : this.getDesktop().body
+			};
+			I = new qqweb.businessClass.WindowManager(o);
+			I.registerWindow("Window", qqweb.businessClass.Window);
+			I.registerWindow("Widget", qqweb.businessClass.Widget)
+		}
+		return I
+	};
+	this.getThemeManager = function() {
+	};
+	this.showDesktop = function() {
+		var o = [], x;
+		x = b.getWindowManager();
+		for (var C = x.getCurrentWindow(), H = x.getWindowList(), G = 0; G < H.length; G++) {
+			x = H[G];
+			if (x.isShow && x.isShow()) {
+				x.min();
+				o.push(x)
+			}
+		}
+		if (o.length > 0) {
+			M = o;
+			L = C
+		} else {
+			L && L.setCurrent();
+			for (G = 0; G < M.length; G++)
+				M[G].show()
+		}
+	};
+	this.setTitle = function(o, x) {
+		x.roll = x.roll || false;
+		x.speed = x.speed || 500;
+		if (x.roll) {
+			if (!(o.length < 1)) {
+				i = document.title;
+				j && clearInterval(j);
+				j = setInterval(function() {
+							document.title = o;
+							o = o.substr(1) + o.charAt(0)
+						}, x.speed)
+			}
+		} else {
+			i = document.title;
+			document.title = o
+		}
+	};
+	this.resetTitle = function() {
+		if (j) {
+			clearInterval(j);
+			j = null
+		}
+		document.title = i
+	};
+	this.setIe9IconOverLay = function(o) {
+		var x = qqweb.CONST.DOMAIN, C = ["overlay1", "overlay2", "overlay3",
+				"overlay4", "overlay5", "overlay6", "overlay7", "overlay8",
+				"overlay9", "overlay10"];
+		if (o == 0)
+			try {
+				window.external.msSiteModeClearIconOverlay()
+			} catch (H) {
+			}
+		else if (o < 10)
+			try {
+				window.external.msSiteModeSetIconOverlay("http://" + x + "/"
+								+ C[o - 1] + ".ico", "overlay " + o);
+				window.external.msSiteModeActivate()
+			} catch (G) {
+			}
+		else if (o >= 10)
+			try {
+				window.external.msSiteModeSetIconOverlay("http://" + x + "/"
+								+ C[9] + ".ico", "overlay 10");
+				window.external.msSiteModeActivate()
+			} catch (O) {
+			}
+	};
+	this.messagebox = function(o, x) {
+		x = x || {};
+		x.innerHtml = o;
+		return (new qqweb.businessClass.MessageBox(x)).Window
+	};
+	this.alert = function(o, x, C) {
+		C = C || {};
+		C.onAccept = x;
+		C.innerHtml = o;
+		return (new qqweb.businessClass.MessageBox.Alert(C)).Window
+	};
+	this.confirm = function(o, x, C) {
+		C = C || {};
+		C.onAccept = x;
+		C.innerHtml = o;
+		return (new qqweb.businessClass.MessageBox.Confirm(C)).Window
 	};
 	this.hideLoginWindow = function() {
-		var g;
-		if (g = b.id("ifram_login"))
-			g.src = "about:blank";
+		var o;
+		if (o = c.id("ifram_login"))
+			o.src = "about:blank";
 		try {
-			this.hideIntroduceWindow()
-		} catch (k) {
-		}
-		try {
-			n.close()
-		} catch (r) {
+			u.close()
+		} catch (x) {
 		}
 	};
-	this.showLoginWindow = function(g, k) {
-		var r = {
+	this.showLoginWindow = function(o, x) {
+		o = {
 			width : 400,
 			height : 300,
 			title : "\u767b\u5f55WebQQ",
@@ -1562,4078 +3763,1349 @@ Jet().$package("qqweb.portal", function(f) {
 			dragable : true,
 			src : ""
 		};
-		m = [g];
-		g = window.location.protocol + "//" + window.location.host
+		var C = window.location.protocol + "//" + window.location.host
 				+ "/loginproxy.html";
-		if (k) {
-			g += "?strong=true";
-			r.title = "\u767b\u5f55QQ"
+		if (x) {
+			C += "?login_level=3";
+			o.title = "\u767b\u5f55QQ"
 		} else {
-			g += "?strong=false";
-			r.title = "\u767b\u5f55WebQQ"
+			C += "?login_level=2";
+			o.title = "\u767b\u5f55WebQQ"
 		}
-		g = encodeURIComponent(g);
-		var D = "";
-		if (k) {
-			r.src = "http://ui.ptlogin2.qq.com/cgi-bin/login?target=self&style=4&appid=1003903&enable_qlogin=0&no_verifyimg=1&s_url="
-					+ g + "&f_url=loginerroralert";
-			D = f.cookie.get("closeLoginTip") == ""
-					? '\t\t\t\t<div id="login_window_content_area" class="content_area"><div style="display:block;position:absolute;padding-left:2px;width:100%;background:#ffffe1"><span style="float:left">\u6e29\u99a8\u63d0\u793a\uff1a\u767b\u5f55\u540e\uff0c\u60a8\u5728\u522b\u5904\u5df2\u767b\u5f55\u7684\u540c\u4e00\u5e10\u53f7\u4f1a\u4e0b\u7ebf.</span><span id="close_login_tip" onclick="this.parentNode.style.display=\'none\';" style="display:inline;cursor:pointer;float:right;margin-right:5px;">\uff58</span></div><div class="login_window_wrap">\t\t\t\t<iframe id="ifram_login"  src="'
-							+ r.src
-							+ '" scrolling="no" frameborder="no" allowtransparency="true" scrolling="hidden" hidefocus ></iframe>\t\t\t\t\t\t</div></div>'
-					: '\t\t\t\t<div id="login_window_content_area" class="content_area"><div class="login_window_wrap">\t\t\t\t<iframe id="ifram_login"  src="'
-							+ r.src
-							+ '" scrolling="no" frameborder="no" allowtransparency="true" scrolling="hidden" hidefocus ></iframe>\t\t\t\t\t\t</div></div>'
+		C = encodeURIComponent(C);
+		var H = "";
+		if (x) {
+			o.src = "http://ui.ptlogin2.qq.com/cgi-bin/login?target=self&style=4&appid=1003903&enable_qlogin=0&no_verifyimg=1&s_url="
+					+ C + "&f_url=loginerroralert";
+			H = a.cookie.get("closeLoginTip") == ""
+					? '                <div id="login_window_content_area" class="content_area"><div style="display:block;position:absolute;padding-left:2px;width:100%;background:#ffffe1"><span style="float:left">\u6e29\u99a8\u63d0\u793a\uff1a\u767b\u5f55\u540e\uff0c\u60a8\u5728\u522b\u5904\u5df2\u767b\u5f55\u7684\u540c\u4e00\u5e10\u53f7\u4f1a\u4e0b\u7ebf.</span><span id="close_login_tip" onclick="this.parentNode.style.display=\'none\';" style="display:inline;cursor:pointer;float:right;margin-right:5px;">\uff58</span></div><div class="login_window_wrap">                <iframe id="ifram_login"  src="'
+							+ o.src
+							+ '" scrolling="no" frameborder="no" allowtransparency="true" scrolling="hidden" hidefocus ></iframe>                        </div></div>'
+					: '                <div id="login_window_content_area" class="content_area"><div class="login_window_wrap">                <iframe id="ifram_login"  src="'
+							+ o.src
+							+ '" scrolling="no" frameborder="no" allowtransparency="true" scrolling="hidden" hidefocus ></iframe>                        </div></div>'
 		} else {
-			r.src = "http://ui.ptlogin2.qq.com/cgi-bin/login?link_target=self&appid=15000101&hide_title_bar=1&no_verifyimg=1&s_url="
-					+ g + "&f_url=loginerroralert&target=self";
-			D = '<div id="login_window_content_area" class="content_area"><div class="login_window_wrap">\t\t\t<iframe id="ifram_login"  src="'
-					+ r.src
-					+ '" scrolling="no" frameborder="no" allowtransparency="true" scrolling="hidden" hidefocus ></iframe>\t\t\t\t\t</div></div>'
+			o.src = "http://ui.ptlogin2.qq.com/cgi-bin/login?link_target=self&appid=15000101&hide_title_bar=1&no_verifyimg=1&s_url="
+					+ C + "&f_url=loginerroralert&target=self";
+			H = '<div id="login_window_content_area" class="content_area"><div class="login_window_wrap">            <iframe id="ifram_login"  src="'
+					+ o.src
+					+ '" scrolling="no" frameborder="no" allowtransparency="true" scrolling="hidden" hidefocus ></iframe>                    </div></div>'
 		}
-		if (!n || !n.isShow())
-			n = new qqweb.businessClass.Window(r);
+		if (!u || !u.isShow())
+			u = qqweb.layout.messagebox("", o);
 		else
-			n.setCurrent();
-		n.setHtml(D);
-		if (k) {
-			r = b.id("loginIcon");
-			g = b.id("loginIcon_disable");
-			if (r && g) {
-				b.hide(r);
-				b.show(g)
+			u.setCurrent();
+		u.setHtml(H);
+		if (x) {
+			x = c.id("loginIcon");
+			o = c.id("loginIcon_disable");
+			if (x && o) {
+				c.hide(x);
+				c.show(o)
 			}
-			a.addObserver(n, "close", function() {
-						a.notifyObservers(d, "StrongLoginClose")
+			d.addObserver(u, "close", function() {
+						d.notifyObservers(qqweb.portal, "StrongLoginClose")
 					})
 		}
-		var F = b.id("login_window_content_area");
-		a.addObserver(n, "setNewHeight", function() {
-					b.setStyle(F, "height", "99%")
+		var G = c.id("login_window_content_area");
+		d.addObserver(u, "setNewHeight", function() {
+					c.setStyle(G, "height", "99%")
 				});
-		b.id("close_login_tip")
-				&& a.on(b.id("close_login_tip"), "click", function() {
+		c.id("close_login_tip")
+				&& d.on(c.id("close_login_tip"), "click", function() {
 							this.parentNode.style.display = "none";
-							f.cookie.set("closeLoginTip", "true", "qq.com", "",
+							a.cookie.set("closeLoginTip", "true", "qq.com", "",
 									3E6)
 						});
-		n.show();
-		this.login_strong = k
+		u.show()
 	};
-	this.setLoginWindowHeight = function(g) {
-		n.setHeight(g)
+	this.setLoginWindowHeight = function(o) {
+		u.setHeight(o)
 	};
-	this.hideIntroduceWindow = function() {
-		i && i.close()
+	this.hideStartingCover = function() {
+		P.start()
 	};
-	this.showIntroduceWindow = function(g) {
-		var k = qqweb.appconfig.getAllConfig(g), r = 'Hi\uff0c\u60a8\u8fd8\u6ca1\u6709\u767b\u5f55\u54e6\uff0c\u8d76\u5feb<a id="portal_login_btn" style="font-size:14px;font-weight:bold;" href="###">\u767b\u5f55</a>\u5c1d\u8bd5\u4e00\u4e0b\u5427\uff01';
-		if (g == "messageBox" || g == "buddyManager")
-			r = 'Hi\uff0c\u6b64\u5e94\u7528\u9700\u8981\u767b\u5f55QQ\uff0c\u8d76\u5feb<a id="portal_login_btn" style="font-size:14px;font-weight:bold;" href="###">\u767b\u5f55</a>\u5c1d\u8bd5\u4e00\u4e0b\u5427\uff01';
-		r = '<div class="content_area" style="_height:406px"><div class="intro_window_wrap">\t\t<div id="intro_window_area" class="intro_window_area" title="'
-				+ f.string.encodeHtmlAttributeSimple(String(k.appDesc))
-				+ '">\t\t\t<h3>'
-				+ f.string.encodeHtmlSimple(String(k.appName))
-				+ "</h3><span>"
-				+ f.string.encodeHtmlSimple(String(k.appDesc))
-				+ '</span></div>\t\t<div style="margin-top:50px; text-align: center; font-weight: bold; font-size:14px;">'
-				+ r + "</div>\t\t</div></div>";
-		k.flashMode = false;
-		k.windowMode = "single";
-		k.dragable = true;
-		k.hasCloseButton = true;
-		k.defaultMode = "restore";
-		k.isSetCurrent = true;
-		k.width = 545;
-		k.height = false;
-		if (!i || !i.isShow())
-			i = new qqweb.businessClass.Window(k);
-		i.setTitle(k.appName);
-		i.setCurrent();
-		i.setHtml(r);
-		r = b.id("intro_window_area");
-		b.setStyle(r, "backgroundImage", "url(./module/appmarket/images/thumb_"
-						+ k.id + ".png)");
-		r = b.id("portal_login_btn");
-		a.on(r, "click", function(D) {
-					D.preventDefault();
-					k.loginLevel > 2 ? d.showLoginWindow(g, true) : d
-							.showLoginWindow(g, false);
-					i.close()
-				})
-	};
-	this.showWarningWindow = function(g) {
-		if (b.id("activeXWindow") == undefined) {
-			g = qqweb.appconfig.getAllConfig(g);
-			g.flashMode = false;
-			g.windowMode = "single";
-			g.dragable = true;
-			g.hasCloseButton = true;
-			g.defaultMode = "restore";
-			g.isSetCurrent = true;
-			g.width = false;
-			g.height = false;
-			var k = new qqweb.businessClass.Window(g);
-			k.setTitle(g.title);
-			k.setCurrent();
-			k
-					.setHtml("<div id='activeXWindow' class='no_available_alt'><div class='appWarning'></div><div  class='appWarningTxt'><span class='strong_text'>\u6b64\u5e94\u7528\u9700\u8981\u63d2\u4ef6\u652f\u6301</span><a class='plain_text' id='get_qqDisk_activeX' href='###'>\u70b9\u51fb\u83b7\u53d6\u5e76\"\u5b89\u88c5\"</a></div></div>");
-			b.setStyle(k.body, "background", "#233040");
-			b.id("get_qqDisk_activeX").onclick = function() {
-				k.body.innerHTML += '<div><object classid="clsid:BDEACC50-F56D-4D60-860F-CF6ED1766D65" codebase="http://res.qqmail.com/zh_CN/activex/TencentMailActiveX.cab#version=1,0,1,32"></object></div>';
-				k.close();
-				b.id("activeXWindow").style.display = "block"
-			}
-		}
-	};
-	this.showIeOnlyWindow = function(g) {
-		var k = "ieOnlyWindow" + g;
-		if (b.id(k) == undefined) {
-			g = qqweb.appconfig.getAllConfig(g);
-			k = "<div id='"
-					+ k
-					+ "' class='no_available_alt'><div class='appWarning'></div><div  class='appWarningTxt'><span class='strong_text'>\u5f88\u62b1\u6b49\uff0c\u6b64\u5e94\u7528\u4ec5\u652f\u6301ie\u6d4f\u89c8\u5668\u3002</span></div></div>";
-			g.flashMode = false;
-			g.windowMode = "single";
-			g.dragable = true;
-			g.hasCloseButton = true;
-			g.defaultMode = "restore";
-			g.isSetCurrent = true;
-			g.width = 545;
-			g.height = 450;
-			var r = new qqweb.businessClass.Window(g);
-			r.setTitle(g.title);
-			r.setCurrent();
-			r.setHtml(k);
-			b.setStyle(r.body, "background", "#233040")
-		}
-	};
-	this.showUnsupportIPadWindow = function(g) {
-		var k = "ieOnlyWindow" + g;
-		if (b.id(k) == undefined) {
-			g = qqweb.appconfig.getAllConfig(g);
-			k = "<div id='"
-					+ k
-					+ "' class='no_available_alt'><div class='appWarning'></div><div  class='appWarningTxt'><span class='strong_text'>\u5f88\u62b1\u6b49\uff0c\u6b64\u5e94\u7528\u6682\u4e0d\u652f\u6301iPad\u3002</span></div></div>";
-			g.flashMode = false;
-			g.windowMode = "single";
-			g.dragable = true;
-			g.hasCloseButton = true;
-			g.defaultMode = "restore";
-			g.isSetCurrent = true;
-			g.width = 545;
-			g.height = 450;
-			var r = new qqweb.businessClass.Window(g);
-			r.setTitle(g.title);
-			r.setCurrent();
-			r.setHtml(k);
-			b.setStyle(r.body, "background", "#233040")
-		}
-	};
-	this.showNotSupportWindow = function(g) {
-		var k = "ieOnlyWindow" + g;
-		if (b.id(k) == undefined) {
-			g = qqweb.appconfig.getAllConfig(g);
-			k = "<div id='"
-					+ k
-					+ "' class='no_available_alt'><div class='appWarning'></div><div  class='appWarningTxt'><span class='strong_text'>\u5f88\u62b1\u6b49\uff0c\u6b64\u5e94\u7528\u6682\u65f6\u4e0d\u652f\u6301\u8be5\u6d4f\u89c8\u5668\u3002</span></div></div>";
-			g.flashMode = false;
-			g.windowMode = "single";
-			g.dragable = true;
-			g.hasCloseButton = true;
-			g.defaultMode = "restore";
-			g.isSetCurrent = true;
-			g.width = 545;
-			g.height = 450;
-			var r = new qqweb.businessClass.Window(g);
-			r.setTitle(g.title);
-			r.setCurrent();
-			r.setHtml(k);
-			b.setStyle(r.body, "background", "#233040")
-		}
-	};
-	this.showComingSoonWindow = function(g) {
-		if (b.id("comingSoonWindow") == undefined) {
-			g = qqweb.appconfig.getAllConfig(g);
-			g.flashMode = false;
-			g.windowMode = "single";
-			g.dragable = true;
-			g.hasCloseButton = true;
-			g.defaultMode = "restore";
-			g.isSetCurrent = true;
-			g.width = false;
-			g.height = false;
-			var k = new qqweb.businessClass.Window(g);
-			k.setTitle(g.title);
-			k.setCurrent();
-			k
-					.setHtml("<div id='comingSoonWindow' class='flash_alt'><div class='appIframeAlter'></div><div  class='appComingSoon'></div></div>");
-			b.id("comingSoonWindow").style.display = "block";
-			b.setStyle(k.body, "background", "#ffffff")
-		}
-	};
-	this.getCookieUin = function() {
-		var g = f.cookie.get("uin", qqweb.CONST.MAIN_DOMAIN);
-		if (g)
-			g = parseInt(g.substr(1), 10);
-		f.out("uin:" + g);
-		return g
-	};
-	this.getOriginalCookieUin = function() {
-		return f.cookie.get("uin", qqweb.CONST.MAIN_DOMAIN)
-	};
-	this.getCookieSkey = function() {
-		return f.cookie.get("skey", qqweb.CONST.MAIN_DOMAIN)
-	};
-	this.getCookiePtwebqq = function() {
-		return f.cookie.get("ptwebqq", qqweb.CONST.MAIN_DOMAIN)
-	};
-	this.runApp = function(g, k) {
-		var r = this.getAllConfig(g);
-		if (r) {
-			var D = this.getApp(g);
-			if (D) {
-				D.run && D.run(k);
-				k && k.callback && k.callback()
-			} else if (r)
-				if (r.appType == 1)
-					this.loadApp(r, k);
-				else if (r.appType == 2) {
-					if (~~g > 0)
-						qqweb.app["app" + g] = new qqweb.businessClass.App(r);
-					else
-						qqweb.app[g] = new qqweb.businessClass.App(r);
-					qqweb.portal.runApp(g, k)
-				}
-			if (r)
-				Y = false
-		} else
-			f.out("id:" + g)
-	};
-	this.loadApp = function(g, k) {
-		g = g || {};
-		if (!this.getAppLoading(g.id)) {
-			this.setAppLoading(g.id, true);
-			var r = g.id, D = qqweb.CONST.PUB_APP_STATIC_URL
-					+ Math.floor(r / 1E3) % 1E3 + "/" + r + "/", F = g.css || D
-					+ "style.css";
-			D = g.js || D + "main.js";
-			if (g.css || f.isNumber(r))
-				h.loadCss(F + "?" + qqweb.CONST.UPDATE_TIME_STAMP);
-			h.loadScript(D + "?" + qqweb.CONST.UPDATE_TIME_STAMP, {
-						onSuccess : function() {
-							qqweb.portal.runApp(g.id, k)
-						}
-					})
-		}
-	};
-	this.getAppConfigList = function() {
-		return qqweb.appconfig.appConfigList
-	};
-	this.getAppConfig = function(g) {
-		return qqweb.appconfig.getAppConfig(g)
-	};
-	this.getSystemConfig = function(g) {
-		return qqweb.appconfig.getSystemConfig(g)
-	};
-	this.getAllConfig = function(g) {
-		return qqweb.appconfig.getAllConfig(g)
-	};
-	this.getApp = function(g) {
-		return ~~g > 0 ? qqweb.app["app" + g] : qqweb.app[g]
-	};
-	this.setAppLoading = function(g, k) {
-		return s[g] = k
-	};
-	this.getAppLoading = function(g) {
-		return s[g]
-	};
-	this.setIsLoginSuccess = function(g) {
-		t = g
-	};
-	this.getIsLoginSuccess = function() {
-		return t
-	};
-	this.confirm = function(g) {
-		return window.confirm(g)
-	};
-	this.alert = function(g) {
-		return window.alert(g)
-	};
-	this.closeHook = function(g) {
-		EQQ.api.log("browser-close");
-		var k = "\u6267\u884c\u6b64\u64cd\u4f5c\u540e\u5c06\u4e22\u5931\u672c\u6b21\u804a\u5929\u4e2d\u7684\u4fe1\u606f\uff0c\u786e\u8ba4\u7ee7\u7eed\uff1f";
-		if (d.getLoginLevel() < qqweb.CONST.LOGIN_LEVEL_ALL)
-			k = "\u6267\u884c\u6b64\u64cd\u4f5c\u53ef\u80fd\u4f1a\u4e22\u5931\u9875\u9762\u4e2d\u7684\u4fe1\u606f\uff0c\u786e\u8ba4\u7ee7\u7eed\uff1f";
-		pgvSendClick({
-					hottag : "web2qq.qqpanel.status.exitQQ"
-				});
-		if (f.browser.safari || f.browser.chrome)
-			return k;
-		else if (f.browser.ie > 0)
-			event.returnValue = k;
-		else
-			g.returnValue = k
-	};
-	this.addCloseHook = function() {
-		if (!e) {
-			e = true;
-			a.on(window, "beforeunload", this.closeHook);
-			a.on(window, "unload", function() {
-						if (EQQ && EQQ.getIsLogin()) {
-							EQQ.logout();
-							EQQ.api.log("browser-close-ok");
-							EQQ.RPCService._proxy
-									&& EQQ.RPCService._proxy.abort();
-							EQQ.View.ChatBox
-									&& EQQ.View.ChatBox.scaptureHotkey
-									&& EQQ.View.ChatBox.scaptureHotkey
-											.unstall()
-						}
-					})
-		}
-	};
-	this.removeCloseHook = function() {
-		a.off(window, "beforeunload");
-		e = false
-	};
-	this.getCloseHook = function() {
-		return e
-	};
-	this.addExitConfirm = function(g) {
-		l += g || 1;
-		l > 0 && this.addCloseHook();
-		return l
-	};
-	this.removeExitConfirm = function(g) {
-		l -= g || 1;
-		l < 1 && this.removeCloseHook();
-		return l
-	};
-	this.getExitConfirm = function() {
-		return l
-	};
-	this.exit = function() {
-		if (this.getExitConfirm() > 0)
-			if (this
-					.confirm("\u60a8\u786e\u8ba4\u8981\u79bb\u5f00 WebQQ \u5417\uff1f")) {
-				this.removeCloseHook();
-				pgvSendClick({
-							hottag : "web2qq.qqpanel.status.exitQQ"
-						})
-			} else
-				return;
-		var g = qqweb.layout.getCurrentWindow(), k = "";
-		if (g)
-			k = g.getAppId();
-		a.notifyObservers(qqweb.portal, "exit");
-		w = true;
-		f.cookie.remove("ptwebqq", qqweb.CONST.MAIN_DOMAIN);
-		f.cookie.remove("skey", qqweb.CONST.MAIN_DOMAIN);
-		f.cookie.remove("uin", qqweb.CONST.MAIN_DOMAIN);
-		f.cookie.remove("vfwebqq", qqweb.CONST.MAIN_DOMAIN);
-		f.out(">>>>> cookie.remove");
-		setTimeout(function() {
-					a.notifyObservers(qqweb.portal, "exitSuccess")
-				}, 1E3);
-		Y && pgvSendClick({
-					hottag : "WEB2QQ.NOAPP.USER.ALL"
-				})
-	};
-	this.getVfWebQQ = function() {
-		return typeof EQQ !== "undefined" && EQQ.getVfWebQQ && EQQ.getVfWebQQ()
-				&& EQQ.getIsLogin() ? EQQ.getVfWebQQ() : o ? o : ""
-	};
-	this.getQQWebStatus = function() {
-		var g = qqweb.layout.getCurrentWindow(), k = "", r;
-		if (g)
-			k = g.getAppId();
-		g = {
-			currentAppId : k,
-			appList : []
-		};
-		k = qqweb.layout.getWindowList();
-		for (var D = 0; D < k.length; D++) {
-			var F = k[D], C = F.getAppId();
-			if (!(C === "eqq--" || C === "sceneChristmas")) {
-				r = F.getX();
-				var U = F.getY();
-				if (F.windowType === "window") {
-					var aa = F.getBoxStatus();
-					if (aa !== "min") {
-						var fa = F.getWidth();
-						F = F.getHeight();
-						r = {
-							appId : C,
-							defaultMode : aa,
-							x : r,
-							y : U,
-							width : fa,
-							height : F
-						};
-						C && g.appList.push(r)
-					}
-				} else if (F.windowType === "widget") {
-					r = {
-						appId : C,
-						x : r,
-						y : U
-					};
-					g.appList.push(r)
-				}
-			}
-		}
-		return g
-	};
-	this.showUnsafeTip = function() {
-		var g = new qqweb.businessClass.Window({
-					title : "\u5b89\u5168\u8b66\u544a",
-					dragable : true,
-					resize : false,
-					width : 520,
-					height : 300,
-					hasCloseButton : true,
-					isSetCentered : true
-				});
-		g.setZIndex(200);
-		g
-				.setHtml('<div id="dangerTip"><p>WebQQ\u662f\u817e\u8baf\u5b98\u65b9\u63a8\u51fa\uff0c\u65e0\u9700\u4e0b\u8f7d\u7684\u7f51\u9875\u7248QQ\u3002</p>\t\t\t<p class="tip">\u5982\u679c\u60a8\u6b63\u5728\u4f7f\u7528360WebApps\u6216360WebQQ\u8f6f\u4ef6\uff0c<br/>\t\t\t\u5c06\u9762\u4e34\u5e10\u53f7\u548c\u9690\u79c1\u88ab\u7a83\u53d6\u7684\u98ce\u9669\u3002</p>\t\t\t<p>\u8bf7\u6539\u7528\u6d4f\u89c8\u5668\u8bbf\u95ee\uff1ahttp://'
-						+ qqweb.CONST.DOMAIN + "\u3002</p></div>")
-	};
-	this.returnLogin = function() {
-		window.location = "./"
-	};
-	this.openInWebBrowser = function(g) {
-		g = g || {};
-		var k = this.getApp(6);
-		if (f.isUndefined(k) || !k.isRunning()) {
-			g.isOpenNewTab = true;
-			qqweb.portal.runApp("6", g)
-		} else {
-			k.openUrl(g);
-			g.callback && g.callback()
-		}
-	};
-	this.openUrl = function() {
-	};
-	this.setTitle = function(g, k) {
-		k.roll = k.roll || false;
-		k.speed = k.speed || 500;
-		if (k.roll) {
-			if (!(g.length < 1)) {
-				v = document.title;
-				z && clearInterval(z);
-				z = setInterval(function() {
-							document.title = g;
-							g = g.substr(1) + g.charAt(0)
-						}, k.speed)
-			}
-		} else {
-			v = document.title;
-			document.title = g
-		}
-	};
-	this.resetTitle = function() {
-		if (z) {
-			clearInterval(z);
-			z = null
-		}
-		document.title = v
-	};
-	this.addNotificationSource = function(g, k, r) {
-		qqweb.app.messageCenter
-				&& qqweb.app.messageCenter.addNotificationSource(g, k, r)
-	};
-	this.removeNotificationSource = function(g) {
-		qqweb.app.messageCenter
-				&& qqweb.app.messageCenter.removeNotificationSource(g)
+	this.hideDesktop = function() {
+		N.start()
 	}
 });
-Jet().$package("qqweb.sound", function(f) {
-			var d = false, b, a = [], h = null, s = false;
-			qqweb.sound = {
-				init : function() {
-					f.sound.onload = function() {
-						s = true
-					};
-					f.sound.embedSWF("./swf/swfsound.swf");
-					d = false
-				},
-				playSound : function(w, c) {
-					if (this.isMute())
-						return false;
-					if (w == "")
-						return false;
-					c = c || false;
-					if (typeof a[w] === "undefined") {
-						if (!s)
-							return false;
-						a[w] = h = f.sound.loadSound(w, c,
-								qqweb.sound.playSoundObj)
-					} else {
-						h = a[w];
-						qqweb.sound.playSoundObj()
-					}
-				},
-				playSoundObj : function() {
-					f.sound.startSound(h)
-				},
-				setMute : function(w) {
-					d = w
-				},
-				isMute : function() {
-					return d
-				},
-				setVol : function(w) {
-					b = w
-				},
-				getVol : function() {
-					return b
-				}
-			}
-		});
-Jet().$package("qqweb.businessClass", function(f) {
-			var d = f.dom, b = f.event;
-			this.Panel = new f.Class({
-						init : function(a) {
-							a = a || {};
-							this.id = a.id;
-							this.name = a.name;
-							this.container = a.container;
-							this.body = a.body || a.container;
-							a.html = a.html || "";
-							a.html && this.setHtml(a.html);
-							d.isShow(this.container) ? this.show() : this
-									.hide()
-						},
-						showName : function() {
-						},
-						setHtml : function(a) {
-							this.html = a;
-							this.body.innerHTML = a
-						},
-						append : function(a) {
-							this.body.appendChild(a)
-						},
-						getSize : function() {
-							return {
-								width : d.getClientWidth(this.container),
-								height : d.getClientHeight(this.container)
-							}
-						},
-						getBodySize : function() {
-							return {
-								width : parseInt(
-										d.getStyle(this.body, "width"), 10),
-								height : parseInt(d.getStyle(this.body,
-												"height"), 10)
-							}
-						},
-						show : function() {
-							d.show(this.container);
-							b.notifyObservers(this, "show", this.getBodySize());
-							this._isShow = true
-						},
-						hide : function() {
-							d.hide(this.container);
-							b.notifyObservers(this, "hide");
-							this._isShow = false
-						},
-						isShow : function() {
-							return this._isShow
-						},
-						toggleShow : function() {
-							this.isShow() ? this.hide() : this.show()
-						},
-						getZIndex : function() {
-							return this._zIndex
-						},
-						setZIndex : function(a) {
-							d.setStyle(this.container, "zIndex", a);
-							this._zIndex = a
-						},
-						setTopZIndex : function() {
-							this.setZIndex(qqweb.layout.getTopZIndex())
-						},
-						setXY : function(a, h) {
-							this.setX(a);
-							this.setY(h)
-						},
-						setX : function(a) {
-							d.setStyle(this.container, "left", a + "px")
-						},
-						setY : function(a) {
-							d.setStyle(this.container, "top", a + "px")
-						},
-						setWidth : function(a) {
-							d.setStyle(this.container, "width", a + "px")
-						},
-						getWidth : function() {
-							return parseInt(d.getStyle(this.container, "width"))
-						},
-						setHeight : function(a) {
-							d.setStyle(this.container, "height", a + "px")
-						},
-						getHeight : function() {
-							return parseInt(d
-									.getStyle(this.container, "height"))
-						}
-					})
-		});
-Jet().$package("qqweb.businessClass", function(f) {
-	var d = f.dom, b = f.event, a = null;
-	this.PopupBox = new f.Class({
-		init : function(h) {
-			var s = this;
-			h = h || {};
-			this.id = h.id;
-			this.container = h.container;
-			this.body = h.body || h.container;
-			this.catchMouseUp = true;
-			h.html = h.html || "";
-			h.html && this.setHtml(h.html);
-			if (h.noCatchMouseUp)
-				this.catchMouseUp = false;
-			this.onDocumentKeydown = function(w) {
-				if (w.keyCode === 27) {
-					w.preventDefault();
-					s.hide()
-				}
-			};
-			this.onMouseUp = function() {
-				s.isShow() && s.hide()
-			};
-			this.onDocumentClick = function() {
-				s.hide()
-			};
-			this.onWindowResize = function() {
-				s.hide()
-			};
-			d.isShow(this.container) ? this.show() : this.hide()
+Jet().$package("qqweb.layout.themeManager", function(a) {
+	var b = this, c = a.dom, d = a.event, h, n, r, w, i = 0, j, m = function() {
+		j
+				|| (j = document.getElementsByTagName("head")
+						? document.getElementsByTagName("head")[0]
+						: document.documentElement);
+		return j
+	}, q, u = {
+		skinRoot : "",
+		timeStamp : 20110106001,
+		window : {
+			titleColor : "#666666",
+			titleHeight : "39px",
+			textColor : "#666666",
+			titleFontWeight : "bold",
+			bodyAreaTop : "28px",
+			actionButtonWidth : "25px",
+			actionButtonHeight : "25px",
+			ie6WindowCenterBackground : "#C2D2C8",
+			ipadContainerBackColor : "rgba(168, 218, 127, .8)"
 		},
-		showName : function() {
+		currentWindow : {
+			titleColor : "black",
+			textColor : "#333333",
+			ipadContainerBackColor : "rgba(168, 218, 127, 1)",
+			windowCenterBackground : "#A8DA7F",
+			ie6WindowCenterBackground : "#A8DA7F"
 		},
-		setHtml : function(h) {
-			if (f.browser.ie)
-				h += '<iframe width="100%" height="100%" class="fullscreen_bg_iframe"></iframe>';
-			this.html = h;
-			this.body.innerHTML = h
+		appbar : {
+			aColor : "white"
 		},
-		show : function() {
-			a && a.hide();
-			d.show(this.container);
-			this.catchMouseUp ? b.on(document, "mouseup", this.onMouseUp) : b
-					.off(document, "mouseup", this.onMouseUp);
-			b.on(document, "click", this.onDocumentClick);
-			b.on(document, "keydown", this.onDocumentKeydown);
-			b.on(window, "resize", this.onWindowResize);
-			a = this;
-			this._isShow = true;
-			b.notifyObservers(this, "show")
-		},
-		hide : function() {
-			b.off(document, "click", this.onDocumentClick);
-			b.off(document, "keydown", this.onDocumentKeydown);
-			b.off(window, "resize", this.onWindowResize);
-			b.off(document, "mouseup", this.onMouseUp);
-			d.hide(this.container);
-			if (a) {
-				a !== this && a.hide();
-				a = null
-			}
-			this._isShow = false;
-			b.notifyObservers(this, "hide")
-		},
-		isShow : function() {
-			return this._isShow
-		},
-		toggleShow : function() {
-			this.isShow() ? this.hide() : this.show()
-		},
-		getZIndex : function() {
-			return this._zIndex
-		},
-		setZIndex : function(h) {
-			d.setStyle(this.container, "zIndex", h);
-			this._zIndex = h
-		},
-		setTopZIndex : function() {
-			this.setZIndex(qqweb.layout.getTopZIndex())
-		},
-		setXY : function(h, s) {
-			this.setX(h);
-			this.setY(s)
-		},
-		setX : function(h) {
-			d.setStyle(this.container, "left", h + "px")
-		},
-		setY : function(h) {
-			d.setStyle(this.container, "top", h + "px")
-		},
-		setWidth : function(h) {
-			d.setStyle(this.container, "width", h + "px")
-		},
-		getWidth : function() {
-			return parseInt(d.getStyle(this.container, "width"))
-		},
-		setHeight : function(h) {
-			d.setStyle(this.container, "height", h + "px")
-		},
-		getHeight : function() {
-			return parseInt(d.getStyle(this.container, "height"))
+		panel : {
+			ie6Background : "#fff"
 		}
-	})
-});
-Jet().$package("qqweb.businessClass", function(f) {
-	var d = f.dom, b = f.event, a;
-	if (!d.id("qqweb_focus_input")) {
-		var h = d.node("input", {
-					id : "qqweb_focus_input"
-				});
-		h.setAttribute("type", "text");
-		d.getDoc().body.appendChild(h)
-	}
-	var s = function() {
-		var c = d.node("div", {
-					"class" : "dragMask"
-				}), i = d.node("div", {
-					"class" : "dragProxy"
-				});
-		c.appendChild(i);
-		d.getDoc().body.appendChild(c);
-		return {
-			maskEl : c,
-			proxyEl : i
-		}
-	}, w = function() {
-		a || (a = s());
-		return a
-	};
-	this.baseWindow = new f.Class({
-		windowType : "window",
-		_windowFlag : 0,
-		_zIndex : 1,
-		_inBorder : 5,
-		_outBorder : 5,
-		_leftMargin : 0,
-		_topMargin : 62,
-		_rightMargin : 0,
-		_bottomMargin : 0,
-		_leftArea : 250,
-		_topArea : 62,
-		_rightArea : 0,
-		_bottomArea : 35,
-		init : function(c) {
-			c = this.parseOption(c);
-			this.type = c.type;
-			this._width = c.width;
-			this._height = c.height;
-			this._restoreWidth = c.width;
-			this._restoreHeight = c.height;
-			this._minWidth = c.minWidth;
-			this._minHeight = c.minHeight;
-			this._appId = c.appId;
-			this.createDom();
-			var i = this.getDefaultPosition();
-			this._x = c.x ? c.x : i.x;
-			this._y = c.y ? c.y : i.y;
-			this._restoreX = this._x;
-			this._restoreY = this._y;
-			this.setZIndex(this.option.zIndex);
-			this.createEvent();
-			switch (c.defaultMode) {
-				case "max" :
-					this.max();
-					break;
-				case "restore" :
-					this.restore();
-					break;
-				case "min" :
-					this.min();
-					break
-			}
-			c.isSetCurrent ? this.setCurrent() : this.setNotCurrent();
-			c.isSetCentered && this.setWindowCentered()
-		},
-		parseOption : function(c) {
-			c = c || {};
-			c.type = c.type || "default";
-			c.flashMode = f.isUndefined(c.flashMode) ? false : c.flashMode;
-			c.ieOnly = f.isUndefined(c.ieOnly) ? false : c.ieOnly;
-			c.loginLevel = f.isUndefined(c.loginLevel)
-					? qqweb.CONST.LOGIN_LEVEL_NONE
-					: c.loginLevel;
-			c.isTask = f.isUndefined(c.isTask) ? true : c.isTask;
-			c.width = c.width || 600;
-			c.height = c.height || 450;
-			c.minWidth = c.minWidth || 180;
-			c.minHeight = c.minHeight || 100;
-			if (typeof c.x == "number")
-				if (c.x + c.width > qqweb.layout.getDesktopWidth()) {
-					var i = qqweb.layout.getDesktopWidth() - c.width;
-					c.x = i < 0 ? 0 : i
-				}
-			if (typeof c.y == "number")
-				if (c.y + c.height + this._bottomArea > qqweb.layout
-						.getDesktopHeight()) {
-					i = qqweb.layout.getDesktopHeight() - c.height
-							- this._bottomArea;
-					c.y = i < this._topArea ? 0 : i
-				}
-			c.zIndex = !f.isUndefined(c.zIndex) ? c.zIndex : qqweb.layout
-					.getTopZIndex();
-			c.title = c.title || "\u672a\u547d\u540d";
-			c.html = c.html || "";
-			c.modeSwitch = c.modeSwitch === true ? true : false;
-			c.isSetCurrent = c.isSetCurrent ? c.isSetCurrent : "true";
-			c.defaultMode = c.defaultMode ? c.defaultMode : "restore";
-			c.dragable = c.dragable === true ? true : false;
-			c.resize = c.resize === true ? true : false;
-			c.dragProxy = c.dragProxy === true ? true : f
-					.isUndefined(c.dragProxy) ? qqweb.layout
-					.getWindowDragProxy() : c.dragProxy;
-			c.dragProxy = false;
-			c.isFixedZIndex = c.isFixedZIndex === true ? true : false;
-			c.isSetCentered = c.isSetCentered === true ? true : false;
-			c.hasCloseButton = c.hasCloseButton === true ? true : false;
-			c.hasMaxButton = c.hasMaxButton === true ? true : false;
-			c.hasRestoreButton = c.hasRestoreButton === true ? true : false;
-			c.hasMinButton = c.hasMinButton === true ? true : false;
-			c.hasRefreshButton = c.hasRefreshButton === true ? true : false;
-			c.hasPinUpButton = c.hasPinUpButton === true ? true : false;
-			c.hasPinDownButton = c.hasPinDownButton === true ? true : false;
-			c.hasOkButton = c.hasOkButton === true ? true : false;
-			c.hasCancelButton = c.hasCancelButton === true ? true : false;
-			c.hasPreviousButton = c.hasPreviousButton === true ? true : false;
-			c.hasNextButton = c.hasNextButton === true ? true : false;
-			c.doubleClickModeSwitch = c.doubleClickModeSwitch === false
-					? false
-					: true;
-			return this.option = c
-		},
-		getAppId : function() {
-			return this._appId
-		},
-		getWindowFlags : function() {
-			return this._windowFlag
-		},
-		setWindowFlags : function(c) {
-			this._windowFlag = c
-		},
-		createDom : function() {
-			var c, i, n = qqweb.layout.getWindowId();
-			this.getId = function() {
-				return n
-			};
-			this.container = d.node("div", {
-						id : "appWindow_" + n,
-						"class" : "window window_current"
-					});
-			c = '\t\t\t\t<div id="window_outer_'
-					+ n
-					+ '" class="window_outer">\t\t\t\t\t<div id="window_inner_'
-					+ n
-					+ '" class="window_inner"  style="z-index:'
-					+ this.option.zIndex
-					+ '">\t\t\t\t\t\t<div class="window_bg_container">\t\t\t\t\t\t\t<div class="window_bg window_center"></div>\t\t\t\t\t\t\t<div class="window_bg window_t"></div>\t\t\t\t\t\t\t<div class="window_bg window_rt"></div>\t\t\t\t\t\t\t<div class="window_bg window_r"></div>\t\t\t\t\t\t\t<div class="window_bg window_rb"></div>\t\t\t\t\t\t\t<div class="window_bg window_b"></div>\t\t\t\t\t\t\t<div class="window_bg window_lb"></div>\t\t\t\t\t\t\t<div class="window_bg window_l"></div>\t\t\t\t\t\t\t<div class="window_bg window_lt"></div>\t\t\t\t\t\t</div>\t\t\t\t\t\t<div class="window_content">\t\t\t\t\t\t\t<div id="window_titleBar_'
-					+ n
-					+ '" class="window_titleBar">\t\t\t\t\t\t\t\t<a id="window_closeButton_'
-					+ n
-					+ '" class="window_close" title="\u5173\u95ed" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_maxButton_'
-					+ n
-					+ '" class="window_max" title="\u6700\u5927\u5316" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_restoreButton_'
-					+ n
-					+ '" class="window_restore" title="\u8fd8\u539f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_minButton_'
-					+ n
-					+ '" class="window_min" title="\u6700\u5c0f\u5316" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_restorefullButton_'
-					+ n
-					+ '" class="window_restore_full" title="\u9000\u51fa\u5168\u5c4f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_fullButton_'
-					+ n
-					+ '" class="window_fullscreen" title="\u5168\u5c4f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_refreshButton_'
-					+ n
-					+ '" class="window_refresh" title="\u5237\u65b0" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_pinUpButton_'
-					+ n
-					+ '" class="window_pinUp" title="\u6d6e\u52a8" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_pinDownButton_'
-					+ n
-					+ '" class="window_pinDown" title="\u9489\u4f4f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<div id="window_title_'
-					+ n
-					+ '" class="window_title titleText">App</div>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t\t<div id="window_body_'
-					+ n
-					+ '" class="window_bodyArea"></div>\t\t\t\t\t\t\t<div id="window_controlArea_'
-					+ n
-					+ '" class="window_controlArea">\t\t\t\t\t\t\t\t<a id="window_cancelButton_'
-					+ n
-					+ '" class="window_button window_cancel" title="\u53d6\u6d88" href="###" hidefocus>\u53d6\u3000\u6d88</a>\t\t\t\t\t\t\t\t<a id="window_okButton_'
-					+ n
-					+ '" class="window_button window_ok" title="\u786e\u5b9a" href="###" hidefocus>\u786e\u3000\u5b9a</a>\t\t\t\t\t\t\t\t<a id="window_nextButton_'
-					+ n
-					+ '" class="window_button window_next" title="\u4e0b\u4e00\u6b65" href="###" hidefocus>\u4e0b\u4e00\u6b65</a>\t\t\t\t\t\t\t\t<a id="window_previousButton_'
-					+ n
-					+ '" class="window_button window_previous" title="\u4e0a\u4e00\u6b65" href="###" hidefocus>\u4e0a\u4e00\u6b65</a>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t</div>\t\t\t\t\t</div>\t\t\t\t</div>\t\t\t';
-			i = '\t\t\t\t<div id="window_outer_'
-					+ n
-					+ '" class="window_outer">\t\t\t\t\t<div id="window_inner_'
-					+ n
-					+ '" class="window_inner"  style="z-index:'
-					+ this.option.zIndex
-					+ '">\t\t\t\t\t\t<div class="window_bg_container_ipad"></div>\t\t\t\t\t\t<div class="window_content">\t\t\t\t\t\t\t<div id="window_titleBar_'
-					+ n
-					+ '" class="window_titleBar">\t\t\t\t\t\t\t\t<a id="window_closeButton_'
-					+ n
-					+ '" class="window_close" title="\u5173\u95ed" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_maxButton_'
-					+ n
-					+ '" class="window_max" title="\u6700\u5927\u5316" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_restoreButton_'
-					+ n
-					+ '" class="window_restore" title="\u8fd8\u539f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_minButton_'
-					+ n
-					+ '" class="window_min" title="\u6700\u5c0f\u5316" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_restorefullButton_'
-					+ n
-					+ '" class="window_restore_full" title="\u9000\u51fa\u5168\u5c4f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_fullButton_'
-					+ n
-					+ '" class="window_fullscreen" title="\u5168\u5c4f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_refreshButton_'
-					+ n
-					+ '" class="window_refresh" title="\u5237\u65b0" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_pinUpButton_'
-					+ n
-					+ '" class="window_pinUp" title="\u6d6e\u52a8" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="window_pinDownButton_'
-					+ n
-					+ '" class="window_pinDown" title="\u9489\u4f4f" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<div id="window_title_'
-					+ n
-					+ '" class="window_title titleText">App</div>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t\t<div id="window_body_'
-					+ n
-					+ '" class="window_bodyArea"></div>\t\t\t\t\t\t\t<div id="window_controlArea_'
-					+ n
-					+ '" class="window_controlArea">\t\t\t\t\t\t\t\t<a id="window_cancelButton_'
-					+ n
-					+ '" class="window_button window_cancel" title="\u53d6\u6d88" href="###" hidefocus>\u53d6\u3000\u6d88</a>\t\t\t\t\t\t\t\t<a id="window_okButton_'
-					+ n
-					+ '" class="window_button window_ok" title="\u786e\u5b9a" href="###" hidefocus>\u786e\u3000\u5b9a</a>\t\t\t\t\t\t\t\t<a id="window_nextButton_'
-					+ n
-					+ '" class="window_button window_next" title="\u4e0b\u4e00\u6b65" href="###" hidefocus>\u4e0b\u4e00\u6b65</a>\t\t\t\t\t\t\t\t<a id="window_previousButton_'
-					+ n
-					+ '" class="window_button window_previous" title="\u4e0a\u4e00\u6b65" href="###" hidefocus>\u4e0a\u4e00\u6b65</a>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t</div>\t\t\t\t\t</div>\t\t\t\t</div>\t\t\t';
-			if (f.platform.iPad)
-				c = i;
-			if (f.browser.ie)
-				c += '<iframe width="100%" height="100%" class="fullscreen_bg_iframe"></iframe>';
-			this.container.innerHTML = c;
-			qqweb.layout.getDesktop().body.appendChild(this.container);
-			this._titleBar = d.id("window_titleBar_" + n);
-			this._title = d.id("window_title_" + n);
-			this.body = d.id("window_body_" + n);
-			this.vscroller = d.id("window_vertical_scroller_" + n);
-			this.hscroller = d.id("window_horizontal_scroller_" + n);
-			this._window_outer = d.id("window_outer_" + n);
-			this._window_inner = d.id("window_inner_" + n);
-			this._closeButton = d.id("window_closeButton_" + n);
-			this._fullButton = d.id("window_fullButton_" + n);
-			this._restorefullButton = d.id("window_restorefullButton_" + n);
-			this._maxButton = d.id("window_maxButton_" + n);
-			this._restoreButton = d.id("window_restoreButton_" + n);
-			this._minButton = d.id("window_minButton_" + n);
-			this._refreshButton = d.id("window_refreshButton_" + n);
-			this._pinUpButton = d.id("window_pinUpButton_" + n);
-			this._pinDownButton = d.id("window_pinDownButton_" + n);
-			this._controlArea = d.id("window_controlArea_" + n);
-			this._cancelButton = d.id("window_cancelButton_" + n);
-			this._okButton = d.id("window_okButton_" + n);
-			this._nextButton = d.id("window_nextButton_" + n);
-			this._previousButton = d.id("window_previousButton_" + n);
-			this.option.hasCloseButton && this.showCloseButton();
-			if (this.option.hasMaxButton) {
-				this.showMaxButton();
-				this.showFullButton()
-			}
-			this.option.hasRestoreButton && this.showRestoreButton();
-			this.option.hasMinButton && this.showMinButton();
-			this.option.hasRefreshButton && this.showRefreshButton();
-			this.option.hasPinUpButton && this.showPinUpButton();
-			this.option.hasPinDownButton && this.showPinDownButton();
-			this.option.hasOkButton && this.showOkButton();
-			this.option.hasCancelButton && this.showCancelButton();
-			this.option.hasPreviousButton && this.showPreviousButton();
-			this.option.hasNextButton && this.showNextButton();
-			this.setTitle(this.option.title);
-			this.option.html && this.setHtml(this.option.html);
-			this.option.isTask && qqweb.layout.addWindow(this);
-			this.option.alterMode && this.createAlterDom(n)
-		},
-		createAlterDom : function(c) {
-			c = typeof c === "undefined" ? this.getId() : c;
-			this.alterDom = d.node("div", {
-						id : "appWindow_" + c + "_alt",
-						"class" : "flash_alt"
-					});
-			this.alterDom.innerHTML = "<div class='appIframeAlter'></div><div  class='appIframeAlterTxt'>\u8fd0\u884c\u4e2d\uff0c\u70b9\u51fb\u6062\u590d\u663e\u793a :)</div>";
-			this.body.appendChild(this.alterDom)
-		},
-		showAlterDom : function() {
-			d.setStyle(this.body, "background", "#FFF");
-			d.show(this.alterDom)
-		},
-		hideAlterDom : function() {
-			d.setStyle(this.body, "background", "transparent none");
-			d.hide(this.alterDom)
-		},
-		createEvent : function() {
-			var c = this;
-			this.observer = {
-				onCloseButtonClick : function(i) {
-					c.close();
-					i.preventDefault();
-					i.stopPropagation()
-				},
-				stopPropagation : function(i) {
-					i.stopPropagation()
-				},
-				onMaxButtonClick : function(i) {
-					i.preventDefault();
-					c.option.modeSwitch && c.max()
-				},
-				onRestorefullButtonClick : function(i) {
-					i.preventDefault();
-					c.option.modeSwitch && c.restorefull()
-				},
-				onFullButtonClick : function(i) {
-					i.preventDefault();
-					c.option.modeSwitch && c.fullscreen()
-				},
-				onRestoreButtonClick : function(i) {
-					i.preventDefault();
-					c.option.modeSwitch && c.restore()
-				},
-				onMinButtonClick : function(i) {
-					i.preventDefault();
-					c.option.modeSwitch && c.min()
-				},
-				onRefreshButtonClick : function(i) {
-					i.preventDefault();
-					i.stopPropagation();
-					b.notifyObservers(c, "clickRefreshButton")
-				},
-				onPinUpButtonClick : function(i) {
-					i.preventDefault();
-					b.notifyObservers(c, "clickPinUpButton");
-					c.showPinDownButton()
-				},
-				onPinDownButtonClick : function(i) {
-					i.preventDefault();
-					b.notifyObservers(c, "clickPinDownButton");
-					c.showPinUpButton()
-				},
-				onOkButtonClick : function(i) {
-					i.preventDefault();
-					b.notifyObservers(c, "clickOkButton")
-							&& setTimeout(function() {
-										c.close()
-									}, 0)
-				},
-				onCancelButtonClick : function(i) {
-					i.preventDefault();
-					b.notifyObservers(c, "clickCancelButton")
-							&& setTimeout(function() {
-										c.close()
-									}, 0)
-				},
-				onPreviousButtonClick : function(i) {
-					i.preventDefault();
-					b.notifyObservers(c, "clickPreviousButton")
-				},
-				onNextButtonClick : function(i) {
-					i.preventDefault();
-					b.notifyObservers(c, "clickNextButton")
-				},
-				onMouseoverWindow : function(i) {
-					i.stopPropagation();
-					b.notifyObservers(c, "mouseoverWindow")
-				},
-				onMouseoutWindow : function(i) {
-					i.stopPropagation();
-					b.notifyObservers(c, "mouseoutWindow")
-				},
-				onMousedownWindow : function() {
-					c && c.setCurrent()
-				},
-				onKeyDownWindow : function() {
-				},
-				onWindowResize : function() {
-					if (c.getBoxStatus() === "max")
-						c.adjustMaxSize();
-					else if (c.getBoxStatus() === "fullscreen") {
-						var i = qqweb.layout.getClientWidth(), n = qqweb.layout
-								.getClientHeight();
-						c.setXY(0, 0);
-						c.setWidth(i);
-						c.setHeight(n)
-					}
-					i = c.getBodySize();
-					i.from = "windowResize";
-					b.notifyObservers(c, "resize", i)
-				},
-				onTitleBarDblClick : function(i) {
-					if (c.option.doubleClickModeSwitch) {
-						i.preventDefault();
-						b.notifyObservers(c, "dblClickTitleBar");
-						if (c.option.modeSwitch)
-							if (c.getBoxStatus() === "max")
-								c.restore();
-							else
-								c.getBoxStatus() === "restore" && c.max()
-					}
-				},
-				onResize : function(i) {
-					i.width && c.setWidth(i.width);
-					i.height && c.setHeight(i.height);
-					b.notifyObservers(c, "resize", c.getBodySize())
-				},
-				onMove : function(i) {
-					c._x = i.x;
-					c._y = i.y
-				},
-				onDragStart : function() {
-					c.hideTouchPad();
-					b.notifyObservers(c, "dragStart")
-				},
-				onDragEnd : function(i) {
-					if (f.platform.iPad) {
-						if (i) {
-							c.setXY(i.x, i.y);
-							try {
-								c.container.style.webkitTransform = "none"
-							} catch (n) {
-							}
-						}
-						c.updateTouchPad()
-					}
-					b.notifyObservers(c, "dragEnd", c.getBodySize())
-				},
-				onMousedown : function(i) {
-					if (!(i.touches && i.touches.length > 1)) {
-						f.out("onMousedown ");
-						d.setStyle(c._dragProxy.proxyEl, "left", c.getX()
-										+ c._outBorder + "px");
-						d.setStyle(c._dragProxy.proxyEl, "top", c.getY()
-										+ c._outBorder + "px");
-						d.setStyle(c._dragProxy.proxyEl, "width", c._width
-										- c._outBorder * 2 + "px");
-						d.setStyle(c._dragProxy.proxyEl, "height", c._height
-										- c._outBorder * 2 + "px");
-						d.setStyle(c._dragProxy.maskEl, "zIndex", 60002);
-						d.show(c._dragProxy.maskEl)
-					}
-				},
-				onTouchStart : function(i) {
-					i.touches.length > 1
-							|| b.on(c.container, "touchmove",
-									c.observer.onTouchMove)
-				},
-				onTouchMove : function(i) {
-					b.off(c.container, "touchmove", c.observer.onTouchMove);
-					if (!(i.touches && i.touches.length > 1)) {
-						i = c.getX() + c._outBorder;
-						var n = c.getY() + c._outBorder;
-						c._dragProxy.proxyEl.style.webkitTransform = "translate3d("
-								+ i + "px," + n + "px, 0px)";
-						d.setStyle(c._dragProxy.proxyEl, "width", c._width
-										- c._outBorder * 2 + "px");
-						d.setStyle(c._dragProxy.proxyEl, "height", c._height
-										- c._outBorder * 2 + "px");
-						d.setStyle(c._dragProxy.maskEl, "zIndex", 60002);
-						d.show(c._dragProxy.maskEl);
-						c.hideTouchPad()
-					}
-				},
-				onDragProxyEnd : function(i) {
-					i && c.setXY(i.x - c._outBorder, i.y - c._outBorder);
-					d.hide(c._dragProxy.maskEl)
-				},
-				onDragProxyResizeEnd : function(i) {
-					d.hide(c._dragProxy.maskEl);
-					f.out(i.x);
-					c.setXY(i.x - c._outBorder, i.y - c._outBorder);
-					var n = 0, t = function() {
-						n++;
-						var x = c.getBodySize(), j = i.width - x.width, e = i.height
-								- x.height;
-						c.setWidth(x.width + j * 1.1 + c._outBorder * 2);
-						c.setHeight(x.height + e * 1.1 + c._outBorder * 2);
-						b.notifyObservers(c, "resize", c.getBodySize());
-						if (n < 5 && (j >= 5 || j <= -5)) {
-							f.out("setting timeout " + j + " " + e + " " + n
-									+ " mostStick:5");
-							setTimeout(t, 200)
-						} else {
-							c.setWidth(i.width + c._outBorder * 2);
-							c.setHeight(i.height + c._outBorder * 2);
-							b.notifyObservers(c, "resize", c.getBodySize())
-						}
-					};
-					c.setWidth(i.width + c._outBorder * 2);
-					c.setHeight(i.height + c._outBorder * 2);
-					b.notifyObservers(c, "resize", c.getBodySize())
-				},
-				stopPropagationAndSetCurrent : function(i) {
-					i.stopPropagation();
-					c.setCurrent()
-				},
-				stopPropagationAndSetCurrentWithoutFocus : function(i) {
-					i.stopPropagation();
-					c.setCurrentWithoutFocus()
-				}
-			};
-			this.option.dragProxy && this.enableDragProxy();
-			this.option.dragable && this.enableDrag();
-			this.option.resize && this.enableResize();
-			f.platform.iPad ? b.on(this.container, "touchstart",
-					this.observer.onMousedownWindow) : b.on(this.container,
-					"mousedown", this.observer.onMousedownWindow);
-			b.on(this.container, "keydown", this.observer.onKeyDownWindow);
-			b.on(this.body, "mousedown",
-					this.observer.stopPropagationAndSetCurrent);
-			b.on(this._titleBar, "dblclick", this.observer.onTitleBarDblClick);
-			b.on(this._closeButton, "click", this.observer.onCloseButtonClick);
-			b.on(this._closeButton, "mousedown", this.observer.stopPropagation);
-			b.on(this._fullButton, "click", this.observer.onFullButtonClick);
-			b.on(this._fullButton, "mousedown",
-					this.observer.stopPropagationAndSetCurrent);
-			b.on(this._restorefullButton, "click",
-					this.observer.onRestorefullButtonClick);
-			b.on(this._restorefullButton, "mousedown",
-					this.observer.stopPropagationAndSetCurrent);
-			b.on(this._maxButton, "click", this.observer.onMaxButtonClick);
-			b.on(this._maxButton, "mousedown",
-					this.observer.stopPropagationAndSetCurrent);
-			b.on(this._restoreButton, "click",
-					this.observer.onRestoreButtonClick);
-			b.on(this._restoreButton, "mousedown",
-					this.observer.stopPropagationAndSetCurrent);
-			b.on(this._minButton, "click", this.observer.onMinButtonClick);
-			b.on(this._minButton, "mousedown", this.observer.stopPropagation);
-			b.on(this._refreshButton, "click",
-					this.observer.onRefreshButtonClick);
-			b.on(this._refreshButton, "mousedown",
-					this.observer.stopPropagation);
-			b.on(this._pinUpButton, "click", this.observer.onPinUpButtonClick);
-			b.on(this._pinUpButton, "mousedown", this.observer.stopPropagation);
-			b.on(this._pinDownButton, "click",
-					this.observer.onPinDownButtonClick);
-			b.on(this._pinDownButton, "mousedown",
-					this.observer.stopPropagation);
-			b.on(this._okButton, "click", this.observer.onOkButtonClick);
-			b.on(this._okButton, "mousedown", this.observer.stopPropagation);
-			b
-					.on(this._cancelButton, "click",
-							this.observer.onCancelButtonClick);
-			b
-					.on(this._cancelButton, "mousedown",
-							this.observer.stopPropagation);
-			b.on(this._previousButton, "click",
-					this.observer.onPreviousButtonClick);
-			b.on(this._previousButton, "mousedown",
-					this.observer.stopPropagation);
-			b.on(this._nextButton, "click", this.observer.onNextButtonClick);
-			b.on(this._nextButton, "mousedown", this.observer.stopPropagation);
-			b.addObserver(this, "closeWindow", this.close)
-		},
-		setTitle : function(c) {
-			this._title.innerHTML = f.string.encodeHtml(c)
-		},
-		setTitleHtml : function(c) {
-			this._title.innerHTML = c
-		},
-		showCloseButton : function() {
-			d.show(this._closeButton)
-		},
-		showFullButton : function() {
-			d.show(this._fullButton)
-		},
-		showMaxButton : function() {
-			d.hide(this._restoreButton);
-			d.show(this._maxButton)
-		},
-		showRestoreButton : function() {
-			d.hide(this._maxButton);
-			d.show(this._restoreButton)
-		},
-		showMinButton : function() {
-			d.show(this._minButton)
-		},
-		showRefreshButton : function() {
-			d.show(this._refreshButton)
-		},
-		showPinUpButton : function() {
-			d.hide(this._pinDownButton);
-			d.show(this._pinUpButton)
-		},
-		showPinDownButton : function() {
-			d.hide(this._pinUpButton);
-			d.show(this._pinDownButton)
-		},
-		showOkButton : function() {
-			d.show(this._controlArea);
-			d.setStyle(this.body, "bottom", "26px");
-			d.show(this._okButton)
-		},
-		showCancelButton : function() {
-			d.show(this._controlArea);
-			d.setStyle(this.body, "bottom", "26px");
-			d.show(this._cancelButton)
-		},
-		showPreviousButton : function() {
-			d.show(this._controlArea);
-			d.setStyle(this.body, "bottom", "26px");
-			d.show(this._previousButton)
-		},
-		showNextButton : function() {
-			d.show(this._controlArea);
-			d.setStyle(this.body, "bottom", "26px");
-			d.show(this._nextButton)
-		},
-		show : function() {
-			d.show(this.container);
-			b.on(window, "resize", this.observer.onWindowResize);
-			f.out(">>>> Window: show");
-			b.notifyObservers(this, "show", this.getBodySize());
-			this._isShow = true
-		},
-		hide : function() {
-			b.off(window, "resize", this.observer.onWindowResize);
-			d.hide(this.container);
-			b.notifyObservers(this, "hide");
-			this._isShow = false
-		},
-		isShow : function() {
-			return this._isShow
-		},
-		toggleShow : function() {
-			this.isShow() ? this.hide() : this.show()
-		},
-		setCurrent : function() {
-			var c = this;
-			this.setWindowFlags(this.getWindowFlags()
-					| qqweb.CONST.WINDOW_FLAG_CURRENT);
-			this.setCurrentWithoutFocus();
-			c.focus();
-			this.updateTouchPad()
-		},
-		setNotCurrent : function(c) {
-			this.setWindowFlags(this.getWindowFlags()
-					& ~qqweb.CONST.WINDOW_FLAG_CURRENT
-					| qqweb.CONST.WINDOW_FLAG_NOT_CURRENT);
-			if (c) {
-				c = this;
-				c.setStyleNotCurrent();
-				b.notifyObservers(c, "setNotCurrent")
-			} else {
-				this.setStyleNotCurrent();
-				b.notifyObservers(this, "setNotCurrent")
-			}
-			this.hideTouchPad()
-		},
-		setCurrentWithoutFocus : function() {
-			var c = this, i = qqweb.layout.getCurrentWindow();
-			if (i != this) {
-				qqweb.layout.setCurrentWindow(this);
-				c.option.isFixedZIndex || this.getWindowFlags()
-						& qqweb.CONST.WINDOW_FLAG_FULLSCREEN
-						|| c.setZIndex(qqweb.layout.getTopZIndex());
-				c.setStyleCurrent();
-				c.show();
-				b.notifyObservers(c, "setCurrent");
-				if (i)
-					f.browser.ie ? i.setNotCurrent(true) : i.setNotCurrent()
-			}
-		},
-		setStyleCurrent : function() {
-			d.addClass(this.container, "window_current")
-		},
-		setStyleNotCurrent : function() {
-			this.container && d.removeClass(this.container, "window_current")
-		},
-		focus : function() {
-			b.notifyObservers(this, "focus")
-		},
-		setBoxStatus : function(c) {
-			this._status = c
-		},
-		getBoxStatus : function() {
-			return this._status
-		},
-		adjustMaxSize : function() {
-			if (this.getWindowFlags() & qqweb.CONST.WINDOW_FLAG_FULLSCREEN)
-				this.setZIndex(this.option.zIndex);
-			else {
-				this._restoreX = this._x;
-				this._restoreY = this._y
-			}
-			this.setXY(0, this._topMargin);
-			var c = qqweb.layout.getDesktopWidth(), i = qqweb.layout
-					.getDesktopHeight();
-			this.setWidth(c - 0);
-			this.setHeight(i - this._topMargin - this._bottomArea);
-			b.notifyObservers(this, "resize", this.getBodySize());
-			this.updateTouchPad()
-		},
-		max : function() {
-			var c = this.getBoxStatus();
-			this.setDisableDrag();
-			this.setWindowFlags(this.getWindowFlags()
-					& ~qqweb.CONST.WINDOW_FLAG_NORMAL
-					| qqweb.CONST.WINDOW_FLAG_MAX);
-			this.setBoxStatus("max");
-			this.adjustMaxSize();
-			b.notifyObservers(this, "max", c);
-			this.showRestoreButton();
-			d.show(this._fullButton);
-			d.hide(this._restorefullButton);
-			b.on(window, "resize", this.observer.onWindowResize)
-		},
-		fullscreen : function() {
-			if (this.getWindowFlags() & qqweb.CONST.WINDOW_FLAG_NORMAL) {
-				this._restoreX = this._x;
-				this._restoreY = this._y
-			}
-			this.setWindowFlags(this.getWindowFlags()
-					| qqweb.CONST.WINDOW_FLAG_FULLSCREEN);
-			this.setBoxStatus("fullscreen");
-			d.hide(this._maxButton);
-			d.hide(this._restoreButton);
-			d.hide(this._fullButton);
-			d.show(this._restorefullButton);
-			var c = qqweb.layout.getClientWidth(), i = qqweb.layout
-					.getClientHeight();
-			this.setXY(0, 0);
-			this.setWidth(c);
-			this.setHeight(i);
-			this.setZIndex(qqweb.layout.getPinZIndex());
-			b.notifyObservers(this, "resize", this.getBodySize());
-			var n = null;
-			if (!f.platform.iPad) {
-				if (d.id("fullscreen_tip_container")) {
-					n = d.id("fullscreen_tip_container");
-					n.style.display = "block"
-				} else {
-					n = d.node("div", {
-								id : "fullscreen_tip_container",
-								"class" : "fullscreen_tip_container"
-							});
-					document.body.appendChild(n);
-					n.innerHTML = '<div class="fullscreen_tip"></div>';
-					n.style.position = "absolute";
-					n.style.zIndex = "20000001";
-					n.style.height = i + "px"
-				}
-				setTimeout(function() {
-							n.style.display = "none"
-						}, 3E3);
-				b.on(window, "resize", this.observer.onWindowResize)
-			}
-			f.platform.iPad && this.hideTouchPad()
-		},
-		restorefull : function() {
-			this.getWindowFlags() & qqweb.CONST.WINDOW_FLAG_NORMAL ? this
-					.restore() : this.max();
-			this.setZIndex(qqweb.layout.getTopZIndex());
-			this.setWindowFlags(this.getWindowFlags()
-					& ~qqweb.CONST.WINDOW_FLAG_FULLSCREEN);
-			if (d.id("fullscreen_tip_container")) {
-				fullscreenTipContainer = d.id("fullscreen_tip_container");
-				fullscreenTipContainer.style.display = "none"
-			}
-		},
-		min : function() {
-			var c = this.getBoxStatus();
-			this.setWindowFlags(this.getWindowFlags()
-					& ~qqweb.CONST.WINDOW_FLAG_CURRENT
-					| qqweb.CONST.WINDOW_FLAG_NOT_CURRENT
-					| qqweb.CONST.WINDOW_FLAG_MIN);
-			qqweb.layout.getCurrentWindow() === this
-					&& qqweb.layout.setCurrentWindow(null);
-			this.option.flashMode || this.hide();
-			this.setBoxStatus(c || "min");
-			b.notifyObservers(this, "min");
-			this._isShow = false;
-			f.platform.iPad && this.hideTouchPad()
-		},
-		restore : function() {
-			this.setWindowFlags(this.getWindowFlags()
-					& ~qqweb.CONST.WINDOW_FLAG_MAX
-					| qqweb.CONST.WINDOW_FLAG_NORMAL);
-			b.off(window, "resize", this.observer.onWindowResize);
-			this.setXY(this._restoreX, this._restoreY);
-			if (this._restoreWidth < 0)
-				this._restoreWidth = 0;
-			if (this._restoreHeight < 0)
-				this._restoreHeight = 0;
-			this.setWidth(this._restoreWidth);
-			this.setHeight(this._restoreHeight);
-			f.out("resize: " + this.getBodySize());
-			f.out("resize w: " + this.getBodySize().width);
-			f.out("resize h: " + this.getBodySize().height);
-			b.notifyObservers(this, "resize", this.getBodySize());
-			this.setEnableDrag();
-			if (this.option.hasMaxButton) {
-				this.showMaxButton();
-				d.show(this._fullButton);
-				d.hide(this._restorefullButton)
-			}
-			b.notifyObservers(this, "restore");
-			this.setBoxStatus("restore");
-			f.platform.iPad && this.updateTouchPad()
-		},
-		setWidth : function(c) {
-			d.setStyle(this.container, "width", c + "px");
-			d.setStyle(this.body, "width", c - 20 + "px");
-			this._width = c;
-			if (this.getBoxStatus() !== "max"
-					&& this.getBoxStatus() !== "fullscreen")
-				this._restoreWidth = c
-		},
-		getWidth : function() {
-			return this._width
-		},
-		getHeight : function() {
-			return this._height
-		},
-		setHeight : function(c) {
-			d.setStyle(this.container, "height", c + "px");
-			d.setStyle(this._window_outer, "height", c - 20 + "px");
-			var i = 28;
-			if (f.browser.ie && f.browser.ie < 7)
-				i = 29;
-			this.option && this.option.hasOkButton ? d.setStyle(this.body,
-					"height", c - 47 - i + "px") : d.setStyle(this.body,
-					"height", c - 20 - i + "px");
-			this._height = c;
-			if (this.getBoxStatus() !== "max"
-					&& this.getBoxStatus() !== "fullscreen")
-				this._restoreHeight = c;
-			b.notifyObservers(this, "setNewHeight", c)
-		},
-		getZIndex : function() {
-			return this._zIndex
-		},
-		setZIndex : function(c) {
-			d.setStyle(this.container, "zIndex", c);
-			d.setStyle(this._window_inner, "zIndex", c);
-			this._zIndex = c
-		},
-		setTopZIndex : function() {
-			this.setZIndex(qqweb.layout.getTopZIndex())
-		},
-		setXY : function(c, i) {
-			if (c || c === 0)
-				this.setX(c);
-			if (i || i === 0)
-				this.setY(i)
-		},
-		setX : function(c) {
-			this._x = c;
-			d.setStyle(this.container, "left", c + "px")
-		},
-		setY : function(c) {
-			this._y = c;
-			d.setStyle(this.container, "top", c + "px")
-		},
-		getX : function() {
-			return parseInt(d.getStyle(this.container, "left"))
-		},
-		getRestoreX : function() {
-			return this._restoreX
-		},
-		getRestoreY : function() {
-			return this._restoreY
-		},
-		getLeft : function() {
-			return this._x
-		},
-		getY : function() {
-			return parseInt(d.getStyle(this.container, "top"))
-		},
-		setLeft : function(c) {
-			d.setStyle(this.container, "left", c + "px");
-			d.setStyle(this.container, "right", "")
-		},
-		setTop : function(c) {
-			d.setStyle(this.container, "top", c + "px");
-			d.setStyle(this.container, "bottom", "")
-		},
-		setRight : function(c) {
-			d.setStyle(this.container, "right", c + "px");
-			d.setStyle(this.container, "left", "")
-		},
-		setBottom : function(c) {
-			d.setStyle(this.container, "bottom", c + "px");
-			d.setStyle(this.container, "top", "")
-		},
-		setWindowCentered : function() {
-			var c = qqweb.layout.getClientWidth(), i = qqweb.layout
-					.getClientHeight();
-			this.setXY(c > this._width ? (c - this._width) / 2 : 0,
-					i > this._height ? (i - this._height) / 2 : 0)
-		},
-		setWindowCenteredRelative : function(c) {
-			this.setX(c.getX() + (c.getWidth() - this._width) / 2)
-		},
-		getDefaultPosition : function() {
-			var c = qqweb.layout.getClientWidth(), i = qqweb.layout
-					.getClientHeight(), n = c - this._width - this._leftMargin
-					- this._rightMargin - this._rightArea - this._leftArea, t = i
-					- this._height
-					- this._topMargin
-					- this._bottomMargin
-					- this._bottomArea;
-			n = n > 0 ? n : 1;
-			t = t > 0 ? t : 1;
-			f.out("ID: " + this.getId());
-			var x = this.getId() - 5 - 1;
-			x = x < 0 ? 0 : x;
-			n = this._leftMargin + this._leftArea + x * 25 % n;
-			t = this._topMargin + this._topArea + x * 25 % t;
-			n = n + this._width >= c ? 0 : n;
-			t = t + this._height + this._topArea >= i ? this._topArea : t;
-			return {
-				x : n,
-				y : t
-			}
-		},
-		enableDrag : function() {
-			this.option.dragable = true;
-			this.getBoxStatus() !== "max" && this.setEnableDrag()
-		},
-		disableDrag : function() {
-			this.option.dragable = false;
-			this.setDisableDrag()
-		},
-		enableDragProxy : function() {
-			this.option.dragProxy = true
-		},
-		disableDragProxy : function() {
-			this.option.dragProxy = false
-		},
-		setEnableDrag : function() {
-			if (this.option.dragable) {
-				if (this._dragController) {
-					if (this.option.dragProxy)
-						f.platform.iPad ? b.on(this.container, "touchstart",
-								this.observer.onTouchStart) : b.on(
-								this.container, "mousedown",
-								this.observer.onMousedown);
-					this._dragController.unlock()
-				} else {
-					if (this.option.dragProxy) {
-						this._dragProxy = w();
-						f.platform.iPad ? b.on(this.container, "touchstart",
-								this.observer.onTouchStart) : b.on(
-								this.container, "mousedown",
-								this.observer.onMousedown);
-						this._dragController = new f.ui.Drag(this.container,
-								this._dragProxy.proxyEl, {
-									isLimited : true,
-									leftMargin : this._leftMargin
-											+ this._outBorder,
-									topMargin : this._topMargin
-											+ this._outBorder,
-									rightMargin : this._rightMargin
-											+ this._outBorder,
-									bottomMargin : this._bottomMargin
-											+ this._outBorder
-								});
-						b.addObserver(this._dragController, "end",
-								this.observer.onDragProxyEnd)
-					} else {
-						this._dragController = new f.ui.Drag(this.container,
-								this.container, {
-									isLimited : true,
-									leftMargin : this._leftMargin,
-									topMargin : this._topMargin,
-									rightMargin : this._rightMargin,
-									bottomMargin : this._bottomMargin
-								});
-						b.addObserver(this._dragController, "move",
-								this.observer.onMove)
-					}
-					b.addObserver(this._dragController, "start",
-							this.observer.onDragStart);
-					b.addObserver(this._dragController, "end",
-							this.observer.onDragEnd)
-				}
-				this.setEnableResize()
-			}
-		},
-		setDisableDrag : function() {
-			if (this._dragController) {
-				this._dragController.lock();
-				if (this.option.dragProxy)
-					f.platform.iPad ? b.off(this.container, "touchstart",
-							this.observer.onTouchStart) : b.off(this.container,
-							"mousedown", this.observer.onMousedown)
-			}
-			this.setDisableResize()
-		},
-		enableResize : function() {
-			this.option.resize = true;
-			this.getBoxStatus() !== "max" && this.setEnableResize()
-		},
-		disableResize : function() {
-			this.option.dragable = false;
-			this.setDisableResize()
-		},
-		setEnableResize : function() {
-			if (this.option.resize)
-				if (this._resizeController) {
-					this.option.dragProxy
-							&& b.addObserver(this._resizeController,
-									"mousedown", this.observer.onMousedown);
-					this._resizeController.show()
-				} else {
-					if (this.option.dragProxy) {
-						this._dragProxy = w();
-						this._resizeController = new f.ui.Resize(
-								this._window_inner, this._dragProxy.proxyEl, {
-									isLimited : true,
-									topMargin : 62,
-									minWidth : this._minWidth,
-									minHeight : this._minHeight,
-									dragProxy : this._dragProxy
-								});
-						b.addObserver(this._resizeController, "mousedown",
-								this.observer.onMousedown);
-						b.addObserver(this._resizeController, "end",
-								this.observer.onDragProxyResizeEnd)
-					} else {
-						this._resizeController = new f.ui.Resize(
-								this._window_inner, this.container, {
-									isLimited : true,
-									topMargin : 62,
-									minWidth : this._minWidth,
-									minHeight : this._minHeight
-								});
-						b.addObserver(this._resizeController, "resize",
-								this.observer.onResize)
-					}
-					b.addObserver(this._resizeController, "mousedown",
-							this.observer.onDragStart);
-					b.addObserver(this._resizeController, "end",
-							this.observer.onDragEnd)
-				}
-		},
-		setDisableResize : function() {
-			if (this._resizeController) {
-				this._resizeController.hide();
-				this.option.dragProxy
-						&& b.removeObserver(this._resizeController,
-								"mousedown", this.observer.onMousedown)
-			}
-		},
-		setHtml : function(c) {
-			this.html = c;
-			this.body.innerHTML = c;
-			this.option.flashMode && this.createAlterDom(this.getId())
-		},
-		append : function(c) {
-			this.body.appendChild(c)
-		},
-		getSize : function() {
-			return {
-				width : d.getClientWidth(this.container),
-				height : d.getClientHeight(this.container)
-			}
-		},
-		getBodySize : function() {
-			return {
-				width : parseInt(d.getStyle(this.body, "width"), 10),
-				height : parseInt(d.getStyle(this.body, "height"), 10)
-			}
-		},
-		getSelfDomObj : function() {
-			return this.container
-		},
-		close : function() {
-			if (d.id("fullscreen_tip_container"))
-				d.id("fullscreen_tip_container").style.display = "none";
-			b.notifyObservers(this, "close", this);
-			this.destroy()
-		},
-		destroy : function() {
-			f.browser.ie && d.id("qqweb_focus_input")
-					&& d.id("qqweb_focus_input").focus();
-			this.option.isTask && qqweb.layout.removeWindow(this);
-			f.out(">>>>>>>>>>>destroy :" + this.container.id);
-			b.off(window, "resize", this.observer.onWindowResize);
-			qqweb.layout.getCurrentWindow() == this
-					&& qqweb.layout.setCurrentWindow(null);
-			try {
-				qqweb.layout.getDesktop().body.removeChild(this.container)
-			} catch (c) {
-				document.body.removeChild(this.container)
-			}
-			for (var i in this)
-				this.hasOwnProperty(i) && delete this[i]
-		},
-		hideTouchPad : function() {
-		},
-		updateTouchPad : function() {
-		},
-		_updateTouchPad : function() {
-		},
-		touchMoveHandler : function(c) {
-			var i = this.getX(), n = this.getY(), t = this.getWidth(), x = this
-					.getHeight(), j = x - d.getHeight(this.body);
-			if (c.px < i || c.px > i + t || c.py < n + j || c.py > n + x) {
-				console.info("overflow" + i + "," + n + " " + c.px + "," + c.py
-						+ " " + t + "," + x);
-				padEventProxy(c.eventType, c.event)
-			} else {
-				console.info("app:touchMoveHandler");
-				var e;
-				if (i = this.getAppId())
-					e = qqweb.app["app" + i];
-				e && "touchMoveHandler" in e && e.touchMoveHandler(c)
-			}
-		},
-		getBodyWidth : function() {
-			return d.getWidth(this.body)
-		},
-		getBodyHeight : function() {
-			return d.getHeight(this.body)
-		}
-	})
-});
-Jet().$package("qqweb.businessClass", function(f) {
-	var d = f.dom, b = f.event;
-	this.Widget = new f.Class({
-		windowType : "widget",
-		_outBorder : 0,
-		_leftMargin : 0,
-		_topMargin : 62,
-		_rightMargin : 0,
-		_bottomMargin : 0,
-		_leftArea : 250,
-		_topArea : 62,
-		_rightArea : 0,
-		_bottomArea : 30,
-		init : function(a) {
-			this.parseOption(a);
-			this.createDom();
-			this.setTopZIndex();
-			this.option.hasPinUpButton && this.setPinZIndex();
-			var h = this.getDefaultPosition();
-			if (a.x && a.y) {
-				var s = a.x;
-				h = a.y
-			} else {
-				s = h.x;
-				h = h.y
-			}
-			this.setLT(s, h);
-			this._x = s;
-			this._y = h;
-			this._appId = a.appId;
-			this.setWidth(this._width);
-			this.setHeight(this._height);
-			this.createEvent();
-			this.setEnableDrag()
-		},
-		setHtml : function(a) {
-			this.body.innerHTML = a;
-			if (this.option.dragTarget) {
-				a = document.getElementById(this.option.dragTarget);
-				this._dragController = new f.ui.Drag(a, this.container);
-				b.addObserver(this._dragController, "move",
-						this.observer.onMove)
-			}
-		},
-		parseOption : function(a) {
-			a = a || {};
-			a.isTask = f.isUndefined(a.isTask) ? true : a.isTask;
-			a.windowMode = a.windowMode || "single";
-			a.width = a.width > 0 ? a.width : 0;
-			a.height = a.height > 0 ? a.height : 0;
-			if (typeof a.x == "number")
-				if (a.x + a.width > qqweb.layout.getDesktopWidth()) {
-					var h = qqweb.layout.getDesktopWidth() - a.width;
-					a.x = h < 0 ? 0 : h
-				}
-			if (typeof a.y == "number")
-				if (a.y + a.height + this._bottomArea > qqweb.layout
-						.getDesktopHeight()) {
-					h = qqweb.layout.getDesktopHeight() - a.height
-							- this._bottomArea;
-					a.y = h < this._topArea ? 0 : h
-				}
-			this._x = a.x;
-			this._y = a.y;
-			this._width = a.width;
-			this._height = a.height;
-			a.dragable = a.dragable === false ? false : true;
-			a.pinUpStyle = a.pinUpStyle || "default-class";
-			a.pinDownStyle = a.pinDownStyle || "default-class";
-			a.closeStyle = a.closeStyle || "default-class";
-			a.hasCloseButton = a.hasCloseButton === true ? true : false;
-			a.hasMinButton = a.hasMinButton === true ? true : false;
-			a.hasRefreshButton = a.hasRefreshButton === true ? true : false;
-			a.hasPinUpButton = a.hasPinUpButton === true ? true : false;
-			a.hasPinDownButton = a.hasPinDownButton === true ? true : false;
-			a.isFix = a.isFix || false;
-			this._isFix = a.isFix;
-			this._pinUpStyle = a.pinUpStyle;
-			this._pinDownStyle = a.pinDownStyle;
-			this._closeStyle = a.closeStyle;
-			return this.option = a
-		},
-		createDom : function() {
-			var a = qqweb.layout.getWindowId();
-			this.getId = function() {
-				return a
-			};
-			this.container = d.node("div", {
-						id : "widget_" + a,
-						"class" : "widget widget_current"
-					});
-			this.container.innerHTML = '\t\t\t\t<div id="widget_outer_'
-					+ a
-					+ '" class="widget_outer">\t\t\t\t\t<div id="widget_inner_'
-					+ a
-					+ '" class="widget_inner"  style="z-index:'
-					+ this.option.zIndex
-					+ '">\t\t\t\t\t\t<div id="widget_bg_container_'
-					+ a
-					+ '" class="widget_bg_container">\t\t\t\t\t\t\t<div class="widget_bg widget_center"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_t"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_rt"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_r"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_rb"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_b"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_lb"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_l"></div>\t\t\t\t\t\t\t<div class="widget_bg widget_lt"></div>\t\t\t\t\t\t</div>\t\t\t\t\t\t<div class="widget_content">\t\t\t\t\t\t\t<div id="widget_titleBar_'
-					+ a
-					+ '" class="widget_titleBar">\t\t\t\t\t\t\t\t<a id="widget_closeButton_'
-					+ a
-					+ '" class="widget_close" title="\u5173\u95ed" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="widget_minButton_'
-					+ a
-					+ '" class="widget_min" title="\u6700\u5c0f\u5316" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="widget_refreshButton_'
-					+ a
-					+ '" class="widget_refresh" title="\u5237\u65b0" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="widget_pinUpButton_'
-					+ a
-					+ '" class="widget_pinUp" title="\u6d6e\u52a8" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<a id="widget_pinDownButton_'
-					+ a
-					+ '" class="widget_pinDown" title="\u7f6e\u9876" href="###" hidefocus></a>\t\t\t\t\t\t\t\t<div id="widget_title_'
-					+ a
-					+ '" class="widget_title"></div>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t\t<div id="widget_Body_'
-					+ a
-					+ '" class="widget_bodyArea"></div>\t\t\t\t\t\t</div>\t\t\t\t\t</div>\t\t\t\t</div>\t\t\t';
-			qqweb.layout.getDesktop().body.appendChild(this.container);
-			this._bg_container = d.id("widget_bg_container_" + a);
-			this._titleBar = d.id("widget_titleBar_" + a);
-			this._title = d.id("widget_title_" + a);
-			this.body = d.id("widget_Body_" + a);
-			this._window_outer = d.id("widget_outer_" + a);
-			this._closeButton = d.id("widget_closeButton_" + a);
-			this._maxButton = d.id("widget_maxButton_" + a);
-			this._restoreButton = d.id("widget_restoreButton_" + a);
-			this._minButton = d.id("widget_minButton_" + a);
-			this._refreshButton = d.id("widget_refreshButton_" + a);
-			this._pinUpButton = d.id("widget_pinUpButton_" + a);
-			this._pinDownButton = d.id("widget_pinDownButton_" + a);
-			this.option.hasCloseButton && this.showCloseButton();
-			this.option.hasMinButton && this.showMinButton();
-			this.option.hasRefreshButton && this.showRefreshButton();
-			this.option.hasPinUpButton && this.showPinUpButton();
-			this.option.hasPinDownButton && this.showPinDownButton();
-			this.option.isTask && qqweb.layout.addWindow(this)
-		},
-		createEvent : function() {
-			var a = this;
-			this.observer = {
-				onMouseoverWindow : function(h) {
-					h.stopPropagation();
-					d.show(a._titleBar);
-					b.notifyObservers(a, "mouseoverWindow", a)
-				},
-				onMouseoutWindow : function(h) {
-					h.stopPropagation();
-					d.hide(a._titleBar);
-					d.hide(a._bg_container);
-					b.notifyObservers(a, "mouseoutWindow", a)
-				},
-				onMove : function(h) {
-					a._x = h.x;
-					a._y = h.y
-				},
-				stopPropagationAndSetCurrent : function(h) {
-					h.stopPropagation();
-					a.setCurrent()
-				},
-				setCurrent : function() {
-					f.out(0);
-					a.setCurrent()
-				},
-				onMousedownWidget : function(h) {
-					a._offX = h.clientX;
-					a._offY = h.clientY
-				},
-				onMouseupWidget : function(h) {
-					Math.abs(a._offX - h.clientX)
-							+ Math.abs(a._offY - h.clientY) < 10
-							&& b.notifyObservers(a, "shortMoveClick", a)
-				},
-				onClickPinDownButton : function(h) {
-					h.preventDefault();
-					h.stopPropagation();
-					b.off(a.container, "mousedown", a.observer.setCurrent);
-					a.setPinZIndex();
-					a.showPinUpButton();
-					b.notifyObservers(a, "clickPinUpButton", a)
-				},
-				onClickPinUpButton : function(h) {
-					h.preventDefault();
-					qqweb.layout.setCurrentWindow(a);
-					h.stopPropagation();
-					b.on(a.container, "mousedown", a.observer.setCurrent);
-					a.setZIndex(qqweb.layout.getTopZIndex());
-					a.showPinDownButton();
-					b.notifyObservers(a, "clickPinDownButton", a)
-				},
-				onClickRefreshButton : function(h) {
-					h.preventDefault();
-					h.stopPropagation();
-					b.notifyObservers(a, "clickRefreshButton", a)
-				},
-				onClickCloseButton : function(h) {
-					h.preventDefault();
-					h.stopPropagation();
-					b.notifyObservers(a, "clickCloseButton", a);
-					setTimeout(function() {
-								a.close()
-							}, 0)
-				}
-			};
-			b.on(this.body, "mousedown", this.observer.onMousedownWidget);
-			b.on(this.body, "mouseup", this.observer.onMouseupWidget);
-			b.on(this.container, "mousedown", this.observer.setCurrent);
-			b.on(this.container, "mouseover", this.observer.onMouseoverWindow);
-			b.on(this.container, "mouseout", this.observer.onMouseoutWindow);
-			b.on(this._closeButton, "click", this.observer.onClickCloseButton);
-			b.on(this._refreshButton, "click",
-					this.observer.onClickRefreshButton);
-			b.on(this._pinUpButton, "click", this.observer.onClickPinUpButton);
-			b.on(this._pinDownButton, "click",
-					this.observer.onClickPinDownButton);
-			b.addObserver(this, "closeWindow", this.close)
-		},
-		getAppId : function() {
-			return this._appId
-		},
-		setZIndex : function(a) {
-			d.setStyle(this.container, "zIndex", a);
-			this._zIndex = a
-		},
-		getZindex : function() {
-			return this._zIndex
-		},
-		setCurrent : function() {
-			var a = qqweb.layout.getCurrentWindow();
-			if (a != this) {
-				qqweb.layout.setCurrentWindow(this);
-				this.setStyleCurrent();
-				this.setZIndex(qqweb.layout.getTopZIndex());
-				a && a.setNotCurrent();
-				b.notifyObservers(this, "setCurrent")
-			}
-		},
-		setNotCurrent : function() {
-			if (qqweb.layout.getCurrentWindow() == this) {
-				this.setStyleNotCurrent();
-				qqweb.layout.setCurrentWindow(null)
-			}
-			b.notifyObservers(this, "setNotCurrent")
-		},
-		setStyleCurrent : function() {
-			d.addClass(this.container, "widget_current")
-		},
-		setStyleNotCurrent : function() {
-			d.removeClass(this.container, "widget_current")
-		},
-		setWidth : function(a) {
-			this._width = a;
-			d.setStyle(this.container, "width", a + "px")
-		},
-		setHeight : function(a) {
-			this._height = a;
-			d.setStyle(this.container, "height", a + "px");
-			d.setStyle(this._window_outer, "height", a - 20 + "px");
-			var h = 28;
-			if (f.browser.ie && f.browser.ie < 7)
-				h = 29;
-			d.setStyle(this.body, "height", a - 20 - h + "px")
-		},
-		setTopZIndex : function() {
-			this.setZIndex(qqweb.layout.getTopZIndex())
-		},
-		setPinZIndex : function() {
-			this.setZIndex(qqweb.layout.getPinZIndex())
-		},
-		getX : function() {
-			return parseInt(d.getStyle(this.container, "left"))
-		},
-		getY : function() {
-			return parseInt(d.getStyle(this.container, "top"))
-		},
-		getDefaultPosition : function() {
-			var a, h;
-			if (this._isFix) {
-				a = this._x;
-				h = this._y
-			} else {
-				a = qqweb.layout.ClientWidth();
-				var s = qqweb.layout.getClientHeight();
-				if (f.isUndefined(qqweb.businessClass.Widget._space)) {
-					a = a - 200 - this._width - 10;
-					h = s - 60 - this._height
-				} else {
-					if (qqweb.businessClass.Widget._space < 0)
-						qqweb.businessClass.Widget._space = a - 200 - 1.5
-								* this._width - 10;
-					h = Math.floor(Math.random() * 11);
-					a = Math.ceil(qqweb.businessClass.Widget._space
-							+ this._width / 2 * h / 10);
-					h = Math.floor(Math.random() * 11);
-					h = (s - this._height - 60 - 41) * h / 10 + 41
-				}
-				qqweb.businessClass.Widget._space = a - this._width;
-				h = s - h - this._height
-			}
-			return {
-				x : a,
-				y : h
-			}
-		},
-		showCloseButton : function() {
-			d.show(this._closeButton)
-		},
-		showRefreshButton : function() {
-			d.show(this._refreshButton)
-		},
-		showPinUpButton : function() {
-			d.hide(this._pinDownButton);
-			d.show(this._pinUpButton)
-		},
-		showPinDownButton : function() {
-			d.hide(this._pinUpButton);
-			d.show(this._pinDownButton)
-		},
-		setEnableDrag : function() {
-			if (this.option.dragable)
-				if (this._dragController)
-					this._dragController.unlock();
-				else if (!this.option.dragTarget) {
-					this._dragController = new f.ui.Drag(this.container,
-							this.container, {
-								isLimited : true,
-								leftMargin : this._leftMargin + this._outBorder,
-								topMargin : this._topMargin + this._outBorder,
-								rightMargin : this._rightMargin
-										+ this._outBorder,
-								bottomMargin : this._bottomMargin
-										+ this._outBorder
-							});
-					b.addObserver(this._dragController, "move",
-							this.observer.onMove)
-				}
-		},
-		setDisableDrag : function() {
-			this._dragController && this._dragController.lock()
-		},
-		setLT : function(a, h) {
-			if (a || a === 0)
-				this.setLeft(a);
-			if (h || h === 0)
-				this.setTop(h)
-		},
-		setLB : function(a, h) {
-			if (a || a === 0)
-				this.setLeft(a);
-			if (h || h === 0)
-				this.setBottom(h)
-		},
-		setLeft : function(a) {
-			d.setStyle(this.container, "left", a + "px");
-			d.setStyle(this.container, "right", "")
-		},
-		setTop : function(a) {
-			d.setStyle(this.container, "top", a + "px");
-			d.setStyle(this.container, "bottom", "")
-		},
-		setRight : function(a) {
-			d.setStyle(this.container, "right", a + "px");
-			d.setStyle(this.container, "left", "")
-		},
-		setBottom : function(a) {
-			d.setStyle(this.container, "bottom", a + "px");
-			d.setStyle(this.container, "top", "")
-		},
-		setToCenter : function() {
-			var a = qqweb.layout.getClientWidth(), h = qqweb.layout
-					.getClientHeight();
-			this.setLT(a > this._width ? (a - this._width) / 2 : 0,
-					h > this._height ? (h - this._height) / 2 : 0)
-		},
-		close : function() {
-			b.notifyObservers(this, "close", this);
-			this.destroy()
-		},
-		destroy : function() {
-			this.option.isTask && qqweb.layout.removeWindow(this);
-			for (var a in this)
-				f.out(a);
-			qqweb.layout.getCurrentWindow() == this
-					&& qqweb.layout.setCurrentWindow(null);
-			qqweb.layout.getDesktop().body.removeChild(this.container);
-			for (a in this)
-				this.hasOwnProperty(a) && delete this[a]
-		}
-	})
-});
-Jet().$package("qqweb.layout", function(f) {
-	var d = this, b = f.dom, a = f.event, h, s, w, c, i, n, t = b
-			.getDocumentElement(), x = document.body, j = 0, e = false, l = false, m = null, o = [], v = {}, z = [], H = null, P = null, Y = null, ia = 10, ja = 2E6, N = b
-			.id("desktop"), da, ea, Z, T = {}, G, Q, K = b.id("topBar"), $ = b
-			.id("qqBar"), W, V, g, k, r;
-	b.id("mainPanel");
-	b.id("toggleBar");
-	b.id("appWindow");
-	b.id("appWindowBody");
-	var D = b.id("toolBar"), F = b.id("taskBar"), C = b.id("statusBar"), U = b
-			.id("layout_statusBar_sound"), aa;
-	if (f.browser.mobileSafari) {
-		h = 680;
-		s = 640
-	} else {
-		h = 320;
-		s = 100
-	}
-	this.setDesktopWidth = function(q) {
-		return i = q
-	};
-	this.setDesktopHeight = function(q) {
-		return n = q
-	};
-	this.getDesktopWidth = function() {
-		return i
-	};
-	this.getDesktopHeight = function() {
-		return n
-	};
-	var fa = function() {
-		var q = d.getDesktopWidth(), u = b.getClientWidth(b.id("quickPanel"))
-				|| 0;
-		if (u > 110 && u < 170)
-			u = 150;
-		else if (u >= 170)
-			u = 30;
-		b.setStyle(aa, "width", q - u - 230 + "px");
-		a.notifyObservers(qqweb, "closeTaskBuddy")
-	}, sa = function() {
-		var q = b.getClientWidth(), u = b.getClientHeight();
-		w = q;
-		c = u;
-		var B = false;
-		if (q >= h) {
-			b.setStyle(t, "overflowX", "hidden");
-			b.setStyle(N, "width", "");
-			i = q
-		} else {
-			B = true;
-			b.setStyle(t, "overflowX", "auto");
-			b.setStyle(N, "width", h + "px");
-			i = h
-		}
-		if (u >= s) {
-			b.setStyle(t, "overflowY", "hidden");
-			b.setStyle(N, "height", "");
-			n = u
-		} else {
-			B = true;
-			b.setStyle(t, "overflowY", "auto");
-			b.setStyle(N, "height", s + "px");
-			n = s
-		}
-		B && b.setStyle(N, "position", "absolute");
-		b.setStyle(x, "height", n + "px")
-	}, Aa = function() {
-		function q(p) {
-			p.preventDefault();
-			!f.browser.ie
-					&& !f.browser.firefox
-					&& alert("\u4e0d\u597d\u610f\u601d\uff0c\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u6b64\u64cd\u4f5c\u3002");
-			p = "http://" + document.URL.split("/")[2] + "/";
-			try {
-				this.style.behavior = "url(#default#homepage)";
-				this.setHomePage(p)
-			} catch (y) {
-				if (f.browser.firefox) {
-					try {
-						netscape.security.PrivilegeManager
-								.enablePrivilege("UniversalXPConnect")
-					} catch (L) {
-						alert("\u6b64\u64cd\u4f5c\u88ab\u6d4f\u89c8\u5668\u62d2\u7edd\uff01/n\u8bf7\u5728\u6d4f\u89c8\u5668\u5730\u5740\u680f\u8f93\u5165\u201cabout:config\u201d\u5e76\u56de\u8f66/n\u7136\u540e\u5c06[signed.applets.codebase_principal_support]\u8bbe\u7f6e\u4e3a'true'")
-					}
-					Components.classes["@mozilla.org/preferences-service;1"]
-							.getService(Components.interfaces.nsIPrefBranch)
-							.setCharPref("browser.startup.homepage", p)
-				}
-			}
-			pgvSendClick({
-						hottag : "WEB2QQ.TASKBAR.HOMEPAGE.LOGIN"
-					})
-		}
-		function u() {
-			open("./WebQQ2.0.url");
-			pgvSendClick({
-						hottag : "WEB2QQ.TASKBAR.SHORTCUT.LOGIN"
-					})
-		}
-		function B(p) {
-			p.preventDefault();
-			p = "http://" + document.URL.split("/")[2] + "/";
-			try {
-				window.external.AddFavorite(p, "WebQQ 2.0")
-			} catch (y) {
-				f.browser.firefox
-						? window.sidebar.addPanel("WebQQ 2.0", p, "")
-						: alert("\u4e0d\u597d\u610f\u601d\uff0c\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u6b64\u64cd\u4f5c\u3002")
-			}
-			pgvSendClick({
-						hottag : "WEB2QQ.TASKBAR.FAVORITE.LOGIN"
-					})
-		}
-		if (f.browser.mobileSafari) {
-			var A = b.id("touchpad");
-			b.show(A);
-			A.src = "./touchpad.html?20101021001";
-			a.on(x, "touchmove", function(p) {
-						p.touches && p.touches.length == 1
-								&& p.preventDefault()
-					}, true)
-		}
-		var R = new d.Panel({
-					id : "desktop",
-					name : "desktop",
-					container : d.getBody(),
-					body : N,
-					html : ""
-				});
-		d.addPanel(R);
-		A = new d.Panel({
-					id : "topBar",
-					name : "topBar",
-					container : K,
-					body : K,
-					html : ""
-				});
-		d.addPanel(A);
-		a.on(b.id("logo"), "mousedown", function() {
-					pgvSendClick({
-								hottag : "web2qq.corner.topleft.logo"
-							})
-				});
-		A = {
-			onClickDesktop : function() {
-				a.notifyObservers(qqweb.layout, "clickDesktop", R)
+	}, f = {
+		blue : {
+			id : 0,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(182,234,253,.8)",
+				ie6WindowCenterBackground : "#C4DEED"
 			},
-			onFocusDesktop : function() {
-				a.notifyObservers(qqweb.layout, "desktopFocus")
-			},
-			onBlurDesktop : function() {
-				a.notifyObservers(qqweb.layout, "desktopBlur")
-			},
-			onClickAppStartButton : function() {
-				var p = this.getAttribute("appId");
-				qqweb.portal.runApp(p, {})
-			},
-			onSelfInfoReady : function() {
-			},
-			onAppRun : function(p) {
-				var y = qqweb.portal.getAllConfig(p);
-				if (!(y.appLevel && y.appLevel == "system")) {
-					p = b.id("quickPanel_" + y.id);
-					if (!p) {
-						p = b.node("a", {
-									id : "quickPanel_" + y.id,
-									"class" : "quickPanelRunningApp",
-									title : y.title,
-									href : "###"
-								});
-						p.aid = y.id;
-						var L = b.node("img", {
-									src : "about:blank"
-								});
-						ka(L, y.id, y.iconUrl);
-						var J = b.node("span", {
-									id : "quickPanel_" + y.id + "_txtnode",
-									"class" : "quickPanelRunningAppPopupTxt"
-								});
-						J.innerHTML = f.string.encodeHtmlSimple(y.appName);
-						p.appendChild(L);
-						p.appendChild(J);
-						y = G.body.children || G.body.childNodes;
-						if (y.length >= 12) {
-							b.show(Q);
-							y = S.children || S.childNodes;
-							S.insertBefore(p, y.length > 0 ? y[0] : null);
-							b.show(Q);
-							b.setStyle(G.body, "width", ba() + "px")
-						} else {
-							G.body.appendChild(p);
-							b
-									.setStyle(G.body, "width", ba(y.length - 2)
-													+ "px");
-							a.notifyObservers(qqweb, "resizeTask")
-						}
-						a.on(p, "click", ta)
-					}
-				}
-			},
-			onShowDesktopButtonClick : function() {
-				var p = d.showDesktop();
-				a.notifyObservers(qqweb, "ClickShowDesktopButton", p);
-				pgvSendClick({
-							hottag : "WEB2QQ.TASKBAR.DESKTOP.LOGIN"
-						})
-			},
-			onQQWebImeButtonClick : function() {
-				qqweb.portal.runApp("qqWebIme");
-				pgvSendClick({
-							hottag : "WEB2QQ.TASKBAR.QQYunPinYin.LOGIN"
-						})
-			},
-			onQQWebDictButtonClick : function() {
-				qqweb.portal.runApp("qqWebDict");
-				pgvSendClick({
-							hottag : "WEB2QQ.TASKBAR.QQCloudDict.LOGIN"
-						})
-			},
-			onAppExit : function(p) {
-				var y = qqweb.portal.getAllConfig(p);
-				if (!(y && y.appLevel && y.appLevel == "system"))
-					if (p = b.id("quickPanel_" + (y ? y.id : p))) {
-						try {
-							G.body.removeChild(p)
-						} catch (L) {
-							S.removeChild(p)
-						}
-						y = S.children || S.childNodes;
-						var J = (G.body.children || G.body.childNodes).length;
-						p = y.length;
-						if (J < 12)
-							if (p > 0)
-								for (var X = 0; X < J; ++X) {
-									p--;
-									G.body.appendChild(y[X]);
-									if (p <= 0)
-										break
-								}
-						y = G.body.children || G.body.childNodes;
-						if (p <= 0) {
-							b.hide(Q);
-							b
-									.setStyle(G.body, "width", ba(y.length - 2)
-													+ "px")
-						} else
-							b.setStyle(G.body, "width", ba() + "px")
-					}
+			currentWindow : {
+				ipadContainerBackColor : "rgba(182,234,253,1)",
+				ie6WindowCenterBackground : "#B6EAFD"
 			}
-		};
-		var ka = function(p, y, L) {
-			var J = qqweb.CONST.PUB_APP_STATIC_URL + Math.floor(y / 1E3) % 1E3
-					+ "/" + y + "/images/", X = qqweb.CONST.PRI_APP_STATIC_URL;
-			if (L && L.smallIcon)
-				if (L.smallIcon.indexOf("priapps") > -1)
-					X = qqweb.CONST.PRI_APP_STATIC_URL2;
-			var na = "";
-			if (((L.type || L) & "001") > 0) {
-				na = y > 99999 ? X + L.smallIcon : J + "small.png";
-				p.src = na
-			} else
-				p.src = "./module/appbar/images/small.png"
-		}, I = new d.Panel({
-					id : "qqBar",
-					name : "qqBar",
-					container : $,
-					body : $,
-					html : ""
-				});
-		d.addPanel(I);
-		I = function(p) {
-			p.stopPropagation()
-		};
-		var E = new d.Panel({
-					id : "toolBar",
-					name : "toolBar",
-					container : D,
-					body : D,
-					html : ""
-				});
-		d.addPanel(E);
-		E = new d.Panel({
-			id : "taskBar",
-			name : "\u4efb\u52a1\u6761",
-			container : F,
-			body : F,
-			html : ' <div id="startButton" class="startButton"></div>\t\t\t\t\t<div id="quickPanel" class="quickPanel"><div class="statusBar_line" style="float:right;margin-left:5px;"></div>\t\t\t\t\t<div id="quickPanelPopupArrow"></div></div>\t\t\t\t\t<!-div id="quickPanelPopupArrow"></div--\>\t\t\t\t\t<div id="taskBar_main" class="EQQ_taskBar">\t\t\t\t\t\t<div id="EQQ_ChatBuddyList" class="EQQ_chatBuddyList"></div>\t\t\t\t\t</div>'
-		});
-		d.addPanel(E);
-		aa = b.id("taskBar_main");
-		var oa = function(p, y, L) {
-			var J = document.createElement("script");
-			J.type = "text/javascript";
-			if (f.browser.ie)
-				J.onreadystatechange = function() {
-					if (J.readyState == "complete" || J.readyState == "loaded")
-						setTimeout(function() {
-									y && y.apply(L)
-								}, 0)
-				};
-			else
-				a.on(J, "load", y, L, true);
-			J.src = p;
-			document.body.appendChild(J)
-		}, pa = function(p) {
-			p.preventDefault();
-			p.stopPropagation();
-			setTimeout(function() {
-						b.hide(b.id("taskbar_start_checkbox"))
-					}, 0);
-			oa("http://web.qq.com/cgi-bin/bookmail/setbookflag.php?uin="
-					+ qqweb.portal.getCookieUin() + "&action=add&time="
-					+ (new Date).getTime())
-		};
-		E = '\t\t\t\t<div class="taskbar_start_menu_head">\t\t\t\t</div>\t\t\t\t<div class="taskbar_start_menu_body">\t\t\t\t\t<ul class="taskbar_start_menu">\t\t\t\t\t<li id="taskbar_start_menu_home"><span class="taskbar_start_menu_home"></span><a href="###">\u8bbe\u4e3a\u4e3b\u9875</a></li>\t\t\t\t\t<li id="taskbar_start_menu_favorite"><span class="taskbar_start_menu_favorite"></span><a href="###">\u6dfb\u52a0\u5230\u6536\u85cf</a></li>\t\t\t\t\t<li id="taskbar_start_menu_shortcut"><span class="taskbar_start_menu_savetodeskptop"></span><a href="###" target="_blank">\u8bbe\u4e3a\u684c\u9762\u56fe\u6807</a></li>\t\t\t\t\t<li id="taskbar_start_menu_subscribe" style="display:none"><span class="taskbar_start_menu_subscribe"></span><a href="###">\u8ba2\u9605\u52a8\u6001\u8d44\u8baf</a></li>\t\t\t\t\t</ul>\t\t\t\t\t<div class="taskbar_start_separate_line"></div>\t\t\t\t\t<ul class="taskbar_start_menu">\t\t\t\t\t<li id="screenLockerButton"><span class="taskbar_start_menu_lock"></span><a href="###">\u9501\u5b9aWebQQ</a></li>\t\t\t\t\t<li id="settingCenterButton"><span class="taskbar_start_menu_setting"></span><a href="###">\u7cfb\u7edf\u8bbe\u7f6e</a></li>\t\t\t\t\t<li id="EQQ_MyPanel_ExitButton"><span class="taskbar_start_menu_exit"></span><a href="###">\u9000\u51fa</a></li>\t\t\t\t\t</ul>\t\t\t\t\t<div id="taskbar_start_subscribe_tip_container" class="taskbar_start_subscribe_tip_container">\t\t\t\t\t<div class="taskbar_start_subscribe_tip">\t\t\t\t\t<div id="taskbar_start_checkbox_container" class="taskbar_start_subscribe_checked" hidefocus="true"><input style="display:none;margin-top:-1px;padding:0;*margin-top:-5px;*margin-left:-4px;" id="taskbar_start_checkbox" type="checkbox" ></input></div>\t\t\t\t\t<a href="###" class="taskbar_start_subscribe_close" onclick="document.getElementById(\'taskbar_start_subscribe_tip_container\').style.display=\'none\';return false;"></a>\t\t\t\t\t</div><iframe width="100%" height="100%" class="fullscreen_bg_iframe"></iframe>\t\t\t\t\t</div>\t\t\t\t</div>\t\t\t\t<div class="taskbar_start_menu_bottom">\t\t\t\t<a id="taskbar_start_button" href="###" class="taskbar_start_button"></a>\t\t\t\t</div>';
-		if (f.browser.ie)
-			E += '<iframe width="100%" height="100%" class="fullscreen_bg_iframe"></iframe>';
-		var O = b.node("div", {
-					"class" : "taskbar_start_menu_container",
-					id : "startMenuContainer"
-				});
-		O.innerHTML = E;
-		N.appendChild(O);
-		var ga = new qqweb.layout.PopupBox({
-					container : O
-				}), qa = O.getElementsByTagName("li"), ua = function(p) {
-			b.setClass(p, "taskbar_start_menu_hover")
-		}, va = function(p) {
-			b.setClass(p, "")
-		};
-		if (f.browser.ie && f.browser.ie == 6)
-			for (var M = 0; M < qa.length; M++)
-				(function() {
-					var p = qa[M];
-					a.on(p, "mouseover", function() {
-								ua(p)
-							});
-					a.on(p, "mouseout", function() {
-								va(p)
-							})
-				})();
-		E = b.id("taskbar_start_subscribe_tip_container");
-		a.on(b.id("taskbar_start_menu_home"), "click", q);
-		a.on(b.id("taskbar_start_menu_shortcut"), "click", u);
-		a.on(b.id("taskbar_start_menu_subscribe"), "click", function(p) {
-					p.preventDefault();
-					p.stopPropagation();
-					p = b.id("taskbar_start_subscribe_tip_container");
-					b.show(p)
-				});
-		a.on(b.id("taskbar_start_menu_subscribe"), "mouseup", I);
-		a.on(b.id("taskbar_start_menu_favorite"), "click", B);
-		a.on(b.id("taskbar_start_button"), "mouseup", I);
-		a.on(b.id("taskbar_start_button"), "mousedown", I);
-		a.on(E, "mouseup", I);
-		a.on(E, "click", I);
-		a.on(b.id("taskbar_start_checkbox_container"), "click", function(p) {
-					p.preventDefault();
-					p.stopPropagation();
-					if (b.id("taskbar_start_checkbox").style.display == "inline")
-						pa(p);
-					else {
-						b.show(b.id("taskbar_start_checkbox"));
-						b.id("taskbar_start_checkbox").checked = false;
-						oa("http://web.qq.com/cgi-bin/bookmail/setbookflag.php?uin="
-								+ qqweb.portal.getCookieUin()
-								+ "&action=del&time=" + (new Date).getTime())
-					}
-				});
-		a.on(b.id("taskbar_start_button"), "click", function() {
-					f.out("taskbar_start_button click")
-				});
-		a.on(b.id("taskbar_start_checkbox"), "click", pa);
-		E = new d.Panel({
-			id : "statusBar",
-			name : "\u72b6\u6001\u6761",
-			container : C,
-			body : C,
-			html : '\t\t\t\t<a id="quickPanel_freeModelButton" href="###" class="quickPanel_freeModelButton login_level_3" title="\u70b9\u51fb\u5207\u6362\u5230 - [\u81ea\u7531\u6a21\u5f0f]" _olddisplay="inline"></a>\t\t\t\t<a id="quickPanel_adsorbModelButton" href="###" class="quickPanel_adsorbModelButton login_level_3" title="\u70b9\u51fb\u5207\u6362\u5230 - [\u5438\u9644\u6a21\u5f0f]" _olddisplay="inline"></a>\t\t\t\t<a id="EQQ_MyPanel_StartButton" class="layout_start login_level_2" href="###" hidefocus title="\u5f00\u59cb"></a>\t\t\t\t<a class="statusBar_help login_level_1" id="statusBar_help_link" href="###" hidefocus title="\u5e2e\u52a9"></a>\t\t\t\t<a id="layoutSaverButton" class="layoutSaveButton login_level_2" href="###" hidefocus title="\u8bb0\u5fc6\u684c\u9762\u5e03\u5c40"></a>\t\t\t\t<a id="themeSettingButton" class="themeSettingButton login_level_2" href="###" hidefocus title="\u4e3b\u9898\u8bbe\u7f6e"></a>\t\t\t\t<a id="quickPanel_qqWebDictButton" class="quickPanel_qqWebDictButton login_level_1" href="###" hidefocus title="QQ\u4e91\u8bcd\u5178"></a>\t\t\t\t<a id="quickPanel_qqWebImeButton" class="quickPanel_qqWebImeButton login_level_1" href="###" hidefocus title="QQ\u4e91\u8f93\u5165\u6cd5"></a>\t\t\t\t<a class="statusBar_sound_open login_level_1" href="###" hidefocus id="layout_statusBar_sound" title="\u5207\u6362\u58f0\u97f3\u6a21\u5f0f"></a>\t\t\t\t<a id="quickPanel_showDesktopButton" href="###" hidefocus class="quickPanel_showDesktopButton login_level_1" title="\u70b9\u51fb\u663e\u793a\u684c\u9762"></a>'
-		});
-		d.addPanel(E);
-		W = b.id("settingCenterButton");
-		V = b.id("screenLockerButton");
-		g = b.id("layoutSaverButton");
-		k = b.id("themeSettingButton");
-		r = b.id("EQQ_MyPanel_StartButton");
-		E = b.id("quickPanel");
-		G = new d.Panel({
-					id : "quickPanel",
-					name : "\u5feb\u6377\u9762\u677f",
-					container : E,
-					body : E,
-					html : ""
-				});
-		d.addPanel(G);
-		var S = b.node("div", {
-					"class" : "quickPanelPopupContainer"
-				});
-		document.body.appendChild(S);
-		var la = new qqweb.layout.PopupBox({
-					container : S,
-					html : ""
-				});
-		Q = b.id("quickPanelPopupArrow");
-		var ta = function(p) {
-			p.preventDefault();
-			p = qqweb.portal.getApp(this.aid);
-			if (p = p.window || p.widget)
-				p.getWindowFlags && p.getWindowFlags()
-						& qqweb.CONST.WINDOW_FLAG_CURRENT ? p.min() : p
-						.setCurrent()
-		}, ba = function(p) {
-			if (!p && p !== 0)
-				p = 10;
-			if (p < 0)
-				p = 0;
-			var y = 9;
-			y += p * 27;
-			if (b.isShow(Q))
-				y += 20;
-			return y
-		}, wa = function(p) {
-			qqweb.portal.openInWebBrowser(p)
-		};
-		E = '\t\t\t\t<div class="taskbar_help_menu_head">\t\t\t\t</div>\t\t\t\t<div class="taskbar_help_menu_body">\t\t\t\t\t<ul class="taskbar_help_menu">\t\t\t\t\t<li><span class="taskbar_help_menu_hot"></span><a id="WebQQ_hot" href="###">WebQQ \u70ed\u70b9</a></li>\t\t\t\t\t<li><span class="taskbar_help_menu_weibo"></span><a href="###">\u5b98\u65b9\u5fae\u535a</a></li>\t\t\t\t\t<li><span class="taskbar_help_menu_fankui"></span><a href="###">\u53cd\u9988\u8bba\u575b</a></li>\t\t\t\t\t<li><span class="taskbar_help_menu_blog"></span><a href="###">\u5b98\u65b9\u535a\u5ba2</a></li>\t\t\t\t\t<li id="webqqHepler"><span class="taskbar_help_menu_helper"></span><a href="###">\u5c0f\u52a9\u624b</a></li>\t\t\t\t\t<li><span class="taskbar_help_menu_question"></span><a href="###">\u5e38\u89c1\u95ee\u9898</a></li>\t\t\t\t\t</ul>\t\t\t\t</div>\t\t\t\t<div class="taskbar_help_menu_bottom"></div>';
-		if (f.browser.ie)
-			E += '<iframe width="100%" height="100%" class="fullscreen_bg_iframe"></iframe>';
-		O = b.node("div", {
-					"class" : "taskbar_help_menu_container"
-				});
-		N.appendChild(O);
-		var ca = new qqweb.layout.PopupBox({
-					container : O,
-					html : E
-				}), ha = O.getElementsByTagName("li"), xa = ["", {
-					url : "http://t.qq.com/Web_QQ",
-					title : "\u5b98\u65b9\u5fae\u535a",
-					isOpenNewTab : true
-				}, {
-					url : "http://support.qq.com/portal/discuss_pdt/513_1.html",
-					title : "\u53cd\u9988\u8bba\u575b",
-					isOpenNewTab : true
-				}, {
-					url : "http://webqq.qzone.qq.com",
-					title : "\u5b98\u65b9\u535a\u5ba2",
-					isOpenNewTab : true
-				}, "", {
-					url : "http://service.qq.com/category/WebQQ2.0.html",
-					title : "\u5e38\u89c1\u95ee\u9898",
-					isOpenNewTab : true
-				}], ya = function(p) {
-			b.setClass(p, "taskbar_help_menu_hover")
-		}, za = function(p) {
-			b.setClass(p, "")
-		};
-		for (M = 0; M < ha.length; M++)
-			M != 4 && M != 0 && a.on(ha[M], "click", function() {
-						var p = M;
-						return function() {
-							wa(xa[p])
-						}
-					}());
-		if (f.browser.ie && f.browser.ie == 6)
-			for (M = 0; M < ha.length; M++)
-				(function() {
-					var p = ha[M];
-					a.on(p, "mouseover", function() {
-								ya(p)
-							});
-					a.on(p, "mouseout", function() {
-								za(p)
-							})
-				})();
-		a.on(b.id("webqqHepler"), "click", function(p) {
-					p.stopPropagation();
-					p.preventDefault();
-					(p = qqweb.app.helper) && p.isRunning()
-							? p.shining()
-							: qqweb.portal.runApp("helper");
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.HELPER.LOGIN"
-							})
-				});
-		a.on(Q, "click", function(p) {
-					la.setX(ba() - 27);
-					la.setTopZIndex();
-					la.show();
-					p.stopPropagation()
-				});
-		a.on(b.id("statusBar_help_link"), "mouseup", I);
-		a.on(b.id("statusBar_help_link"), "click", function(p) {
-					p.preventDefault();
-					p.stopPropagation();
-					qqweb.portal.getLoginLevel() < 2 ? ca.setX(b
-							.getClientWidth()
-							- 120) : ca.setX(b.getClientWidth() - 158);
-					ca.setY(b.getClientHeight() - 200);
-					ca.setZIndex(99999);
-					ca.toggleShow();
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.HELP.LOGIN"
-							})
-				});
-		E = function(p) {
-			p.preventDefault();
-			f.out("click setting center");
-			qqweb.portal.runApp("settingCenter");
-			pgvSendClick({
-						hottag : "WEB2QQ.TASKBAR.SETTING.LOGIN"
-					})
-		};
-		O = function(p) {
-			(p = d.layoutFunctions["loginLevel_" + p]) && p()
-		};
-		O(1);
-		qqweb.portal.getCookieUin();
-		a.addObservers({
-					targetModel : qqweb.portal,
-					eventMapping : {
-						selfInfoReady : A.onSelfInfoReady,
-						appRun : A.onAppRun,
-						appExit : A.onAppExit
-					}
-				});
-		a.on(W, "click", E);
-		a.on(W, "click", E);
-		a.on(k, "click", function(p) {
-					p.preventDefault();
-					f.out("click theme setting");
-					qqweb.portal.runApp("themeSetting");
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.THEMESETTING.LOGIN"
-							})
-				});
-		a.on(k, "click", I);
-		a.on(V, "click", function(p) {
-					p.preventDefault();
-					qqweb.portal.runApp("screenLocker");
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.SCREENLOCKER.LOGIN"
-							})
-				});
-		a.on(V, "click", I);
-		U = b.id("layout_statusBar_sound");
-		a.on(U, "click", function() {
-					if (qqweb.sound.isMute()) {
-						qqweb.sound.setMute(false);
-						U.className = "statusBar_sound_open"
-					} else {
-						qqweb.sound.setMute(true);
-						U.className = "statusBar_sound_mute"
-					}
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.SOUND.LOGIN"
-							})
-				});
-		a.on(g, "click", function(p) {
-					p.preventDefault();
-					qqweb.portal.runApp("layoutSaver");
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.LAYOUTSAVER.LOGIN"
-							})
-				});
-		a.on(g, "click", I);
-		a.on(r, "click", function(p) {
-					p.stopPropagation();
-					p.preventDefault();
-					ga.setX(b.getClientWidth() - 178);
-					ga.setY(b.getClientHeight() - 273);
-					ga.setZIndex(999999);
-					ga.show();
-					p = b.id("taskbar_start_subscribe_tip_container");
-					b.hide(p);
-					pgvSendClick({
-								hottag : "WEB2QQ.TASKBAR.START.LOGIN"
-							})
-				});
-		a.addObserver(qqweb.portal, "loginLevelChanged", O);
-		I = function() {
-			sa();
-			fa();
-			d.sideBar != undefined && d.sideBar && qqweb.app.eqq.onResize()
-		};
-		f.browser.firefox ? setTimeout(I, 100) : I();
-		a.addObserver(qqweb, "resizeTask", fa);
-		a.on(window, "resize", I);
-		da = b.id("quickPanel_showDesktopButton");
-		a.on(da, "click", A.onShowDesktopButtonClick);
-		ea = b.id("quickPanel_qqWebImeButton");
-		a.on(ea, "click", A.onQQWebImeButtonClick);
-		qqWebDictButton = b.id("quickPanel_qqWebDictButton");
-		a.on(qqWebDictButton, "click", A.onQQWebDictButtonClick);
-		a.on(N, "click", A.onClickDesktop);
-		if ("onfocusin" in document) {
-			a.on(document, "focusin", A.onFocusDesktop);
-			a.on(document, "focusout", A.onBlurDesktop)
-		} else {
-			a.on(window, "focus", A.onFocusDesktop);
-			a.on(window, "blur", A.onBlurDesktop)
+		},
+		black : {
+			id : 1,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(232,232,232,.8)",
+				ie6WindowCenterBackground : "#C4C4C4"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(232,232,232,1)",
+				ie6WindowCenterBackground : "#e8e8e8"
+			}
+		},
+		light_green : {
+			id : 2,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(168,218,127,.8)",
+				ie6WindowCenterBackground : "#C2D2C8"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(168,218,127,1)",
+				ie6WindowCenterBackground : "#A8DA7F"
+			}
+		},
+		pink : {
+			id : 3,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(255,225,229,.8)",
+				ie6WindowCenterBackground : "#CCCCCC"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(255,225,229,1)",
+				ie6WindowCenterBackground : "#FFE1E5"
+			}
+		},
+		light_violet : {
+			id : 4,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(255,225,229,.8)",
+				ie6WindowCenterBackground : "#CCCCCC"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(255,225,229,1)",
+				ie6WindowCenterBackground : "#FFE1E5"
+			}
+		},
+		dark_voilet : {
+			id : 5,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(255,225,229,.8)",
+				ie6WindowCenterBackground : "#CCCCCC"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(255,225,229,1)",
+				ie6WindowCenterBackground : "#FFE1E5"
+			}
+		},
+		grey : {
+			id : 6,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(232,232,232,.8)",
+				ie6WindowCenterBackground : "#C4C4C4"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(232,232,232,1)",
+				ie6WindowCenterBackground : "#e8e8e8"
+			}
+		},
+		dark_brown : {
+			id : 7,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(234,222,197,.8)",
+				ie6WindowCenterBackground : "#C4C4C4"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(234,222,197,1)",
+				ie6WindowCenterBackground : "#EADEC5"
+			}
+		},
+		dark_blue : {
+			id : 8,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(232,232,232,.8)",
+				ie6WindowCenterBackground : "#C4C4C4"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(232,232,232,1)",
+				ie6WindowCenterBackground : "#e8e8e8"
+			}
+		},
+		light_blue : {
+			id : 9,
+			timeStamp : 20110106001,
+			window : {
+				ipadContainerBackColor : "rgba(232,232,232,.8)",
+				ie6WindowCenterBackground : "#C4DEED"
+			},
+			currentWindow : {
+				ipadContainerBackColor : "rgba(232,232,232,1)",
+				ie6WindowCenterBackground : "#B6EAFD"
+			}
 		}
-		return R
-	};
-	this.mainLayoutParam = {
-		top : 63,
-		bottom : 31,
-		right : 5
-	};
-	this.init = function() {
-		Aa()
-	};
-	this.refreshPanel = function() {
-	};
-	this.Panel = qqweb.businessClass.Panel;
-	this.PopupBox = qqweb.businessClass.PopupBox;
-	this.getWindowId = function() {
-		return j++
-	};
-	this.getWindowDragProxy = function() {
-		return true
-	};
-	this.setGlobalDragProxyEnabled = function(q, u) {
-		l = q;
-		e = !!u
-	};
-	this.getGlobalDragProxyEnabled = function() {
-		return {
-			useGlobal : l,
-			isGlobalProxy : e
+	}, g = {
+		theme_blue : "blue",
+		theme_wood2 : "black",
+		theme_green : "light_green",
+		theme_pinky_night : "pink",
+		theme_pinky_light : "light_violet",
+		theme_pinky_flower : "dark_voilet",
+		theme_metal : "grey",
+		theme_wood1 : "dark_brown",
+		theme_universe : "dark_blue",
+		theme_christmas : "light_blue",
+		theme_2011 : "black"
+	}, p = {
+		theme_blue : "blue.jpg",
+		theme_wood2 : "wood2.jpg",
+		theme_green : "green.jpg",
+		theme_pinky_night : "pinky_night.jpg",
+		theme_pinky_light : "pinky_light.jpg",
+		theme_pinky_flower : "pinky_flower.jpg",
+		theme_metal : "metal.jpg",
+		theme_wood1 : "wood1.jpg",
+		theme_universe : "universe.jpg",
+		theme_christmas : "christmas.jpg",
+		theme_2011 : "2011.jpg"
+	}, l = {}, t = function(s, o) {
+		s = c.node("style", {
+					id : s,
+					type : "text/css"
+				});
+		if (s.styleSheet)
+			s.styleSheet.cssText = o;
+		else {
+			o = document.createTextNode(o);
+			s.appendChild(o)
 		}
-	};
-	this.getTopZIndex = function() {
-		return ia += 2
-	};
-	this.getPinZIndex = function() {
-		return ja++
-	};
-	this.getCurrentWindow = function() {
-		return m
-	};
-	this.setCurrentWindow = function(q) {
-		m = q
-	};
-	this.getWindowList = function() {
+		m().appendChild(s);
+		return s
+	}, y = function(s, o) {
+		o = o || q;
+		s = a.extend(u, s);
+		return a.string.template(o, s)
+	}, z = function(s) {
+		return "http://hp.qq.com/webqqpic/style/wallpaper/" + p[s]
+	}, D = function(s) {
+		var o = l[s];
+		if (!o) {
+			o = "http://hp.qq.com/webqqpic/style/skin/" + s;
+			l[s] = o
+		}
 		return o
-	};
-	this.getWindow = function(q) {
-		return v[q]
-	};
-	this.addWindow = function(q) {
-		o.push(q);
-		return v[q.getId()] = q
-	};
-	this.removeWindow = function(q) {
-		f.array.remove(o, q);
-		v[q.getId()] = null;
-		delete v[q.getId()]
-	};
-	this.showDesktop = function() {
-		for (var q = [], u = d.getCurrentWindow(), B = d.getWindowList(), A = 0; A < B.length; A++)
-			if (B[A].isShow && B[A].isShow()) {
-				B[A].min();
-				q.push(B[A])
+	}, E = function() {
+		var s = c.id("skinTemplate");
+		q = s.innerHTML;
+		document.body.removeChild(s);
+		return q
+	}, I = function() {
+		var s = g.theme_2011, o = "body{ background: url(" + z("theme_2011")
+				+ "?t=<%=timeStamp%>) repeat; }\n" + q, x = f[s] || {};
+		x.skinRoot = D(s);
+		s = y(x, o);
+		t("skinStyleNode", s)
+	}, M = function(s, o) {
+		o = o || function() {
+		};
+		var x = s.length;
+		if (s.length)
+			for (var C = function() {
+				--x < 1 && o()
+			}, H = function() {
+				C()
+			}, G = function() {
+				C()
+			}; s.length > 0;) {
+				var O = new Image;
+				O.onload = H;
+				O.onerror = G;
+				O.src = s.shift()
 			}
-		if (q.length > 0) {
-			z = q;
-			H = u
-		} else {
-			H && H.setCurrent();
-			for (A = 0; A < z.length; A++)
-				z[A].show()
-		}
-	};
-	this.getMaskLayer = function() {
-		Z || (Z = new f.ui.MaskLayer({
-					appendTo : qqweb.layout.getDesktop().body
-				}));
-		return Z
-	};
-	this.showMaskLayer = function() {
-		this.getMaskLayer().show()
-	};
-	this.hideMaskLayer = function() {
-		this.getMaskLayer().hide()
-	};
-	this.getDesktop = function() {
-		return this.getPanel("desktop")
-	};
-	this.getBody = function() {
-		return document.body
-	};
-	this.addPanel = function(q, u) {
-		u && u.appendChild(q.container);
-		return T[q.id] = q
-	};
-	this.getPanel = function(q) {
-		return T[q]
-	};
-	this.getCoverLayer = function() {
-		return b.id("coverLayer")
-	};
-	this.setSideBar = function(q) {
-		d.sideBar = q
-	};
-	this.getSideBarMargin = function() {
-		return 99
-	};
-	var Ba = {
-		themeRoot : "http://hp.qq.com/webqqpic/style/",
-		init : function() {
-			this.isInit = true
-		},
-		applyTheme : function(q) {
-			this.isInit || this.init();
-			ma.applyWallpaper(this.themeRoot + q + "/images/wallpaper.jpg");
-			ra.applyAppearance(q, true)
-		}
-	};
-	this.applyTheme = function(q) {
-		P = q;
-		Ba.applyTheme(q)
-	};
-	this.onSendThemeSuccess = function() {
-	};
-	this.getCurrentThemeID = function() {
-		return P
-	};
-	var ma = {
-		init : function() {
-			this._zoomWallpaperContainer = null;
-			this._mode = "repeat";
-			this._isInit = true
-		},
-		getMode : function() {
-			return this._mode
-		},
-		isHackLayerNeeded : function() {
-			return true
-		},
-		initHackLayer : function() {
-			if (this.isHackLayerNeeded() && this._mode != "zoom") {
-				if (!this._zoomWallpaperContainer)
-					this._zoomWallpaperContainer = b.node("img", {
-								id : "zoomWallpaper",
-								"class" : "zoomWallpaper"
-							});
-				qqweb.layout.getDesktop().body
-						.appendChild(this._zoomWallpaperContainer);
-				a.on(window, "resize", f.bind(this.zoomWallpaper, this))
-			}
-		},
-		removeHackLayout : function() {
-			if (this.isHackLayerNeeded() && this._mode === "zoom") {
-				if (this._zoomWallpaperContainer) {
-					qqweb.layout.getDesktop().body
-							.removeChild(this._zoomWallpaperContainer);
-					this._zoomWallpaperContainer = null
-				}
-				a.off(window, "resize", f.bind(this.zoomWallpaper, this))
-			} else
-				this._mode === "zoom"
-						&& b.removeClass(document.body, "wallpaperCss3Zoom")
-		},
-		preLoadImage : function(q, u) {
-			if (q != "") {
-				u = u || function() {
-				};
-				var B = this, A = new Image;
-				A.onload = function() {
-					u.call(B)
-				};
-				A.onerror = function() {
-					u.call(B)
-				};
-				A.src = q
-			}
-		},
-		applyWallpaper : function(q, u) {
-			this._isInit || this.init();
-			this._wallpaper = q;
-			this._nMode = u;
-			this.preLoadImage(q, this.onWallpaperLoaded)
-		},
-		onWallpaperLoaded : function() {
-			var q = "url(" + this._wallpaper + ")";
-			this._nMode = this._nMode || "repeat";
-			switch (this._nMode) {
-				case "repeat" :
+		else
+			o()
+	}, L = new a.Class({
+				init : function() {
+					this._zoomWallpaperContainer = null;
+					this._mode = "repeat";
+					var s = this;
+					this._onWindowResize = function() {
+						s.zoomWallpaper.apply(s)
+					}
+				},
+				getMode : function() {
+					return this._mode
+				},
+				isHackLayerNeeded : function() {
+					return true
+				},
+				initHackLayer : function() {
+					if (this.isHackLayerNeeded() && this._mode != "zoom") {
+						if (!this._zoomWallpaperContainer)
+							this._zoomWallpaperContainer = c.node("img", {
+										id : "zoomWallpaper",
+										"class" : "zoomWallpaper"
+									});
+						qqweb.layout.getDesktop().body
+								.appendChild(this._zoomWallpaperContainer);
+						d.on(window, "resize", this._onWindowResize)
+					}
+				},
+				removeHackLayout : function() {
+					if (this.isHackLayerNeeded() && this._mode === "zoom") {
+						if (this._zoomWallpaperContainer) {
+							qqweb.layout.getDesktop().body
+									.removeChild(this._zoomWallpaperContainer);
+							this._zoomWallpaperContainer = null
+						}
+						d.off(window, "resize", this._onWindowResize)
+					} else
+						this._mode === "zoom"
+								&& c.removeClass(document.body,
+										"wallpaperCss3Zoom")
+				},
+				getCurrentWallpaper : function() {
+					return this._wallpaper
+				},
+				applyWallpaper : function(s, o) {
+					this._wallpaper = s;
+					this._nMode = o;
+					M([s], a.bind(this.onWallpaperLoaded, this));
+					w.closeScene()
+				},
+				applyBackColor : function(s) {
+					c.setStyle(document.body, "backbroundColor", s)
+				},
+				onWallpaperLoaded : function() {
+					var s = "url(" + this._wallpaper + ")";
+					this._nMode = this._nMode || "repeat";
+					switch (this._nMode) {
+						case "repeat" :
+							this.removeHackLayout();
+							this._mode = "repeat";
+							c.setStyle(document.body, "backgroundImage", s);
+							c.setStyle(document.body, "backgroundRepeat",
+									"repeat");
+							break;
+						case "center" :
+							this.removeHackLayout();
+							this._mode = "center";
+							c.setStyle(document.body, "backgroundImage", s);
+							c.setStyle(document.body, "backgroundRepeat",
+									"no-repeat");
+							c.setStyle(document.body, "backgroundPosition",
+									"center center");
+							break;
+						case "zoom" :
+							this.initHackLayer();
+							this._mode = "zoom";
+							if (this.isHackLayerNeeded()) {
+								this._zoomWallpaperContainer.src = this._wallpaper;
+								this.zoomWallpaper()
+							} else {
+								c.setStyle(document.body, "backgroundImage", s);
+								c.setStyle(document.body, "backgroundRepeat",
+										"no-repeat");
+								c.addClass(document.body, "wallpaperCss3Zoom")
+							}
+							break;
+						default :
+							break
+					}
+				},
+				zoomWallpaper : function() {
+					if (this._mode === "zoom") {
+						var s = qqweb.layout.getDesktopHeight(), o = qqweb.layout
+								.getDesktopWidth();
+						c.setStyle(this._zoomWallpaperContainer, "height", s
+										+ "px");
+						c.setStyle(this._zoomWallpaperContainer, "width", o
+										+ "px")
+					}
+				},
+				reset : function() {
 					this.removeHackLayout();
 					this._mode = "repeat";
-					b.setStyle(document.body, "backgroundImage", q);
-					b.setStyle(document.body, "backgroundRepeat", "repeat");
-					break;
-				case "center" :
-					this.removeHackLayout();
-					this._mode = "center";
-					b.setStyle(document.body, "backgroundImage", q);
-					b.setStyle(document.body, "backgroundRepeat", "no-repeat");
-					b.setStyle(document.body, "backgroundPosition",
-							"center center");
-					break;
-				case "zoom" :
-					this.initHackLayer();
-					this._mode = "zoom";
-					if (this.isHackLayerNeeded()) {
-						this._zoomWallpaperContainer.src = this._wallpaper;
-						this.zoomWallpaper()
-					} else {
-						b.setStyle(document.body, "backgroundImage", q);
-						b.setStyle(document.body, "backgroundRepeat",
-								"no-repeat");
-						b.addClass(document.body, "wallpaperCss3Zoom")
+					if (a.browser.ie) {
+						document.body.style.removeAttribute("backgroundImage");
+						document.body.style.removeAttribute("backgroundRepeat");
+						document.body.style
+								.removeAttribute("backgroundPosition")
+					} else
+						c.setStyle(document.body, "background", "")
+				}
+			}), J = function() {
+		return i++
+	}, P = new a.Class({
+				init : function() {
+					this._oldStyleNode = c.id("skinStyleNode")
+				},
+				getCurrentSkin : function() {
+					return this._skinId
+				},
+				applySkin : function(s) {
+					this._skinId = s;
+					var o = f[s];
+					this._config = o;
+					o.skinRoot = D(s);
+					M(this._getPreloadImages(o.skinRoot, o.timeStamp), a.bind(
+									this._onImagePreloaded, this))
+				},
+				applySkinStyle : function(s) {
+					if (this._newStyleNode) {
+						this._oldStyleNode
+								&& m().removeChild(this._oldStyleNode);
+						this._oldStyleNode = this._newStyleNode
 					}
-					break;
-				default :
-					break
-			}
-		},
-		zoomWallpaper : function() {
-			if (this._mode === "zoom") {
-				var q = b.getClientHeight(qqweb.layout.getDesktop().body), u = b
-						.getClientWidth(qqweb.layout.getDesktop().body);
-				b.setStyle(this._zoomWallpaperContainer, "height", q + "px");
-				b.setStyle(this._zoomWallpaperContainer, "width", u + "px")
-			}
-		},
-		reset : function() {
-			this.removeHackLayout();
-			this._mode = "repeat";
-			if (f.browser.ie) {
-				document.body.style.removeAttribute("backgroundImage");
-				document.body.style.removeAttribute("backgroundRepeat");
-				document.body.style.removeAttribute("backgroundPosition")
-			} else
-				b.setStyle(document.body, "background", "")
-		}
+					this._newStyleNode = t("skinStyleNode" + J(), s)
+				},
+				_onImagePreloaded : function() {
+					var s = this._config.styleText;
+					if (!s) {
+						s = y(this._config);
+						this._config.styleText = s
+					}
+					this.applySkinStyle(s)
+				},
+				_getPreloadImages : function(s, o) {
+					return a.browser.ie == 6 || a.browser.ie == 7 ? [] : [
+							s + "/images/task_buddy.gif?t=" + o,
+							s + "/images/toolbar_bg.png?t=" + o,
+							s + "/images/topbar_bg.png?t=" + o,
+							s + "/images/sprite_repeat_x_png.png?t=" + o,
+							s + "/images/sprite_repeat_y_png.png?t=" + o,
+							s + "/images/sprite_main_png.png?t=" + o,
+							s + "/images/appbar_bg.png?t=" + o,
+							s + "/images/appbar_bg_c.png?t=" + o,
+							s + "/images/window.png?t=" + o,
+							s + "/images/window_cur.png?t=" + o,
+							s + "/images/transparent.gif?t=" + o]
+				}
+			}), N = new a.Class({
+				init : function() {
+					this.isInit = true
+				},
+				applyScene : function(s) {
+					s == "theme_christmas" ? qqweb.portal
+							.runApp("sceneChristmas") : this
+							.closeScene("sceneChristmas")
+				},
+				closeScene : function() {
+					qqweb.app.sceneChristmas
+							&& qqweb.app.sceneChristmas.isRunning()
+							&& qqweb.app.sceneChristmas.exit()
+				}
+			}), Q = new a.Class({
+				init : function() {
+				},
+				getCurrentTheme : function() {
+					return this._themeId
+				},
+				applyTheme : function(s) {
+					this._themeId = s;
+					var o = g[s], x = z(s);
+					r.applyWallpaper(x);
+					n.applySkin(o);
+					w.applyScene(s)
+				}
+			});
+	this.applyTheme = function(s) {
+		h.applyTheme(s)
 	};
-	this.applyWallpaper = function(q, u) {
-		Y = q;
-		ma.applyWallpaper(q, u)
+	this.getCurrentThemeID = function() {
+		return h.getCurrentTheme()
+	};
+	this.applyWallpaper = function(s, o) {
+		r.applyWallpaper(s, o)
 	};
 	this.getCurrentWallpaper = function() {
-		return Y
+		return r.getCurrentWallpaper()
 	};
 	this.resetWallpaper = function() {
-		ma.reset()
+		r.reset()
 	};
-	var ra = {
-		oldThemeNode : null,
-		newThemeNode : null,
-		head : null,
-		isInit : false,
-		id : 0,
-		currThemeId : null,
-		themeRoot : "http://hp.qq.com/webqqpic/style/",
-		themeName : "/qqweb.theme.css",
-		init : function() {
-			this.oldThemeNode = b.id("qqwebSkin");
-			this.head = document.getElementsByTagName("head") ? document
-					.getElementsByTagName("head")[0] : document.documentElement;
-			this._aprThemeMapping = {
-				black : "theme_wood2",
-				light_green : "theme_green",
-				pink : "theme_pinky_night",
-				light_violet : "theme_pinky_light",
-				dark_voilet : "theme_pinky_flower",
-				grey : "theme_metal",
-				dark_brown : "theme_wood1",
-				dark_blue : "theme_universe"
-			};
-			this.isInit = true
-		},
-		getId : function() {
-			return this.id++
-		},
-		linkNode : function(q, u, B) {
-			u = u || window;
-			B = B || "utf-8";
-			return b.node("link", {
-						id : "qqwebSkin" + this.getId(),
-						type : "text/css",
-						charset : B,
-						rel : "stylesheet",
-						href : q
-					}, u)
-		},
-		getAprMappingTheme : function(q) {
-			return this._aprThemeMapping[q]
-		},
-		applyAppearance : function(q, u) {
-			this.isInit || this.init();
-			(u = u || false) || (q = this.getAprMappingTheme(q));
-			this.currThemeId = q;
-			this.preLoadImage(this.getPreLoadImages(this.currThemeId),
-					this.onImagePreLoaded)
-		},
-		applyAppearanceLink : function(q) {
-			if (this.newThemeNode) {
-				this.head.removeChild(this.oldThemeNode);
-				this.oldThemeNode = this.newThemeNode
-			}
-			this.newThemeNode = this.linkNode(this.themeRoot + q
-							+ this.themeName + "?t="
-							+ qqweb.CONST.UPDATE_TIME_STAMP, window);
-			this.head.appendChild(this.newThemeNode)
-		},
-		onImagePreLoaded : function() {
-			this.applyAppearanceLink(this.currThemeId)
-		},
-		getPreLoadImages : function(q) {
-			var u = [];
-			u.push(this.themeRoot + q + "/images/task_buddy.gif");
-			u.push(this.themeRoot + q + "/images/toolbar_bg.png");
-			u.push(this.themeRoot + q + "/images/topbar_bg.png");
-			if (f.browser.ie == 6 || f.browser.ie == 7)
-				u = [];
-			else {
-				u.push(this.themeRoot + q + "/images/sprite_repeat_x_png.png");
-				u.push(this.themeRoot + q + "/images/sprite_repeat_y_png.png");
-				u.push(this.themeRoot + q + "/images/sprite_main_png.png");
-				u.push(this.themeRoot + q + "/images/appbar_bg.png");
-				u.push(this.themeRoot + q + "/images/appbar_bg_c.png");
-				u.push(this.themeRoot + q + "/images/window.png");
-				u.push(this.themeRoot + q + "/images/window_cur.png")
-			}
-			return u
-		},
-		preLoadImage : function(q, u) {
-			u = u || function() {
-			};
-			var B = this, A = q.length;
-			if (q.length)
-				for (var R = function() {
-					--A < 1 && u.call(B)
-				}, ka = function() {
-					R()
-				}, I = function() {
-					R()
-				}; q.length > 0;) {
-					var E = new Image;
-					E.onload = ka;
-					E.onerror = I;
-					E.src = q.shift()
-				}
-			else
-				u.call(B)
-		}
+	this.applySkin = function(s) {
+		n.applySkin(s)
 	};
-	this.applyAppearance = function(q) {
-		ra.applyAppearance(q)
+	this.init = function() {
+		E();
+		h = new Q;
+		n = new P;
+		r = new L;
+		w = new N;
+		d.addObserver(qqweb.portal, "UACReady", R)
 	};
-	this.initSystemTheme = function() {
-		var q = qqweb.config.getTheme().id, u = qqweb.config.getWallpaper().id, B = qqweb.config
-				.getWallpaper().mode, A = qqweb.config.getWallpaper().url, R = qqweb.config
-				.getAppearance().id;
-		if (u) {
-			this.applyWallpaper(A, B);
-			this.applyAppearance(R)
+	var R = function() {
+		if (qqweb.portal.getUin() && qqweb.portal.getSkey()) {
+			var s = qqweb.config.getTheme().id, o = qqweb.config.getWallpaper().id, x = qqweb.config
+					.getWallpaper().mode, C = qqweb.config.getWallpaper().url, H = qqweb.config
+					.getAppearance().id;
+			if (o) {
+				b.applyWallpaper(C, x);
+				b.applySkin(H)
+			} else
+				b.applyTheme(s)
 		} else
-			this.applyTheme(q)
-	};
-	this.layoutFunctions = {};
-	this.layoutFunctions["loginLevel_" + qqweb.CONST.LOGIN_LEVEL_NONE] = function() {
-		b.removeClass(C, "statusBar_login_level_3");
-		b.removeClass(C, "statusBar_login_level_2");
-		b.addClass(C, "statusBar_login_level_1");
-		for (var q = C.children || C.childNodes, u = 0; u < q.length; ++u)
-			if (q[u].nodeType == 1)
-				b.hasClass(q[u], "login_level_3")
-						|| b.hasClass(q[u], "login_level_2") ? b.hide(q[u]) : b
-						.show(q[u])
-	};
-	this.layoutFunctions["loginLevel_" + qqweb.CONST.LOGIN_LEVEL_NOCHAT] = function() {
-		b.removeClass(C, "statusBar_login_level_3");
-		b.removeClass(C, "statusBar_login_level_1");
-		b.addClass(C, "statusBar_login_level_2");
-		for (var q = C.children || C.childNodes, u = 0; u < q.length; ++u)
-			b.hasClass(q[u], "login_level_3") ? b.hide(q[u]) : b.show(q[u])
-	};
-	this.layoutFunctions["loginLevel_" + qqweb.CONST.LOGIN_LEVEL_ALL] = function() {
-		b.removeClass(C, "statusBar_login_level_1");
-		b.removeClass(C, "statusBar_login_level_2");
-		b.addClass(C, "statusBar_login_level_3");
-		for (var q = C.children || C.childNodes, u = 0; u < q.length; ++u)
-			b.hasClass(q[u], "login_level_2") && b.show(q[u])
-	};
-	this.getIconIndex = function(q) {
-		for (var u = G.body.children || G.body.childNodes, B = 0; B < u.length; ++B)
-			if (u[B].id == "quickPanel_" + q)
-				return B - 2;
-		return 10
-	};
-	this.getClientWidth = function() {
-		return w = w || b.getClientWidth()
-	};
-	this.getClientHeight = function() {
-		return c = c || b.getClientHeight()
-	};
-	this.alert = function(q, u) {
-		q = '<div class="alert_container">\t\t\t\t\t\t\t<div class="alert_alert">'
-				+ f.string.encodeHtml(q) + "</div>\t\t\t\t\t\t</div>";
-		var B = new qqweb.businessClass.Window({
-					title : "\u6e29\u99a8\u63d0\u793a",
-					modeSwitch : true,
-					dragable : true,
-					resize : false,
-					width : 370,
-					height : 127,
-					html : q,
-					hasOkButton : true,
-					isSetCentered : true
-				});
-		a.addObserver(B, "clickOkButton", function() {
-					B.close();
-					u && u()
-				});
-		B.setTopZIndex()
+			I()
 	}
 });
-Jet().$package("qqweb.util", function() {
-	this.initSystem = function() {
-		new Function(function(f) {
-			var d = "", b, a, h = "", s, w = "", c = 0;
-			/[^A-Za-z0-9+/=]/g.exec(f);
-			f = f.replace(/[^A-Za-z0-9+/=]/g, "");
-			do {
-				b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-						.indexOf(f.charAt(c++));
-				a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-						.indexOf(f.charAt(c++));
-				s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-						.indexOf(f.charAt(c++));
-				w = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-						.indexOf(f.charAt(c++));
-				b = b << 2 | a >> 4;
-				a = (a & 15) << 4 | s >> 2;
-				h = (s & 3) << 6 | w;
-				d += String.fromCharCode(b);
-				if (s != 64)
-					d += String.fromCharCode(a);
-				if (w != 64)
-					d += String.fromCharCode(h)
-			} while (c < f.length);
-			return unescape(d)
-		}("dmFyJTIwc2hvd0l0JTNEZnVuY3Rpb24lMjhrZXklMjklN0JpZiUyOE1hdGgucmFuZG9tJTI4JTI5JTNDMC4xJTI5JTdCcXF3ZWIucnBjU2VydmljZS5mb3JtU2VuZCUyOCUyMmh0dHAlM0EvL3RqLnFzdGF0aWMuY29tL2xvZyUyMiUyQyU3Qm1ldGhvZCUzQSUyMlBPU1QlMjIlMkNkYXRhJTNBJTdCciUzQWtleSU3RCU3RCUyOSU3RCUzQmxvY2F0aW9uLnJlcGxhY2UlMjglMjJodHRwJTNBLy9ocC5xcS5jb20vNDA0JTIyJTI5JTNCJTdEJTNCdmFyJTIwaW1nMiUzRG5ldyUyMEltYWdlJTI4JTI5JTNCaW1nMi5zcmMlM0QlMjJyZXMlM0EvL1dlYlFRLmV4ZS8lMjMyMy9MT0dPLlBORyUyMiUzQmltZzIub25sb2FkJTNEZnVuY3Rpb24lMjglMjklN0JzaG93SXQlMjglMjJfZnVrX3dfMiUyMiUyOSUzQiU3RCUzQnZhciUyMGltZzMlM0RuZXclMjBJbWFnZSUyOCUyOSUzQmltZzMuc3JjJTNEJTIycmVzJTNBLy9XZWJRUTIuZXhlLyUyMzIzL0xPR08uUE5HJTIyJTNCaW1nMy5vbmxvYWQlM0RmdW5jdGlvbiUyOCUyOSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTNCdmFyJTIwaW1nNCUzRG5ldyUyMEltYWdlJTI4JTI5JTNCaW1nNC5zcmMlM0QlMjJyZXMlM0EvL1dlYlFRMi5leGUvbG9nby5wbmclMjIlM0JpbWc0Lm9ubG9hZCUzRGZ1bmN0aW9uJTI4JTI5JTdCc2hvd0l0JTI4JTIyX2Z1a193XzIlMjIlMjklM0IlN0QlM0J0cnklN0JpZiUyOHdpbmRvdy5leHRlcm5hbCUyNiUyNndpbmRvdy5leHRlcm5hbC50d0dldFJ1blBhdGglMjklN0J2YXIlMjB0JTNEZXh0ZXJuYWwudHdHZXRSdW5QYXRoJTI4JTI5JTNCaWYlMjh0JTI2JTI2dC50b0xvd2VyQ2FzZSUyOCUyOS5pbmRleE9mJTI4JTIyd2VicXElMjIlMjklM0UtMSUyOSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTdEJTdEY2F0Y2glMjhlJTI5JTdCJTdEJTNCdHJ5JTdCaWYlMjh3aW5kb3cuZXh0ZXJuYWwlMjklN0IlN0QlN0RjYXRjaCUyOGUlMjklN0JpZiUyOGUuZGVzY3JpcHRpb24ubGVuZ3RoJTNEJTNENiUyOSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTdEJTNCdHJ5JTdCdmFyJTIwdWElM0RuYXZpZ2F0b3IudXNlckFnZW50LnRvTG93ZXJDYXNlJTI4JTI5JTNCaWYlMjh1YS5pbmRleE9mJTI4JTIybXNpZSUyMiUyOSUzRS0xJTI5JTdCaWYlMjh0eXBlb2YlMjh3aW5kb3cuZXh0ZXJuYWwuU2hvd0Jyb3dzZXJVSSUyOSUzRCUzRCUyMnVuZGVmaW5lZCUyMiUyOSU3QmlmJTI4dWEuaW5kZXhPZiUyOCUyMnRlbmNlbnQlMjIlMjklM0UtMSU3QyU3Q3VhLmluZGV4T2YlMjglMjJtYXh0aG9uJTIyJTI5JTNFLTElN0MlN0N1YS5pbmRleE9mJTI4JTIyU2FhWWFhJTIyJTI5JTNFLTElN0MlN0N1YS5tYXRjaCUyOC9zZSUyMCUyOCU1QiU1Q2QuJTVEKyUyOS8lMjklMjklN0IlN0RlbHNlJTdCc2hvd0l0JTI4JTIyX2Z1a193XzIlMjIlMjklM0IlN0QlN0QlN0QlN0RjYXRjaCUyOGUlMjklN0IlN0QlM0J0cnklN0J2YXIlMjB1YSUzRG5hdmlnYXRvci51c2VyQWdlbnQudG9Mb3dlckNhc2UlMjglMjklM0JpZiUyOHVhLmluZGV4T2YlMjglMjJtc2llJTIyJTI5JTNFLTElMjklN0JpZiUyOHR5cGVvZiUyOHdpbmRvdy5leHRlcm5hbC5JbXBvcnRFeHBvcnRGYXZvcml0ZXMlMjklM0QlM0QlMjJ1bmRlZmluZWQlMjIlMjklN0JpZiUyOHVhLmluZGV4T2YlMjglMjJ0ZW5jZW50JTIyJTI5JTNFLTElN0MlN0N1YS5pbmRleE9mJTI4JTIybWF4dGhvbiUyMiUyOSUzRS0xJTdDJTdDdWEuaW5kZXhPZiUyOCUyMlNhYVlhYSUyMiUyOSUzRS0xJTdDJTdDdWEubWF0Y2glMjgvJTNCJTIwc2UlMjAlMjglNUIlNUNkLiU1RCslMjkvJTI5JTI5JTdCJTdEZWxzZSU3QnNob3dJdCUyOCUyMl9mdWtfd18yJTIyJTI5JTNCJTdEJTdEJTdEJTdEY2F0Y2glMjhlJTI5JTdCJTdEJTNC"))
-	}
-});
-Jet().$package("qqweb.rpcService", function(f) {
-	var d = this, b = f.dom, a = f.event, h, s = false, w = [], c = function() {
-		var j = window.frames.qqweb_proxySendIframe;
-		try {
-			h = j.ajax;
-			for (j = 0; j < w.length; j++)
-				i(w[j].url, w[j].option)
-		} catch (e) {
-			f.out(">>>>>ajaxProxy error: " + e.message + " !!!!")
-		}
-	}, i = function(j, e) {
-		e = e || {};
-		e.cacheTime = e.cacheTime || 0;
-		e.onSuccess = e.onSuccess || function() {
-		};
-		e.onError = e.onError || function() {
-		};
-		e.onTimeout = e.onTimeout || function() {
-		};
-		e.onComplete = e.onComplete || function() {
-		};
-		var l = {
-			method : e.method || "GET",
-			enctype : e.enctype || "",
-			data : e.data || {},
-			param : e.param || {},
-			arguments : e.arguments || {},
-			context : e.context || null,
-			timeout : e.timeout,
-			onSuccess : function(o) {
-				var v = {};
-				o.responseText = o.responseText || "-";
-				try {
-					v = f.json.parse(o.responseText)
-				} catch (z) {
-					f.out("qqweb.rpcservice: JSON \u683c\u5f0f\u51fa\u9519")
+Jet().$package("qqweb.rpcService", function(a) {
+	var b = this, c = a.dom, d = a.event, h, n, r = new a.Class({
+		init : function(f) {
+			this._ajaxRequestInstant = f
+		},
+		send : function(f, g) {
+			g = g || {};
+			g.cacheTime = g.cacheTime || 0;
+			g.onSuccess = g.onSuccess || function() {
+			};
+			g.onError = g.onError || function() {
+			};
+			g.onTimeout = g.onTimeout || function() {
+			};
+			g.onComplete = g.onComplete || function() {
+			};
+			var p = {
+				method : g.method || "GET",
+				contentType : g.contentType || "",
+				enctype : g.enctype || "",
+				param : g.param || {},
+				arguments : g.arguments || {},
+				context : g.context || null,
+				timeout : g.timeout || 3E4,
+				onSuccess : function(t) {
+					t = t.responseText || "-";
+					var y = {};
+					try {
+						y = a.json.parse(t)
+					} catch (z) {
+						a
+								.error(
+										"qqweb.rpcservice: JSON \u683c\u5f0f\u51fa\u9519",
+										"HttpRequest")
+					}
+					y.arguments = g.arguments || {};
+					g.onSuccess.call(g.context, y)
+				},
+				onError : function(t) {
+					g.onError.call(g.context, t)
+				},
+				onTimeout : function() {
+					var t = {};
+					t.arguments = g.arguments || {};
+					g.onTimeout.call(g.context, t)
+				},
+				onComplete : function() {
+					var t = {};
+					t.arguments = g.arguments || {};
+					g.onComplete.call(g.context, t)
 				}
-				v.arguments = e.arguments || {};
-				e.onSuccess.call(e.context, v)
-			},
-			onError : function() {
-				var o = {};
-				o.arguments = e.arguments || {};
-				e.onError.call(e.context, o)
-			},
-			onTimeout : function() {
-				var o = {};
-				o.arguments = e.arguments || {};
-				e.onTimeout.call(e.context, o)
-			},
-			onComplete : function() {
-				var o = {};
-				o.arguments = e.arguments || {};
-				e.onComplete.call(e.context, o)
+			};
+			qqweb.portal.recoverCookie();
+			if (p.method == "GET") {
+				p.data = g.data || {};
+				var l = a.string.toQueryString(p.data);
+				if (g.cacheTime === 0)
+					l += l ? "&t=" + (new Date).getTime() : "t="
+							+ (new Date).getTime();
+				if (l)
+					f = f + "?" + l;
+				p.data = null
+			} else {
+				p.data = g.data || "";
+				p.contentType = "application/x-www-form-urlencoded";
+				f.indexOf("?")
 			}
-		};
-		qqweb.portal.recoverCookie();
-		if (l.method == "GET") {
-			var m = f.string.toQueryString(l.data);
-			if (e.cacheTime === 0)
-				m += m ? "&t=" + (new Date).getTime() : "t="
-						+ (new Date).getTime();
-			if (m)
-				j = j + "?" + m;
-			l.data = null
-		} else {
-			l.contentType = "application/x-www-form-urlencoded";
-			j.indexOf("?")
+			this._ajaxRequestInstant(f, p)
 		}
-		h(j, l)
-	};
-	this.selfSend = function(j, e) {
-		e = e || {};
-		e.cacheTime = e.cacheTime || 0;
-		e.onSuccess = e.onSuccess || function() {
-		};
-		e.onError = e.onError || function() {
-		};
-		e.onTimeout = e.onTimeout || function() {
-		};
-		e.onComplete = e.onComplete || function() {
-		};
-		var l = {
-			method : e.method || "GET",
-			contentType : e.contentType || "",
-			enctype : e.enctype || "",
-			param : e.param || {},
-			arguments : e.arguments || {},
-			context : e.context || null,
-			timeout : e.timeout || 3E4,
-			onSuccess : function(v) {
-				v = f.json.parse(v.responseText);
-				v.arguments = e.arguments || {};
-				e.onSuccess.call(e.context, v)
-			},
-			onError : function(v) {
-				e.onError.call(e.context, v)
-			},
-			onTimeout : function() {
-				var v = {};
-				v.arguments = e.arguments || {};
-				e.onTimeout.call(e.context, v)
-			},
-			onComplete : function() {
-				var v = {};
-				v.arguments = e.arguments || {};
-				e.onComplete.call(e.context, v)
-			}
-		};
-		qqweb.portal.recoverCookie();
-		if (l.method == "GET") {
-			l.data = e.data || {};
-			var m = f.string.toQueryString(l.data);
-			if (e.cacheTime === 0)
-				m += m ? "&t=" + (new Date).getTime() : "t="
-						+ (new Date).getTime();
-			if (m) {
-				var o = qqweb.portal.getVfWebQQ();
-				if (o)
-					m += "&vfwebqq=" + o;
-				j = j + "?" + m
-			}
-			l.data = null
-		} else {
-			l.data = e.data || "";
-			l.contentType = "application/x-www-form-urlencoded";
-			j.indexOf("?")
+	}), w = new a.Class({
+		init : function(f, g) {
+			var p = "qqweb_proxySendIframe" + f, l = this, t;
+			this._ajaxCallbacks = [];
+			this._proxyAjaxSend = this._proxySend = null;
+			a.out("ProxyRequest >>>>> init: " + g, "ProxyRequest");
+			f = document.body;
+			var y = c.node("div", {
+						"class" : "hiddenIframe"
+					});
+			y.innerHTML = '<iframe id="' + p + '" class="hiddenIframe" name="'
+					+ p + '" src="about:blank" width="1" height="1"></iframe>';
+			f.appendChild(y);
+			t = c.id(p);
+			d.on(t, "load", function() {
+				var z = window.frames[p];
+				a.out("ProxyRequest >>>>> iframe load.", "ProxyRequest");
+				try {
+					if (z.ajax) {
+						l._proxyAjaxSend = z.ajax;
+						var D = l._ajaxCallbacks;
+						z = 0;
+						for (var E = D.length; z < E; z++)
+							l.proxySend(D[z].url, D[z].option);
+						l._ajaxCallbacks = []
+					} else {
+						a
+								.warn(
+										"ProxyRequest >>>>> ajaxProxy error: ajax is undefined!!!!",
+										"ProxyRequest");
+						a.warn("ProxyRequest >>>>> set proxyIframe src again!",
+								"ProxyRequest");
+						t.setAttribute("src", g);
+						qqweb.util.report2h("proxyrequest_error", "start")
+					}
+				} catch (I) {
+					a.error("ProxyRequest >>>>> ajaxProxy error: " + I.message
+									+ " !!!!", "ProxyRequest");
+					qqweb.util.report2h("proxyrequest_error2", "start")
+				}
+			});
+			t.setAttribute("src", g)
+		},
+		send : function(f, g) {
+			if (this._proxyAjaxSend) {
+				this.proxySend(f, g);
+				this.send = this.proxySend
+			} else
+				this._ajaxCallbacks.push({
+							url : f,
+							option : g
+						})
+		},
+		proxySend : function(f, g) {
+			if (!this._proxySend)
+				this._proxySend = new r(this._proxyAjaxSend);
+			this._proxySend.send(f, g)
 		}
-		f.http.ajax(j, l)
+	}), i = new a.Class({
+				init : function() {
+					this._proxyArr = {};
+					this._proxyId = 0
+				},
+				getProxyId : function() {
+					return this._proxyId++
+				},
+				getProxy : function(f) {
+					var g = this._proxyArr[f];
+					if (!g) {
+						g = new w(this.getProxyId(), f);
+						this._proxyArr[f] = g
+					}
+					return g
+				}
+			});
+	this.selfSend = function(f, g) {
+		h || (h = new r(a.http.ajax));
+		h.send(f, g)
 	};
-	var n = {
+	this.send = this.proxySend = function(f, g, p) {
+		n || (n = new i);
+		p = p || qqweb.CONST.API_PROXY_URL;
+		n.getProxy(p).send(f, g)
+	};
+	var j, m = {
 		_iframes : [],
 		_tick : 0,
 		_select : function() {
 			this._tick++;
 			return this._iframes[(this._tick - 1) % this._len]
 		},
-		init : function(j) {
+		init : function(f) {
 			if (this._isInit != true) {
-				this._len = j;
-				for (var e = document.body, l = 0; l < j; l++) {
-					divEl = b.node("div", {
+				this._len = f;
+				for (var g = document.body, p = 0; p < f; p++) {
+					j = c.node("div", {
 								"class" : "RPCService_hDiv"
 							});
-					b.hide(divEl);
-					divEl.innerHTML = '<iframe id="RPCService_hIframe_' + l
-							+ '" name="RPCService_hIframe_' + l
+					c.hide(j);
+					j.innerHTML = '<iframe id="RPCService_hIframe_' + p
+							+ '" name="RPCService_hIframe_' + p
 							+ '" src="about:blank"></iframe>';
-					e.appendChild(divEl);
-					this._iframes[l] = [divEl, null, "RPCService_hIframe_" + l]
+					g.appendChild(j);
+					this._iframes[p] = [j, null, "RPCService_hIframe_" + p]
 				}
 				this._isInit = true
 			}
 		},
-		take : function(j) {
-			var e = this._select();
-			e[1] && e[0].removeChild(e[1]);
-			j.setAttribute("target", e[2]);
-			e[1] = j;
-			e[0].appendChild(j)
+		take : function(f) {
+			var g = this._select();
+			g[1] && g[0].removeChild(g[1]);
+			f.setAttribute("target", g[2]);
+			g[1] = f;
+			g[0].appendChild(f)
 		}
 	};
-	this.formSend = function(j, e) {
-		n.init(2);
-		e = {
-			method : e.method || "GET",
-			enctype : e.enctype || "",
-			data : e.data || {},
-			onSuccess : e.onSuccess || function() {
+	this.formSend = function(f, g) {
+		m.init(2);
+		g = {
+			method : g.method || "GET",
+			enctype : g.enctype || "",
+			data : g.data || {},
+			onSuccess : g.onSuccess || function() {
 			},
-			onError : e.onError || function() {
+			onError : g.onError || function() {
 			},
-			onComplete : e.onComplete || function() {
+			onComplete : g.onComplete || function() {
 			},
-			onTimeout : e.onTimeout || function() {
+			onTimeout : g.onTimeout || function() {
 			},
-			timeout : e.timeout ? e.timeout : 1E4
+			timeout : g.timeout ? g.timeout : 1E4
 		};
-		j = b.node("form", {
+		f = c.node("form", {
 					"class" : "RPCService_form",
-					method : e.method,
-					action : j + "?t=" + (new Date).getTime(),
-					enctype : e.enctype
+					method : g.method,
+					action : f + "?t=" + (new Date).getTime(),
+					enctype : g.enctype
 				});
-		for (var l in e.data) {
-			var m = b.node("input");
-			m.type = "text";
-			m.name = l;
-			m.setAttribute("value", e.data[l]);
-			j.appendChild(m)
-		}
-		n.take(j);
-		j.submit()
-	};
-	this.send = function(j, e) {
-		if (h)
-			i(j, e);
-		else {
-			w.push({
-						url : j,
-						option : e
-					});
-			if (!s) {
-				s = true;
-				j = document.body;
-				e = b.node("div", {
-							"class" : "hiddenIframe"
-						});
-				e.innerHTML = '<iframe id="qqweb_proxySendIframe" class="hiddenIframe" name="qqweb_proxySendIframe" width="1" height="1" src="about:blank"></iframe>';
-				j.appendChild(e);
-				j = b.id("qqweb_proxySendIframe");
-				a.on(j, "load", c);
-				j.setAttribute("src", qqweb.CONST.API_PROXY_URL)
+		if (Object.prototype.toString.call(g.data).indexOf("String") > -1) {
+			var p = c.node("input");
+			p.type = "text";
+			p.name = g.data;
+			f.appendChild(p)
+		} else
+			for (var l in g.data) {
+				p = c.node("input");
+				p.type = "text";
+				p.name = l;
+				p.setAttribute("value", g.data[l]);
+				f.appendChild(p)
 			}
-		}
+		m.take(f);
+		f.submit()
 	};
-	this.sendGetVfWebQQ = function(j, e, l) {
-		if (qqweb.portal.uin && qqweb.portal.skey) {
+	this.sendGetVfWebQQ = function(f, g, p) {
+		if (qqweb.portal.getUin() && qqweb.portal.getSkey()) {
 			qqweb.portal.speedTest.sRTS(1, "start", new Date);
 			this.send(qqweb.CONST.API_SERVER_URL + "get_vfwebqq2", {
 				context : this,
 				data : {},
 				arguments : {},
-				onSuccess : e || function(m) {
-					if (m.retcode === 0 && m.result && m.result.length === 2
-							&& m.result[0] == "vfwebqq") {
-						f.out(":GetVfWebQQSuccess...");
-						a.notifyObservers(this, "GetVfWebQQSuccess", m)
+				onSuccess : g || function(l) {
+					if (l.retcode === 0 && l.result && l.result.length === 2
+							&& l.result[0] == "vfwebqq") {
+						a.out(":GetVfWebQQSuccess...");
+						d.notifyObservers(this, "GetVfWebQQSuccess", l)
 					} else {
-						f
+						a
 								.out("[sendGetVfWebQQ\uff1a\u6570\u636e\u683c\u5f0f\u9519\u8bef] error: "
-										+ m.retcode + "-" + m.errmsg);
-						a.notifyObservers(this, "GetVfWebQQError", m)
+										+ l.retcode + "-" + l.errmsg);
+						d.notifyObservers(this, "GetVfWebQQError", l)
 					}
 					qqweb.portal.speedTest.sRTS(1, "end", new Date, true);
 					qqweb.portal.speedTest.sRTS(4, "start", new Date);
 					qqweb.portal.speedTest.sRTS(5, "start", new Date)
 				},
-				onError : l || function(m) {
-					f
+				onError : p || function(l) {
+					a
 							.out("\u83b7\u53d6\u4e00\u4e2a\u4eba\u7684\u767b\u5f55\u4fe1\u606f\u5931\u8d25");
-					a.notifyObservers(this, "GetVfWebQQError", m);
+					d.notifyObservers(this, "GetVfWebQQError", l);
 					qqweb.portal.speedTest.sRTS(1, "end", new Date, true)
 				}
 			})
 		} else
-			a.notifyObservers(this, "GetVfWebQQError", {})
+			d.notifyObservers(this, "GetVfWebQQError", {})
 	};
-	var t, x = function(j, e) {
-		t = new qqweb.businessClass.Window({
-					title : "\u8eab\u4efd\u9a8c\u8bc1",
-					modeSwitch : true,
-					dragable : true,
-					resize : true,
-					width : 400,
-					height : 200,
-					hasCloseButton : true,
-					hasOkButton : true,
-					isSetCentered : false
+	var q, u = function(f, g) {
+		q = qqweb.layout
+				.messagebox(
+						'<div style="width:100%; height:100%; background-color:#FFFFFF; line-height:30px;">\t\t\t\t\t\t<div style="margin-left:10px;">\t\t\t\t\t\t\t<div>\u4e3a\u4e86\u60a8\u7684\u8d26\u53f7\u5b89\u5168\uff0c\u8bf7\u6267\u884c\u8eab\u4efd\u9a8c\u8bc1\uff0c\u5728\u8f93\u5165\u6846\u8f93\u5165\u4e0b\u56fe\u4e2d\u7684\u9a8c\u8bc1\u7801</div>\t\t\t\t\t\t\t<div>\u9a8c\u8bc1\u7801:&nbsp&nbsp<input id="verify_input_code" type="text" /></div>\t\t\t\t\t\t\t<img style="float:left;margin-right:10px" id="verify_img_code" src="" />\t\t\t\t\t\t\t<a style="display:inline;line-height:60px;" id="verify_a_code" alt="\u770b\u4e0d\u6e05\u6362\u4e00\u5f20" href="">\u770b\u4e0d\u6e05\u6362\u4e00\u5f20</a>\t\t\t\t\t\t\t<div id="verify_img_code_wrong" style="display:none;color:red;width:65px;">\u9a8c\u8bc1\u7801\u9519\u8bef</div>\t\t\t\t\t\t</div>\t\t\t\t\t</div>',
+						{
+							title : "\u8eab\u4efd\u9a8c\u8bc1",
+							resize : true,
+							width : 400,
+							height : 200,
+							hasOkButton : true,
+							isSetCentered : false
+						});
+		var p = c.id("verify_img_code"), l = c.id("verify_a_code"), t = c
+				.id("verify_input_code"), y = null;
+		d.on(p, "load", function() {
+					y = a.cookie.get("verifysession", EQQ.CONST.MAIN_DOMAIN)
 				});
-		t
-				.setHtml('<div style="width:100%; height:100%; background-color:#FFFFFF; line-height:30px;">\t\t\t\t\t\t\t<div style="margin-left:10px;">\t\t\t\t\t\t\t\t<div>\u4e3a\u4e86\u60a8\u7684\u8d26\u53f7\u5b89\u5168\uff0c\u8bf7\u6267\u884c\u8eab\u4efd\u9a8c\u8bc1\uff0c\u5728\u8f93\u5165\u6846\u8f93\u5165\u4e0b\u56fe\u4e2d\u7684\u9a8c\u8bc1\u7801</div>\t\t\t\t\t\t\t\t<div>\u9a8c\u8bc1\u7801:&nbsp&nbsp<input id="verify_input_code" type="text" /></div>\t\t\t\t\t\t\t\t<img style="float:left;margin-right:10px" id="verify_img_code" src="" />\t\t\t\t\t\t\t\t<a style="display:inline;line-height:60px;" id="verify_a_code" alt="\u770b\u4e0d\u6e05\u6362\u4e00\u5f20" href="">\u770b\u4e0d\u6e05\u6362\u4e00\u5f20</a>\t\t\t\t\t\t\t\t<div id="verify_img_code_wrong" style="display:none;color:red;width:65px;">\u9a8c\u8bc1\u7801\u9519\u8bef</div>\t\t\t\t\t\t\t</div>\t\t\t\t\t\t</div>');
-		var l = b.id("verify_img_code"), m = b.id("verify_a_code"), o = b
-				.id("verify_input_code"), v = null;
-		a.on(l, "load", function() {
-					v = f.cookie.get("verifysession", EQQ.CONST.MAIN_DOMAIN)
-				});
-		a.on(m, "click", function(z) {
+		d.on(l, "click", function(z) {
 			z.preventDefault();
-			b.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
+			c.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
 					+ Math.random()
 		});
-		a.addObserver(t, "clickOkButton", function() {
-					var z = o.value;
-					z && v && e(j, z, v)
+		d.addObserver(q, "clickOkButton", function() {
+					var z = t.value;
+					z && y && g(f, z, y)
 				});
-		o.focus();
-		a.on(o, "keydown", function(z) {
-					z.keyCode == 13 && a.notifyObservers(t, "clickOkButton")
+		t.focus();
+		d.on(t, "keydown", function(z) {
+					z.keyCode == 13 && d.notifyObservers(q, "clickOkButton")
 							&& setTimeout(function() {
-										t.close()
+										q.close()
 									}, 0)
 				});
-		b.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
+		c.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
 				+ Math.random()
 	};
-	this.sendGetUserInfo = function(j, e, l, m) {
-		e = e || "";
-		l = l || "";
+	this.sendGetUserInfo = function(f, g, p, l) {
+		g = g || "";
+		p = p || "";
 		this.send(qqweb.CONST.API_SERVER_URL + "get_friend_info2", {
 			context : this,
 			data : {
-				tuin : j,
-				verifysession : l,
-				code : e,
+				tuin : f,
+				verifysession : p,
+				code : g,
 				vfwebqq : qqweb.portal.getVfWebQQ()
 			},
 			arguments : {
-				uin : j
+				uin : f
 			},
-			onSuccess : function(o) {
-				if (o.retcode === 0) {
+			onSuccess : function(t) {
+				if (t.retcode === 0) {
 					setTimeout(function() {
-								t && t.close()
+								q && q.close()
 							}, 0);
-					m ? m.call(this, o) : a.notifyObservers(this,
-							"GetUserInfoSuccess", o)
-				} else if (o.retcode === 1E3)
-					x(j, function(v, z, H) {
-								d.sendGetUserInfo(v, z, H, m)
+					l ? l.call(this, t) : d.notifyObservers(this,
+							"GetUserInfoSuccess", t)
+				} else if (t.retcode === 1E3)
+					u(f, function(y, z, D) {
+								b.sendGetUserInfo(y, z, D, l)
 							});
-				else if (o.retcode === 1001) {
-					b.id("verify_img_code_wrong").style.display = "inline";
-					b.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
+				else if (t.retcode === 1001) {
+					c.id("verify_img_code_wrong").style.display = "inline";
+					c.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
 							+ Math.random();
-					b.id("verify_input_code").value = "";
-					b.id("verify_input_code").focus()
+					c.id("verify_input_code").value = "";
+					c.id("verify_input_code").focus()
 				} else {
 					setTimeout(function() {
-								t && t.close()
+								q && q.close()
 							}, 0);
-					a.notifyObservers(this, "GetUserInfoError", o)
+					d.notifyObservers(this, "GetUserInfoError", t)
 				}
 			},
-			onError : function(o) {
-				a.notifyObservers(this, "GetUserInfoError", o)
+			onError : function(t) {
+				d.notifyObservers(this, "GetUserInfoError", t)
 			}
 		})
 	};
-	this.sendGetSingleInfo = function(j, e, l, m) {
-		if (!e || !l)
-			x(j, function(o, v, z) {
-						d.sendGetSingleInfo(o, v, z, m)
+	this.sendGetSingleInfo = function(f, g, p, l) {
+		if (!g || !p)
+			u(f, function(t, y, z) {
+						b.sendGetSingleInfo(t, y, z, l)
 					});
 		else {
-			e = e || "";
-			l = l || "";
+			g = g || "";
+			p = p || "";
 			this.send(qqweb.CONST.API_SERVER_URL + "get_single_info2", {
 				context : this,
 				data : {
-					tuin : j,
-					verifysession : l,
-					code : e,
+					tuin : f,
+					verifysession : p,
+					code : g,
 					vfwebqq : qqweb.portal.getVfWebQQ()
 				},
 				arguments : {
-					uin : j
+					uin : f
 				},
-				onSuccess : function(o) {
-					if (o.retcode === 0) {
+				onSuccess : function(t) {
+					if (t.retcode === 0) {
 						setTimeout(function() {
-									t && t.close()
+									q && q.close()
 								}, 0);
-						m ? m.call(this, o) : a.notifyObservers(this,
-								"GetUserInfoSuccess", o)
-					} else if (o.retcode === 1E3)
-						x(j, function(v, z, H) {
-									d.sendGetSingleInfo(v, z, H, m)
+						l ? l.call(this, t) : d.notifyObservers(this,
+								"GetUserInfoSuccess", t)
+					} else if (t.retcode === 1E3)
+						u(f, function(y, z, D) {
+									b.sendGetSingleInfo(y, z, D, l)
 								});
-					else if (o.retcode === 1001) {
-						b.id("verify_img_code_wrong").style.display = "inline";
-						b.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
+					else if (t.retcode === 1001) {
+						c.id("verify_img_code_wrong").style.display = "inline";
+						c.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
 								+ Math.random();
-						b.id("verify_input_code").value = "";
-						b.id("verify_input_code").focus()
+						c.id("verify_input_code").value = "";
+						c.id("verify_input_code").focus()
 					} else {
 						setTimeout(function() {
-									t && t.close()
+									q && q.close()
 								}, 0);
-						a.notifyObservers(this, "GetUserInfoError", o)
+						d.notifyObservers(this, "GetUserInfoError", t)
 					}
 				},
-				onError : function(o) {
-					a.notifyObservers(this, "GetUserInfoError", o)
+				onError : function(t) {
+					d.notifyObservers(this, "GetUserInfoError", t)
 				}
 			})
 		}
 	};
-	this.sendGetUserInfo_with_code = function(j, e, l, m, o) {
-		e = e || "";
-		l = l || "";
+	this.sendGetUserInfo_with_code = function(f, g, p, l, t) {
+		g = g || "";
+		p = p || "";
 		this.send(qqweb.CONST.API_SERVER_URL + "get_stranger_info2", {
 			context : this,
 			data : {
-				tuin : j,
-				verifysession : l,
+				tuin : f,
+				verifysession : p,
 				gid : 0,
-				code : e,
+				code : g,
 				vfwebqq : qqweb.portal.getVfWebQQ()
 			},
 			arguments : {
-				uin : j
+				uin : f
 			},
-			onSuccess : function(v) {
-				if (v.retcode === 0) {
+			onSuccess : function(y) {
+				if (y.retcode === 0) {
 					setTimeout(function() {
-								t && t.close()
+								q && q.close()
 							}, 0);
-					m ? m.call(this, v) : a.notifyObservers(this,
-							"GetUserInfoSuccess", v)
-				} else if (v.retcode === 1E3)
-					x(j, function(z, H, P) {
-								d.sendGetUserInfo_with_code(z, H, P)
+					l ? l.call(this, y) : d.notifyObservers(this,
+							"GetUserInfoSuccess", y)
+				} else if (y.retcode === 1E3)
+					u(f, function(z, D, E) {
+								b.sendGetUserInfo_with_code(z, D, E)
 							});
-				else if (v.retcode === 1001) {
-					b.id("verify_img_code_wrong").style.display = "inline";
-					b.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
+				else if (y.retcode === 1001) {
+					c.id("verify_img_code_wrong").style.display = "inline";
+					c.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
 							+ Math.random();
-					b.id("verify_input_code").value = "";
-					b.id("verify_input_code").focus()
+					c.id("verify_input_code").value = "";
+					c.id("verify_input_code").focus()
 				} else {
 					setTimeout(function() {
-								t && t.close()
+								q && q.close()
 							}, 0);
-					a.notifyObservers(this, "GetUserInfoError", v)
+					d.notifyObservers(this, "GetUserInfoError", y)
 				}
 			},
-			onError : o || function(v) {
-				f
+			onError : t || function(y) {
+				a
 						.out("\u83b7\u53d6\u4e00\u4e2a\u4eba\u7684\u4fe1\u606f\u5931\u8d25");
-				a.notifyObservers(this, "GetUserInfoError", v)
+				d.notifyObservers(this, "GetUserInfoError", y)
 			}
 		})
 	};
-	this.sendGetFriendUin2 = function(j, e, l, m, o) {
-		m = m || "";
-		o = o || "";
+	this.sendGetFriendUin2 = function(f, g, p, l, t) {
+		l = l || "";
+		t = t || "";
 		this.send(qqweb.CONST.API_SERVER_URL + "get_friend_uin2", {
 			context : this,
 			data : {
-				tuin : j,
-				verifysession : o,
-				type : e,
-				code : m,
+				tuin : f,
+				verifysession : t,
+				type : g,
+				code : l,
 				vfwebqq : qqweb.portal.getVfWebQQ()
 			},
 			arguments : {
-				uin : j
+				uin : f
 			},
-			onSuccess : function(v) {
-				if (v.retcode === 0) {
+			onSuccess : function(y) {
+				if (y.retcode === 0) {
 					setTimeout(function() {
-								t && t.close()
+								q && q.close()
 							}, 0);
-					l && l(v);
-					a.notifyObservers(this, "GetFriendUinSuccess", v)
-				} else if (v.retcode === 1E3)
-					x(j, function(z, H, P) {
-								d.sendGetFriendUin2(z, e, l, H, P)
+					p && p(y);
+					d.notifyObservers(this, "GetFriendUinSuccess", y)
+				} else if (y.retcode === 1E3)
+					u(f, function(z, D, E) {
+								b.sendGetFriendUin2(z, g, p, D, E)
 							});
-				else if (v.retcode === 1001) {
-					b.id("verify_img_code_wrong").style.display = "inline";
-					b.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
+				else if (y.retcode === 1001) {
+					c.id("verify_img_code_wrong").style.display = "inline";
+					c.id("verify_img_code").src = "http://captcha.qq.com/getimage?aid=1003901&"
 							+ Math.random();
-					b.id("verify_input_code").value = "";
-					b.id("verify_input_code").focus()
+					c.id("verify_input_code").value = "";
+					c.id("verify_input_code").focus()
 				} else {
 					setTimeout(function() {
-								t && t.close()
+								q && q.close()
 							}, 0);
-					a.notifyObservers(this, "GetFriendUinError", v)
+					d.notifyObservers(this, "GetFriendUinError", y)
 				}
 			},
-			onError : function(v) {
-				f.out("\u83b7\u53d6\u4e00\u4e2a\u4eba\u7684uin\u5931\u8d25");
-				a.notifyObservers(this, "GetFriendUinError", v)
+			onError : function(y) {
+				a.out("\u83b7\u53d6\u4e00\u4e2a\u4eba\u7684uin\u5931\u8d25");
+				d.notifyObservers(this, "GetFriendUinError", y)
 			}
 		})
 	};
-	this.sendModifyMyDetails = function(j) {
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendModifyMyDetails = function(f) {
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		this.send(qqweb.CONST.API_SERVER_URL + "modify_my_details2", {
 			context : this,
 			method : "POST",
-			data : "r=" + encodeURIComponent(f.json.stringify(j)),
+			data : "r=" + encodeURIComponent(a.json.stringify(f)),
 			arguments : {},
-			onSuccess : function(e) {
-				if (e.retcode === 0) {
-					f.out(":ModifyMyDetailsSuccess...");
-					a.notifyObservers(this, "ModifyMyDetailsSuccess", e)
+			onSuccess : function(g) {
+				if (g.retcode === 0) {
+					a.out(":ModifyMyDetailsSuccess...");
+					d.notifyObservers(this, "ModifyMyDetailsSuccess", g)
 				} else {
-					f
+					a
 							.out("[sendModifyMyDetails\uff1a\u6570\u636e\u683c\u5f0f\u9519\u8bef] error: "
-									+ e.retcode + "-" + e.errmsg);
-					a.notifyObservers(this, "ModifyMyDetailsError", e)
+									+ g.retcode + "-" + g.errmsg);
+					d.notifyObservers(this, "ModifyMyDetailsError", g)
 				}
 			},
-			onError : function(e) {
-				f
+			onError : function(g) {
+				a
 						.out("\u4fee\u6539\u81ea\u5df1\u7684\u7684\u8be6\u7ec6\u8d44\u6599\u5931\u8d25");
-				a.notifyObservers(this, "ModifyMyDetailsError", e)
+				d.notifyObservers(this, "ModifyMyDetailsError", g)
 			}
 		})
 	};
-	this.sendModifyMyAvatar = function(j) {
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendModifyMyAvatar = function(f) {
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		this.send(qqweb.CONST.API_SERVER_URL + "modify_my_head", {
 					context : this,
 					method : "POST",
-					data : "r=" + encodeURIComponent(f.json.stringify(j)),
+					data : "r=" + encodeURIComponent(a.json.stringify(f)),
 					arguments : {},
-					onSuccess : function(e) {
-						e.retcode === 0
-								? a.notifyObservers(this,
-										"ModifyMyAvatarSuccess", e)
-								: a.notifyObservers(this,
-										"ModifyMyAvatarError", e)
+					onSuccess : function(g) {
+						g.retcode === 0
+								? d.notifyObservers(this,
+										"ModifyMyAvatarSuccess", g)
+								: d.notifyObservers(this,
+										"ModifyMyAvatarError", g)
 					},
-					onError : function(e) {
-						a.notifyObservers(this, "ModifyMyAvatarError", e)
+					onError : function(g) {
+						d.notifyObservers(this, "ModifyMyAvatarError", g)
 					}
 				})
 	};
-	this.sendGetGroupInfoByGid = function(j) {
+	this.sendGetGroupInfoByGid = function(f) {
 		this.send(qqweb.CONST.API_SERVER_URL + "get_group_info_ext2", {
 			context : this,
 			data : {
-				gcode : j,
+				gcode : f,
 				vfwebqq : qqweb.portal.getVfWebQQ()
 			},
 			arguments : {
-				gcode : j
+				gcode : f
 			},
-			onSuccess : function(e) {
-				if (e.retcode === 0) {
-					f.out(":GetUserInfoSuccess...");
-					a.notifyObservers(this, "GetGroupInfoByGidSuccess", e)
+			onSuccess : function(g) {
+				if (g.retcode === 0) {
+					a.out(":GetUserInfoSuccess...");
+					d.notifyObservers(this, "GetGroupInfoByGidSuccess", g)
 				} else {
-					f
+					a
 							.out("[sendGetUserInfo\uff1a\u6570\u636e\u683c\u5f0f\u9519\u8bef] error: "
-									+ e.retcode + "-" + e.errmsg);
-					a.notifyObservers(this, "GetGroupInfoByGidError", e)
+									+ g.retcode + "-" + g.errmsg);
+					d.notifyObservers(this, "GetGroupInfoByGidError", g)
 				}
 			},
-			onError : function(e) {
-				f.out("\u83b7\u53d6\u7fa4\u7684\u4fe1\u606f\u5931\u8d25");
-				a.notifyObservers(this, "GetUserInfoError", e)
+			onError : function(g) {
+				a.out("\u83b7\u53d6\u7fa4\u7684\u4fe1\u606f\u5931\u8d25");
+				d.notifyObservers(this, "GetUserInfoError", g)
 			}
 		})
 	};
-	this.sendGetGCardInfo = function(j) {
+	this.sendGetGCardInfo = function(f) {
 		this.send(qqweb.CONST.API_SERVER_URL + "get_self_business_card2", {
 			context : this,
 			data : {
-				gcode : j,
+				gcode : f,
 				vfwebqq : qqweb.portal.getVfWebQQ()
 			},
 			arguments : {
-				gcode : j
+				gcode : f
 			},
-			onSuccess : function(e) {
-				if (e.retcode === 0) {
-					f.out(":GetGCardInfoSuccess...");
-					a.notifyObservers(this, "GetGCardInfoSuccess", e)
+			onSuccess : function(g) {
+				if (g.retcode === 0) {
+					a.out(":GetGCardInfoSuccess...");
+					d.notifyObservers(this, "GetGCardInfoSuccess", g)
 				} else {
-					f
+					a
 							.out("[sendGetUserInfo\uff1a\u6570\u636e\u683c\u5f0f\u9519\u8bef] error: "
-									+ e.retcode + "-" + e.errmsg);
-					a.notifyObservers(this, "GetGCardInfoError", e)
+									+ g.retcode + "-" + g.errmsg);
+					d.notifyObservers(this, "GetGCardInfoError", g)
 				}
 			},
-			onError : function(e) {
-				f.out("\u83b7\u53d6\u7fa4\u7684\u4fe1\u606f\u5931\u8d25");
-				a.notifyObservers(this, "GetGCardInfoError", e)
+			onError : function(g) {
+				a.out("\u83b7\u53d6\u7fa4\u7684\u4fe1\u606f\u5931\u8d25");
+				d.notifyObservers(this, "GetGCardInfoError", g)
 			}
 		})
 	};
-	this.sendGetBuddyList = function(j, e, l) {
-		j = j || {};
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendGetBuddyList = function(f, g, p) {
+		f = f || {};
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		qqweb.portal.speedTest.sRTS(3, "start", new Date);
 		this.send(qqweb.CONST.API_SERVER_URL + "get_user_friends2", {
 			context : this,
 			method : "POST",
-			data : "r=" + encodeURIComponent(f.json.stringify(j)),
-			onSuccess : e || function(m) {
-				if (m.retcode === 0) {
-					for (var o = m.result.categories || [], v = false, z = 0; z < o.length; z++)
-						if (o[z].index == 0)
-							v = true;
-					v || o.unshift({
+			data : "r=" + encodeURIComponent(a.json.stringify(f)),
+			onSuccess : g || function(l) {
+				if (l.retcode === 0) {
+					for (var t = l.result.categories || [], y = false, z = 0; z < t.length; z++)
+						if (t[z].index == 0)
+							y = true;
+					y || t.unshift({
 								index : 0,
 								name : "\u6211\u7684\u597d\u53cb"
 							});
-					f.out(":GetBuddyListSuccess...1");
-					a.notifyObservers(this, "GetBuddyListSuccess", m.result);
-					f.out(":GetBuddyListSuccess...2");
-					qqweb.portal.speedTest.sRTS(2, "end", new Date);
-					qqweb.portal.speedTest.sRTS(3, "end", new Date);
-					qqweb.portal.speedTest.report([2, 3])
+					a.out(":GetBuddyListSuccess...1");
+					d.notifyObservers(this, "GetBuddyListSuccess", l.result);
+					a.out(":GetBuddyListSuccess...2")
 				} else {
-					f.out("[sendGetBuddyList] error: " + m.retcode + "-"
-							+ m.errmsg);
-					a.notifyObservers(this, "GetBuddyListError", m);
-					f.out("[sendGetBuddyList] error: end")
+					a.out("[sendGetBuddyList] error: " + l.retcode + "-"
+							+ l.errmsg);
+					d.notifyObservers(this, "GetBuddyListError", l);
+					a.out("[sendGetBuddyList] error: end")
 				}
 			},
-			onError : l || function(m) {
-				f.out("\u597d\u53cb\u5217\u8868\u5931\u8d25");
-				a.notifyObservers(this, "GetBuddyListError", m)
+			onError : p || function(l) {
+				a.out("\u597d\u53cb\u5217\u8868\u5931\u8d25");
+				d.notifyObservers(this, "GetBuddyListError", l)
 			}
 		})
 	};
-	this.sendGetGroupList = function(j, e, l) {
-		j = j || {};
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendGetGroupList = function(f, g, p) {
+		f = f || {};
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		this.send(qqweb.CONST.API_SERVER_URL + "get_group_name_list_mask2", {
 					context : this,
 					method : "POST",
-					data : "r=" + encodeURIComponent(f.json.stringify(j)),
-					onSuccess : e || function(m) {
-						if (m.retcode === 0) {
-							a.notifyObservers(this, "GetGroupListSuccess",
-									m.result);
-							f.out(":GetGroupListSuccess...")
+					data : "r=" + encodeURIComponent(a.json.stringify(f)),
+					onSuccess : g || function(l) {
+						if (l.retcode === 0) {
+							d.notifyObservers(this, "GetGroupListSuccess",
+									l.result);
+							a.out(":GetGroupListSuccess...")
 						} else {
-							f.out("[sendGetGroupList] error: " + m.retcode
-									+ "-" + m.errmsg);
-							a.notifyObservers(this, "GetGroupListError", m)
+							a.out("[sendGetGroupList] error: " + l.retcode
+									+ "-" + l.errmsg);
+							d.notifyObservers(this, "GetGroupListError", l)
 						}
 					},
-					onError : l || function(m) {
-						f.out("\u7fa4\u5217\u8868\u5931\u8d25");
-						a.notifyObservers(this, "GetGroupListError", m)
+					onError : p || function(l) {
+						a.out("\u7fa4\u5217\u8868\u5931\u8d25");
+						d.notifyObservers(this, "GetGroupListError", l)
 					}
 				})
 	};
-	this.sendGetRecentList = function(j, e, l) {
-		j = j || {};
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendGetRecentList = function(f, g, p) {
+		f = f || {};
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		this.send(qqweb.CONST.API_SERVER_URL + "get_recent_contact2", {
 			context : this,
 			method : "POST",
-			data : "r=" + encodeURIComponent(f.json.stringify(j)),
-			onSuccess : e || function(m) {
-				if (m.retcode === 0) {
-					a.notifyObservers(this, "GetRecentListSuccess", m.result);
-					f.out(":GetRecentListSuccess...")
+			data : "r=" + encodeURIComponent(a.json.stringify(f)),
+			onSuccess : g || function(l) {
+				if (l.retcode === 0) {
+					d.notifyObservers(this, "GetRecentListSuccess", l.result);
+					a.out(":GetRecentListSuccess...")
 				} else {
-					f.out("[sendGetRecentList] error: " + m.retcode + "-"
-							+ m.errmsg);
-					a.notifyObservers(this, "GetRecentListError", m)
+					a.out("[sendGetRecentList] error: " + l.retcode + "-"
+							+ l.errmsg);
+					d.notifyObservers(this, "GetRecentListError", l)
 				}
 			},
-			onError : l || function(m) {
-				f.out("\u6700\u8fd1\u8054\u7cfb\u4eba\u5217\u8868\u5931\u8d25");
-				a.notifyObservers(this, "GetRecentListError", m)
+			onError : p || function(l) {
+				a.out("\u6700\u8fd1\u8054\u7cfb\u4eba\u5217\u8868\u5931\u8d25");
+				d.notifyObservers(this, "GetRecentListError", l)
 			}
 		})
 	};
 	this.sendChangeGroupMask = function() {
 	};
-	this.sendGetGroupInfo = function(j) {
-		j = j || {};
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendGetGroupInfo = function(f) {
+		f = f || {};
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		this.send(qqweb.CONST.API_SERVER_URL + "get_group_info_ext2", {
 					context : this,
-					data : j,
-					onSuccess : function(e) {
-						if (e.retcode === 0) {
-							f.out(":GetGroupInfoSuccess 1...");
-							a.notifyObservers(this, "GetGroupInfoSuccess",
-									e.result);
-							f.out(":GetGroupInfoSuccess 2...")
+					data : f,
+					onSuccess : function(g) {
+						if (g.retcode === 0) {
+							a.out(":GetGroupInfoSuccess 1...");
+							d.notifyObservers(this, "GetGroupInfoSuccess",
+									g.result);
+							a.out(":GetGroupInfoSuccess 2...")
 						} else {
-							f.out("[sendGetGroupInfo] error: " + e.retcode
-									+ "-" + e.errmsg);
-							a.notifyObservers(this, "GetGroupInfoError", e)
+							a.out("[sendGetGroupInfo] error: " + g.retcode
+									+ "-" + g.errmsg);
+							d.notifyObservers(this, "GetGroupInfoError", g)
 						}
 					},
-					onError : function(e) {
-						f.out("\u7fa4\u8d44\u6599\u5931\u8d25");
-						a.notifyObservers(this, "GetGroupInfoError", e)
+					onError : function(g) {
+						a.out("\u7fa4\u8d44\u6599\u5931\u8d25");
+						d.notifyObservers(this, "GetGroupInfoError", g)
 					}
 				})
 	};
-	this.sendGetQQLevel = function(j) {
+	this.sendGetQQLevel = function(f) {
 		this.send(qqweb.CONST.API_SERVER_URL + "get_qq_level2", {
 					context : this,
 					method : "GET",
 					data : {
-						tuin : j,
+						tuin : f,
 						vfwebqq : qqweb.portal.getVfWebQQ()
 					},
 					arguments : {
-						uin : j
+						uin : f
 					},
-					onSuccess : function(e) {
-						if (e.retcode === 0) {
-							f.out(":GetQQLevelSuccess 1...");
-							a.notifyObservers(d, "GetQQLevelSuccess", e);
-							f.out(":GetQQLevelSuccess 2...")
+					onSuccess : function(g) {
+						if (g.retcode === 0) {
+							a.out(":GetQQLevelSuccess 1...");
+							d.notifyObservers(b, "GetQQLevelSuccess", g);
+							a.out(":GetQQLevelSuccess 2...")
 						} else {
-							f.out("[sendGetQQLevel] error: " + e.retcode + "-"
-									+ e.errmsg);
-							a.notifyObservers(d, "GetQQLevelError", e)
+							a.out("[sendGetQQLevel] error: " + g.retcode + "-"
+									+ g.errmsg);
+							d.notifyObservers(b, "GetQQLevelError", g)
 						}
 					},
-					onError : function(e) {
-						f.out("QQ\u7b49\u7ea7\u62c9\u53bb\u5931\u8d25");
-						a.notifyObservers(d, "GetQQLevelError", e)
+					onError : function(g) {
+						a.out("QQ\u7b49\u7ea7\u62c9\u53bb\u5931\u8d25");
+						d.notifyObservers(b, "GetQQLevelError", g)
 					}
 				})
 	};
-	this.sendGetSignature = function(j) {
+	this.sendGetSignature = function(f) {
 		this.send(qqweb.CONST.API_SERVER_URL + "get_single_long_nick2", {
 					context : this,
 					method : "GET",
 					data : {
-						tuin : j,
+						tuin : f,
 						vfwebqq : qqweb.portal.getVfWebQQ()
 					},
 					arguments : {
-						uin : j
+						uin : f
 					},
-					onSuccess : function(e) {
-						e.retcode === 0 ? a.notifyObservers(d,
-								"GetBuddySignatureSuccess", e) : f
-								.out("[sendGetSignature] error: " + e.retcode
-										+ "-" + e.errmsg)
+					onSuccess : function(g) {
+						g.retcode === 0 ? d.notifyObservers(b,
+								"GetBuddySignatureSuccess", g) : a
+								.out("[sendGetSignature] error: " + g.retcode
+										+ "-" + g.errmsg)
 					},
 					onError : function() {
-						f.out(" sendGetSignatureError")
+						a.out(" sendGetSignatureError")
 					}
 				})
 	};
-	this.sendGetTipsInfo = function(j) {
-		j = j || {};
+	this.sendGetTipsInfo = function(f) {
+		f = f || {};
 		qqweb.rpcService.selfSend(qqweb.CONST.MAIN_URL + "web2/get_msg_tip", {
-					context : d,
+					context : b,
 					method : "GET",
 					data : {
-						uin : j.uin || "",
-						tp : j.tp || 1,
-						id : j.id || 0,
-						retype : j.retype || 1,
-						rc : j.rc || 0
+						uin : f.uin || "",
+						tp : f.tp || 1,
+						id : f.id || 0,
+						retype : f.retype || 1,
+						rc : f.rc || 0
 					},
-					onSuccess : j.onSuccess ? j.onSuccess : function(e) {
-						e.c === 0 ? a.notifyObservers(d, "GetTipsInfoSuccess",
-								e) : f.out("[sendGetTipsInfo] error: ")
+					onSuccess : f.onSuccess ? f.onSuccess : function(g) {
+						if (g.c === 0)
+							d.notifyObservers(b, "GetTipsInfoSuccess", g);
+						else
+							g.c !== 1 && a.error("[sendGetTipsInfo] error!")
 					}
 				})
 	};
-	this.sendQuitGroup = function(j) {
-		j.vfwebqq = qqweb.portal.getVfWebQQ();
+	this.sendQuitGroup = function(f) {
+		f.vfwebqq = qqweb.portal.getVfWebQQ();
 		qqweb.rpcService.send(qqweb.CONST.API_SERVER_URL + "quit_group2", {
 			context : this,
 			method : "POST",
-			data : "r=" + encodeURIComponent(f.json.stringify(j)),
-			arguments : j,
-			onSuccess : function(e) {
-				if (e.retcode === 0) {
-					f.out(":sendQuitGroup...");
-					a.notifyObservers(qqweb.rpcService, "sendQuitGroupSuccess",
-							e)
+			data : "r=" + encodeURIComponent(a.json.stringify(f)),
+			arguments : f,
+			onSuccess : function(g) {
+				if (g.retcode === 0) {
+					a.out(":sendQuitGroup...");
+					d.notifyObservers(qqweb.rpcService, "sendQuitGroupSuccess",
+							g)
 				} else {
-					f
-							.out("[sendModifyMyDetails\uff1a\u6570\u636e\u683c\u5f0f\u9519\u8bef] error: "
-									+ e.retcode + "-" + e.errmsg);
 					a
+							.out("[sendModifyMyDetails\uff1a\u6570\u636e\u683c\u5f0f\u9519\u8bef] error: "
+									+ g.retcode + "-" + g.errmsg);
+					d
 							.notifyObservers(qqweb.rpcService,
-									"sendQuitGroupError", e)
+									"sendQuitGroupError", g)
 				}
 			},
-			onError : function(e) {
-				f.out("\u9000\u51fa\u5931\u8d25");
-				a.notifyObservers(qqweb.rpcService, "sendQuitGroupError", e)
+			onError : function(g) {
+				a.out("\u9000\u51fa\u5931\u8d25");
+				d.notifyObservers(qqweb.rpcService, "sendQuitGroupError", g)
 			}
 		})
 	};
-	this.sendSetConfig = function(j) {
-		j.data.vfwebqq = qqweb.portal.getVfWebQQ();
-		this.selfSend("cgi/qqweb/uac/" + (j.action || "set") + ".do", {
+	this.sendSetConfig = function(f) {
+		f.data.vfwebqq = qqweb.portal.getVfWebQQ();
+		this.selfSend(qqweb.CONST.MAIN_URL + "cgi/qqweb/uac/"
+						+ (f.action || "set") + ".do", {
 					method : "POST",
-					data : f.string.toQueryString(j.data),
-					onSuccess : j.onSuccess,
-					context : j.context
+					data : a.string.toQueryString(f.data),
+					onSuccess : f.onSuccess,
+					context : f.context
 				})
 	};
-	this.sendGetConfigByPost = function(j) {
-		j.data.vfwebqq = qqweb.portal.getVfWebQQ();
-		this.selfSend("cgi/qqweb/uac", {
+	this.sendGetConfigByPost = function(f) {
+		f.data.vfwebqq = qqweb.portal.getVfWebQQ();
+		this.selfSend(qqweb.CONST.MAIN_URL + "cgi/qqweb/uac", {
 					method : "POST",
-					data : f.string.toQueryString(j.data),
-					onSuccess : j.onSuccess,
-					context : j.context
+					data : a.string.toQueryString(f.data),
+					onSuccess : f.onSuccess,
+					context : f.context
 				})
 	};
-	this.sendGetConfig = function(j) {
-		this.selfSend("cgi/qqweb/uac/" + j.action + ".do", {
-					data : j.data,
-					onSuccess : j.onSuccess,
-					context : j.context
+	this.sendGetConfig = function(f) {
+		f.data = f.data || {};
+		f.data.vfwebqq = qqweb.portal.getVfWebQQ();
+		this.selfSend(qqweb.CONST.MAIN_URL + "cgi/qqweb/uac/" + f.action
+						+ ".do", {
+					data : f.data,
+					onSuccess : f.onSuccess,
+					context : f.context
+				})
+	};
+	this.sendReport = function(f) {
+		qqweb.rpcService.formSend("http://tj.qstatic.com/log", {
+					method : "POST",
+					data : {
+						r : a.string.trim(f)
+					}
 				})
 	}
 });
-Jet().$package("qqweb.appconfig", function(f) {
-	var d = this, b = f.event;
-	d = this;
-	var a = false, h = false, s = 0;
+Jet().$package("qqweb.appconfig", function(a) {
+	var b = this, c = a.event;
+	b = this;
+	var d = false, h = false, n = 0;
 	this.appConfigList = {};
 	this.appTempList = {};
 	this.systemConfigList = {
@@ -5642,8 +5114,16 @@ Jet().$package("qqweb.appconfig", function(f) {
 			appName : "\u6211\u7684\u9762\u677f",
 			appType : 1,
 			appLevel : "system",
-			css : "./module/mypanel/qqweb.app.mypanel.css",
-			js : "./module/mypanel/qqweb.app.mypanel.js",
+			js : "./js/qqweb.system.module.js",
+			windowMode : "none",
+			customLoginValidate : true,
+			settingCenter : 0
+		},
+		taskBar : {
+			id : "taskBar",
+			appName : "\u4efb\u52a1\u680f",
+			appType : 1,
+			appLevel : "system",
 			windowMode : "none",
 			customLoginValidate : true,
 			settingCenter : 0
@@ -5708,8 +5188,6 @@ Jet().$package("qqweb.appconfig", function(f) {
 			appName : "appBar",
 			appType : 1,
 			appLevel : "system",
-			css : "./module/appbar/qqweb.app.appbar.css",
-			js : "./module/appbar/qqweb.app.appbar.js",
 			windowMode : "none",
 			settingCenter : 0
 		},
@@ -5717,7 +5195,7 @@ Jet().$package("qqweb.appconfig", function(f) {
 			id : "appMarket",
 			appName : "\u5e94\u7528\u4e2d\u5fc3",
 			appType : 1,
-			appDesc : "\u5728\u8fd9\u91cc\uff0c\u5e94\u7528\u4e2d\u5fc3",
+			appDesc : "\u5e94\u7528\u4e2d\u5fc3\u662fWebQQ\u7ed9\u7f51\u53cb\u6dfb\u52a0\u5e94\u7528\u7684\u5e73\u53f0\uff0c\u63d0\u4f9b\u6700\u70ed\uff0c\u6700\u65b0\u7684\u5e94\u7528\uff0c\u7f51\u53cb\u5206\u4eab\u4e5f\u5c3d\u5728\u5176\u4e2d\u3002",
 			appLevel : "system",
 			css : "./module/appmarket/qqweb.app.appmarket.css",
 			js : "./module/appmarket/qqweb.app.appmarket.js",
@@ -5760,17 +5238,6 @@ Jet().$package("qqweb.appconfig", function(f) {
 			appType : 1,
 			appLevel : "system",
 			appName : "\u6d88\u606f\u8d70\u9a6c\u706f",
-			css : "./module/messagebubble/qqweb.app.msgbubble.css",
-			js : "./module/messagebubble/qqweb.app.msgbubble.js",
-			windowMode : "none",
-			settingCenter : 0
-		},
-		messageCenter : {
-			id : "messageCenter",
-			appType : 1,
-			appLevel : "system",
-			appName : "\u6d88\u606f\u63d0\u9192\u4e2d\u5fc3",
-			js : "./module/messagecenter/qqweb.app.messagecenter.js",
 			windowMode : "none",
 			settingCenter : 0
 		},
@@ -5949,175 +5416,202 @@ Jet().$package("qqweb.appconfig", function(f) {
 	this.getAppConfigList = function() {
 		return this.appConfigList
 	};
-	this.getAllConfig = function(t) {
-		return w(t, this.appConfigList) || w(t, this.systemConfigList)
+	this.getAllConfig = function(m) {
+		return r(m, this.appConfigList) || r(m, this.systemConfigList)
 	};
-	this.getAppConfig = function(t) {
-		return w(t, this.appConfigList)
+	this.getAppConfig = function(m) {
+		return r(m, this.appConfigList)
 	};
-	this.getSystemConfig = function(t) {
-		return w(t, this.systemConfigList)
+	this.getSystemConfig = function(m) {
+		return r(m, this.systemConfigList)
 	};
 	this.isAppConfigLoad = function() {
 		return h
 	};
-	var w = function(t, x) {
-		if (t && t.call) {
-			var j = [];
-			for (var e in x) {
-				var l = x[e];
-				t(l) && j.push(l)
+	var r = function(m, q) {
+		if (m && m.call) {
+			var u = [];
+			for (var f in q) {
+				var g = q[f];
+				m(g) && u.push(g)
 			}
-			return j
+			return u
 		} else
-			return x[t]
+			return q[m]
 	};
 	this.clearConfig = function() {
 		this.appConfigList = {}
 	};
-	this.addAppConfigList = function(t) {
-		var x = t.result.resultData;
-		f.out("AddAppConfigList\u5f00\u59cb");
-		for (var j in x)
-			if (x[j]) {
-				x[j].title = x[j].appName;
-				x[j].type = x[j].appType;
-				f.extend(x[j], x[j].exinfo)
+	this.addAppConfigList = function(m) {
+		var q = m.result.resultData;
+		a.profile("AddAppConfigList");
+		for (var u in q)
+			if (q[u]) {
+				q[u].title = q[u].appName;
+				q[u].type = q[u].appType;
+				a.extend(q[u], q[u].exinfo)
 			} else
-				delete x[j];
-		f.extend(this.appConfigList, x);
-		f.out("AddAppConfigList\u7ed3\u675f");
-		b.notifyObservers(d, "AddAppConfigList", t)
+				delete q[u];
+		a.extend(this.appConfigList, q);
+		a.profile("AddAppConfigListEnd");
+		c.notifyObservers(b, "AddAppConfigList", m)
 	};
-	this.addAppConfig = function(t) {
-		this.appConfigList[t.id] = f.extend(t, t.exinfo);
-		c({
-					appid : t.id,
+	this.addAppConfig = function(m) {
+		a.profile("addAppConfig");
+		this.appConfigList[m.id] = a.extend(m, m.exinfo);
+		w({
+					appid : m.id,
 					value : 1,
 					type : 0
 				});
-		b.notifyObservers(d, "AddAppConfig", t)
+		c.notifyObservers(b, "AddAppConfig", m)
 	};
-	this.updateAppConfig = function(t) {
-		this.appConfigList[t.id] = t;
-		b.notifyObservers(d, "UpdateAppConfig", t)
+	this.updateAppConfig = function(m) {
+		a.profile("updateAppConfig");
+		this.appConfigList[m.id] = m;
+		c.notifyObservers(b, "UpdateAppConfig", m)
 	};
-	this.removeAppConfig = function(t) {
-		delete this.appConfigList[t.id];
-		b.notifyObservers(d, "RemoveAppConfig", t)
+	this.removeAppConfig = function(m) {
+		a.profile("removeAppConfig");
+		delete this.appConfigList[m.id];
+		c.notifyObservers(b, "RemoveAppConfig", m)
 	};
-	var c = function(t) {
-		t.vfwebqq = qqweb.portal.getVfWebQQ();
-		qqweb.rpcService.selfSend("/cgi/qqweb/market/updateapphot.do", {
-			context : d,
+	var w = function(m) {
+		m.vfwebqq = qqweb.portal.getVfWebQQ();
+		qqweb.rpcService.selfSend(qqweb.CONST.MAIN_URL
+						+ "cgi/qqweb/market/updateapphot.do", {
+					context : b,
+					method : "POST",
+					data : "appattrib="
+							+ encodeURIComponent(a.json.stringify(m)),
+					arguments : m,
+					onSuccess : function(q) {
+						q.retcode !== 0
+								&& a
+										.out("\u5e94\u7528\u6b21\u6570\u6dfb\u52a0\u5931\u8d25"
+												+ q.errmsg)
+					},
+					onError : function(q) {
+						a
+								.out("\u5e94\u7528\u6b21\u6570\u6dfb\u52a0\u5931\u8d25");
+						c.notifyObservers(b, "SetAppCountError", q)
+					}
+				})
+	}, i = function(m, q) {
+		m.vfwebqq = qqweb.portal.getVfWebQQ();
+		qqweb.rpcService.selfSend(qqweb.CONST.MAIN_URL + q, {
+			context : b,
 			method : "POST",
-			data : "appattrib=" + encodeURIComponent(f.json.stringify(t)),
-			arguments : t,
-			onSuccess : function(x) {
-				x.retcode !== 0
-						&& f
-								.out("\u5e94\u7528\u6b21\u6570\u6dfb\u52a0\u5931\u8d25"
-										+ x.errmsg)
-			},
-			onError : function(x) {
-				f.out("\u5e94\u7528\u6b21\u6570\u6dfb\u52a0\u5931\u8d25");
-				b.notifyObservers(d, "SetAppCountError", x)
-			}
-		})
-	}, i = function(t, x) {
-		t.vfwebqq = qqweb.portal.getVfWebQQ();
-		qqweb.rpcService.selfSend("/" + x, {
-			context : d,
-			method : "POST",
-			arguments : t.appid,
-			data : "appattrib=" + encodeURIComponent(f.json.stringify(t)),
-			onSuccess : function(j) {
-				if (j.retcode === 0)
-					if (a) {
-						this.addAppConfigList(j);
-						b.notifyObservers(d, "GetDefaultAppConfigComplete",
+			arguments : m.appid,
+			data : "appattrib=" + encodeURIComponent(a.json.stringify(m)),
+			onSuccess : function(u) {
+				if (u.retcode === 0)
+					if (d) {
+						this.addAppConfigList(u);
+						c.notifyObservers(b, "GetDefaultAppConfigComplete",
 								this.getAppConfigList());
-						f.out("\u9ed8\u8ba4config\u5b8c\u6210")
+						a.profile("\u9ed8\u8ba4app config\u5b8c\u6210");
+						qqweb.util.report2h("def_appinfo", "end")
 					} else {
-						b.notifyObservers(d, "GetAppConfigAsPartSuccess",
-								j.result);
-						s++;
-						var e = qqweb.config.getSetupAppList(), l = s * 100, m = (s + 1)
+						c.notifyObservers(b, "GetAppConfigAsPartSuccess",
+								u.result);
+						n++;
+						var f = qqweb.config.getSetupAppList(), g = n * 100, p = (n + 1)
 								* 100;
-						this.addAppConfigList(j);
-						if (l < e.length) {
-							j = e.slice(l, m);
+						this.addAppConfigList(u);
+						if (g < f.length) {
+							u = f.slice(g, p);
 							i({
-										appid : j,
+										appid : u,
 										loadMethod : 2
 									}, "cgi/qqweb/market/getappinfo.do")
 						} else {
 							h = true;
-							b.notifyObservers(d, "GetAppConfigComplete", this
+							c.notifyObservers(b, "GetAppConfigComplete", this
 											.getAppConfigList());
 							qqweb.portal.speedTest.sRTS(5, "end", new Date,
 									true);
-							f.out("\u81ea\u5b9a\u4e49config\u5b8c\u6210")
+							a
+									.profile("\u81ea\u5b9a\u4e49app config\u5b8c\u6210");
+							qqweb.util.report2h("appinfo", "end")
 						}
 					}
 			},
-			onError : function(j) {
-				b.notifyObservers(d, "GetAppConfigError", j.resutlt)
+			onError : function(u) {
+				a.profile("GetAppConfigError");
+				qqweb.util.report2h("all_appinfo_error", "start");
+				c.notifyObservers(b, "GetAppConfigError", u.resutlt)
 			},
 			onTimeout : function() {
+				qqweb.util.report2h("all_appinfo_timeout", "start")
 			}
 		})
-	}, n = {
-		onSystemAppReady : function() {
-			f.out("systemAppReadyInAppconfig");
+	}, j = {
+		onUACReady : function() {
+			a.profile("UACReady\uff1a" + qqweb.config.isSetupAppListLoaded());
 			if (qqweb.config.isSetupAppListLoaded())
 				if (h)
-					b.notifyObservers(d, "GetAppConfigComplete");
+					c.notifyObservers(b, "GetAppConfigComplete");
 				else {
-					b.notifyObservers(d, "ClearDefaultApp");
-					var t;
-					t = qqweb.config.getSetupAppList();
-					d.clearConfig();
-					a = false;
-					s = 0;
-					t = t.slice(0, 100);
-					f.out("\u62c9\u53d6\u81ea\u5b9a\u4e49appconfig");
+					c.notifyObservers(b, "ClearDefaultApp");
+					var m;
+					m = qqweb.config.getSetupAppList();
+					b.clearConfig();
+					d = false;
+					n = 0;
+					m = m.slice(0, 100);
+					a.profile("\u62c9\u53d6\u81ea\u5b9a\u4e49app config");
+					qqweb.util.report2h("appinfo", "start");
 					i({
-								appid : t,
+								appid : m,
 								loadMethod : 2
 							}, "cgi/qqweb/market/getappinfo.do")
 				}
 			else {
-				a = true;
-				f.out("\u62c9\u53d6\u9ed8\u8ba4appconfig");
+				d = true;
+				a.profile("\u62c9\u53d6\u9ed8\u8ba4app config",
+						a.console.TYPE.WARNING);
+				qqweb.util.report2h("def_appinfo", "start");
 				i({
 							appid : qqweb.config.getDefaultSetupAppList(),
 							loadMethod : 2
 						}, "cgi/qqweb/market/getdefaultappinfo.do")
 			}
 		},
-		onUinChange : function() {
+		onReset : function() {
 			h = false
 		}
 	};
-	b.addObserver(qqweb.portal, "uinChange", n.onUinChange);
-	b.addObserver(qqweb.portal, "systemAppReady", n.onSystemAppReady)
+	c.addObserver(qqweb.portal, "reset", j.onReset);
+	c.addObserver(qqweb.portal, "UACReady", j.onUACReady)
 });
-Jet().$package(function(f) {
-	var d = f.http, b = 1;
-	b = f.platform.iPad ? 1 : 0;
-	if (document.location.search != "?normal") {
-		f = "./extend/" + b + "/extend.js?t=" + qqweb.CONST.UPDATE_TIME_STAMP;
-		(b = "./extend/" + b + "/extend.css?t=" + qqweb.CONST.UPDATE_TIME_STAMP)
-				&& d.loadCss(b);
-		f && d.loadScript(f, {
-					onSuccess : function() {
-						qqweb && qqweb.init && qqweb.init()
-					}
-				})
-	} else if (qqweb && qqweb.init) {
-		console.log("normal");
-		qqweb.businessClass.Window = qqweb.businessClass.baseWindow;
-		qqweb.init()
+Jet().$package(function(a) {
+	var b = a.http, c = a.event, d = 1;
+	if (top.location.host != location.host) {
+		qqweb.util.report2h("be_iframed", "start");
+		top.location = location
 	}
+	a
+			.profile("Hello everyone, welcome to WebQQ, 100% loaded, we're starting... time: "
+					+ a.now());
+	qqweb.util.report2h("portal", "start");
+	qqweb.portal.speedTest.sRTS(7, "start", window._SPEEDTIME_WINDOWSTART);
+	qqweb.portal.speedTest.sRTS(7, "end", new Date, true);
+	qqweb.portal.speedTest.sRTS(8, "start", new Date);
+	d = a.browser.mobileSafari ? 1 : 0;
+	var h = "./extend/" + d + "/extend.js?t=" + qqweb.CONST.UPDATE_TIME_STAMP, n = "./extend/"
+			+ d + "/extend.css?t=" + qqweb.CONST.UPDATE_TIME_STAMP;
+	if (n) {
+		b.loadCss(n);
+		a.profile("loadExtendCSS:" + d)
+	}
+	c.onDomReady(function() {
+				a.profile("WebQQ: dom ready!!! time: " + a.now());
+				b.loadScript(h, {
+							onSuccess : function() {
+								a.profile("loadExtendJS:" + d);
+								qqweb && qqweb.init && qqweb.init()
+							}
+						})
+			})
 });
