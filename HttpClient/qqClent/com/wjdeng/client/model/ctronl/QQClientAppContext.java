@@ -57,6 +57,8 @@ public class QQClientAppContext{
 			connection.setCookie("pgv_pvid", "3024370100");//pgv_pvid=3024370100; pgv_flv=9.0 r45; pgv_info=pgvReferrer=&ssid=s2836044620
 			connection.setCookie("pgv_flv", "9.0 r45");
 			connection.setCookie("pgv_info", "pgvReferrer=&ssid=s2836044620");
+			connection.setCookie("ptui_width", "370");
+			connection.setCookie("ptui_height", "192");
 			doc.setUrlConnection(connection);
 			doc.loadCompiledAllPageJS();
 			String ptui = " function ptuiCB(a,b,c,d,e){alert(c);alert(e)};";
@@ -87,7 +89,7 @@ public class QQClientAppContext{
 			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis()+"&p=loadEqqAllJs%24end_loadEqqAllJs%2482891911%240%240";
 			connection.getContentByURL(plog,true);
 			Thread.currentThread().sleep(100);
-			
+			this.connection.removeCookieValueByName("login_param");
 			String ptwebqq  =this.connection.getCookieValueByName("ptwebqq");
 			Math.random();
 			Random a = new Random(this.getClass().hashCode());
@@ -95,6 +97,9 @@ public class QQClientAppContext{
 			String log2url = "http://d.web2.qq.com/channel/login2?";//二次验证登陆
 			//r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid":"48247021","psessionid":null}
 			log2url+="r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%"+clientId+"%22%2C%22psessionid%22%3Anull%7D";
+			//log2url = "{\"status\":\"\",\"ptwebqq\":\""+ptwebqq+"\",\"passwd_sig\":\"\",\"clientid\":\""+clientId+"\",\"psessionid\":null}\n";
+			//log2url = java.net.URLEncoder.encode(log2url,HTTP.UTF_8);
+			//log2url = "http://d.web2.qq.com/channel/login2?r="+log2url;
 			temmap =this.connection.getContentByURL(log2url, false, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 			System.out.println(temmap.get(URLContentManage.KEY_CONTENT));//登陆成功。。	
 			//r={"status":"","ptwebqq":"1e836fb862aad64d8b40eb02cccda1d1b2c5253fdd8849fd5e1d4271941ffe2e","passwd_sig":"","clientid":"53555591","psessionid":null}
