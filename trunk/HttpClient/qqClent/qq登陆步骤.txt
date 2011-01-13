@@ -2,11 +2,29 @@
 http://ptlogin2.qq.com/login?u=82891911&p=222ADC4C8DA51A6EAE51D4FA61DA8991&verifycode=!8T9&remember_uin=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin_level%3D3&h=1&ptredirect=0&ptlang=2052&from_ui=1&pttype=1&dumy=&fp=loginerroralert
 ����ptuiCB('0','0','http://web2.qq.com/loginproxy.html?login_level=3','0','��¼�ɹ���');
 2������http://web2.qq.com/loginproxy.html?login_level=3 
-��ȡcookie:pgv_pvid=9276947131; pgv_flv=9.0 r45; pgv_info=pgvReferrer=&ssid=s8201090420; 
-	ptui_width=370; ptui_height=192; pt2gguin=o0082891911; uin=o0082891911; 
-	skey=@WSZOMAvET; ptisp=ctc; ptcz=82e580c127069214b596d986f6886ab00d74338146864d3c9c2c4e7f96b43af3; 
-	ptwebqq=b2fe40e8f0ae7ae496064a7e514b8e5aaf48bb6cbbbb4761f0cb8b77eed04545
-��ptwebqq
+pgv_pvid=117632726; 
+pgv_flv=9.0 r45; 
+pgv_info=pgvReferrer=&ssid=s5570928680; 
+ptui_width=370; ptui_height=192; 
+pt2gguin=o0082891911; 
+uin=o0082891911; 
+skey=@UGFMq7pPa; 
+ptisp=ctc; 
+ptcz=596170e8b9e0f349b98fe3c989a64bca2c911b4baf76cdd429bfee5a921482f6; 
+ptwebqq=a81f944cfa3431dc9100a72153becde7c80cc9b60c1995859704a7147cc48c46
+///////----------------------原本
+
+ptvfsession=74109ddd360caa3fac06ac83832d7443a3454bcb0671b84b53433f54cd677e7e352d81a8889bceefd4a25623392b8308; 
+pgv_pvid=3024370100; 
+pgv_flv=9.0 r45; 
+pgv_info=pgvReferrer=&ssid=s2836044620; 
+ptuserinfo=2e2e2e; 
+pt2gguin=o1732960362; 
+uin=o1732960362; 
+skey=@8QtxW17UC; 
+ptisp=ctc; 
+ptcz=0ccad530c472dd48228650c830facafb3e8636380a10a2f1bbc9969f970e4b18; 
+ptwebqq=244f15ecfec64b6cf617a7b03b7d1417fd0f25ea881369e78915b73edcc97ca0;  
 
 3��getlog
 http://tj.qstatic.com/getlog?

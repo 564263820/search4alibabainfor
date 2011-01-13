@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -64,15 +65,37 @@ public class URLContentManage implements URLContent {
 		return list;
 	}
 	
+	/**
+	 * 获取cookie 
+	 */
 	public String getCookieValueByName(String name){
 		name = SysUtils.trim2empty(name);
 		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
+		
 		for(Cookie cookie :list){
 			if(cookie.getName().equals(name)){
 				return cookie.getValue();
 			}
 		}
 		return "";
+	}
+	
+	/**
+	 * 删除cookie
+	 * */
+	public void removeCookieValueByName(String name){
+		name = SysUtils.trim2empty(name);
+		List<Cookie> list  = ((AbstractHttpClient) client).getCookieStore().getCookies();
+		Iterator<Cookie> it =list.iterator();
+		BasicCookieStore bcook = new BasicCookieStore();
+		while(it.hasNext()){
+			Cookie cookie = it.next();
+			if(!cookie.getName().equals(name)){
+				bcook.addCookie(cookie);
+			}
+		}
+		((AbstractHttpClient) client).getCookieStore().clear();
+		((AbstractHttpClient) client).setCookieStore(bcook);
 	}
 	
 	public void setCookie(String name,String value){
@@ -107,7 +130,7 @@ public class URLContentManage implements URLContent {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(url==null)return map;
 		HttpGet httget = new HttpGet(url);
-		
+		//httget.setHeader("", "");
 		HttpResponse response;
 		response = client.execute(httget);
 		HttpEntity entity = response.getEntity();
@@ -213,8 +236,9 @@ public class URLContentManage implements URLContent {
 	}
 
 	private String setPairByUrl(String url, List<NameValuePair> list) {
-		String[] sta = url.split("&");
-		for (int i = 1; i < sta.length; i++) {
+		String urlstr =url.substring(url.indexOf("?")+1);
+		String[] sta = urlstr.split("&");
+		for (int i = 0; i < sta.length; i++) {
 			String[] params = sta[i].split("=");
 			String name = params[0];
 			String value = "";
@@ -223,7 +247,7 @@ public class URLContentManage implements URLContent {
 			list.add(new BasicNameValuePair(name, value));
 
 		}
-		return sta[0];
+		return url.substring(0, url.indexOf("?"));
 	}
 
 	public static void main(String[] arg) {
