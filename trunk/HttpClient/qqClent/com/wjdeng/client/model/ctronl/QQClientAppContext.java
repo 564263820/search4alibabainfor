@@ -7,6 +7,8 @@
 package com.wjdeng.client.model.ctronl;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Random;
 
@@ -60,7 +62,9 @@ public class QQClientAppContext{
 			connection.setCookie("ptui_width", "370");
 			connection.setCookie("ptui_height", "192");
 			doc.setUrlConnection(connection);
-			doc.loadCompiledAllPageJS();
+			String pinginfo = "http://pingfore.qq.com/pingd?dm=web2.qq.com&url=web2.qq.com&tt=WebQQ2.0&rdm=-&rurl=-&pvid=-&scr=1440x900&scl=24-bit&lang=zh-cn&java=1&cc=undefined&pf=Win32&tz=-8&flash=10.1%20r85&ct=-&vs=tcss.3.2&ext=2&reserved1=&rand=50415";
+			connection.getContentByURL(pinginfo,true);
+			doc.loadCompiledAllPageJS();//加载所有的js文件
 			String ptui = " function ptuiCB(a,b,c,d,e){alert(c);alert(e)};";
 			doc.includeJavascript(ptui);
 			/*byte[] bytes =(byte[]) app.getModeParament().getUrlConnection().getContentByURL(vercodUrl).get(URLContentManage.KEY_CONTENT_BYTES);
@@ -68,38 +72,41 @@ public class QQClientAppContext{
 				SysUtils.wirtfile(bytes,"jpeg");//获取校验码
 				get_user_friends2
 			}*/
+			connection.removeCookieValueByName("login_param");
 			String httpUrl =this.getLogonUrl(doc);//获取登录地址
-			String loginproxy = "http://web2.qq.com/loginproxy.html?strong=true";
+			String loginproxy = "http://web2.qq.com/loginproxy.html?login_level=3";
 			Map<String, Object> temmap = connection.getContentByURL(loginproxy,true);
 			String logonState =temmap.get(URLContentManage.KEY_CONTENT).toString();//登录请求 获得登录状态
 			System.out.println(logonState);//登陆成功。。		
-			String plog = "http://tj.qstatic.com/getlog?t="+System.currentTimeMillis()+"&p=pass_ptlogin%24start%2411ba40ebcb832d54%240%240";
+			String plog = "http://tj.qstatic.com/getlog?t="+System.currentTimeMillis();
+			plog+="&p="+URLEncoder.encode("pass_ptlogin$start$"+user+"$0$0", HTTP.UTF_8);
 			connection.getContentByURL(plog,true);
-			Thread.currentThread().sleep(100);
-			
-			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis()+"&p=loadEqqAllJs%24start%2482891911%240%240";
+			//URLDecoder.decode("&p=pass_ptlogin$start$11ba40ebcb832d54$0$0", HTTP.UTF_8);
+			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis();
+			plog+="&p="+URLEncoder.encode("loadEqqAllJs$start$"+user+"$0$0", HTTP.UTF_8);
 			connection.getContentByURL(plog,true);
-			Thread.currentThread().sleep(100);
 			//doc.includeJavascript("function ptui_reportSpeed(a,b){alert(a);alert(b)};");
-			doc.eval("ptui_reportSpeed();");
-			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis()+"&p=eqqLoginCgi%24start%2482891911%240%240";
-			connection.getContentByURL(plog,true);
-			Thread.currentThread().sleep(100);
+			//doc.eval("ptui_reportSpeed();");
 			
-			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis()+"&p=loadEqqAllJs%24end_loadEqqAllJs%2482891911%240%240";
+			connection.getContentByURL("http://d.web2.qq.com/proxy.html?v=20101025002",true);
+			
+			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis();
+			plog+="&p="+URLEncoder.encode("eqqLoginCgi$start$"+user+"$0$0", HTTP.UTF_8);
 			connection.getContentByURL(plog,true);
-			Thread.currentThread().sleep(100);
+			
+			plog="http://tj.qstatic.com/getlog?t="+System.currentTimeMillis();
+			plog+="&p="+URLEncoder.encode("loadEqqAllJs$end_loadEqqAllJs$"+user+"$0$0", HTTP.UTF_8);
+			connection.getContentByURL(plog,true);
 			this.connection.removeCookieValueByName("login_param");
 			String ptwebqq  =this.connection.getCookieValueByName("ptwebqq");
 			Math.random();
 			Random a = new Random(this.getClass().hashCode());
 			String clientId = a.nextInt(99)+ (String) doc.eval("String((new Date()).getTime() % 1000000);");
 			String log2url = "http://d.web2.qq.com/channel/login2?";//二次验证登陆
-			//r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid":"48247021","psessionid":null}
-			log2url+="r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22"+ptwebqq+"%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%"+clientId+"%22%2C%22psessionid%22%3Anull%7D";
-			//log2url = "{\"status\":\"\",\"ptwebqq\":\""+ptwebqq+"\",\"passwd_sig\":\"\",\"clientid\":\""+clientId+"\",\"psessionid\":null}\n";
-			//log2url = java.net.URLEncoder.encode(log2url,HTTP.UTF_8);
-			//log2url = "http://d.web2.qq.com/channel/login2?r="+log2url;
+
+			
+			log2url = "{\"status\":\"\",\"ptwebqq\":\""+ptwebqq+"\",\"passwd_sig\":\"\",\"clientid\":\""+clientId+"\",\"psessionid\":null}";
+			log2url = "http://d.web2.qq.com/channel/login2?r="+log2url;
 			temmap =this.connection.getContentByURL(log2url, false, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 			System.out.println(temmap.get(URLContentManage.KEY_CONTENT));//登陆成功。。	
 			//r={"status":"","ptwebqq":"1e836fb862aad64d8b40eb02cccda1d1b2c5253fdd8849fd5e1d4271941ffe2e","passwd_sig":"","clientid":"53555591","psessionid":null}
@@ -155,3 +162,7 @@ public class QQClientAppContext{
 	}
 }
 
+
+//147	28.158420	183.62.125.17	192.168.0.126	HTTP	HTTP/1.1 500 Internal Server Error 
+//r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22cacebb9bed422b8f4f3a5967c4dd973e6d8b4cc59914ff1b7dab82678e1e0b29%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%2222774031%22%2C%22psessionid%22%3Anull%7D%09%0A
+//r=%7B%22status%22%3A%22%22%2C%22ptwebqq%22%3A%22804528d30c8509c702362abfd72fb667523c00cafc1aa74536e8747e8eb6e03e%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%2263588550%22%2C%22psessionid%22%3Anull%7D
