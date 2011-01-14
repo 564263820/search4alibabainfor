@@ -159,14 +159,6 @@ public class URLContentManage implements URLContent {
 		return map;
 	}
 	
-	private HttpGet createHttpGet(String url ){
-		HttpGet httpget = new HttpGet(url);
-		HttpParams params = new BasicHttpParams();
-		params.setParameter("", "");
-		httpget.setParams(params);
-		return httpget;
-	}
-	
 	/**
 	 * 
 	 * 清理混淆cooke
@@ -231,10 +223,32 @@ public class URLContentManage implements URLContent {
 			map.put(KEY_CHARSET, EntityUtils.getContentCharSet(entity));
 		}
 		clearMuCookie();
-		LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
+		System.out.println(url);
+		//LogUtil.getLogger(this.getClass().getSimpleName()).warn(url);
 		return map;
 	}
 
+	private HttpGet createHttpGet(String url ){
+		int sindex = url.indexOf("?");
+		HttpGet httpget = new HttpGet(url.substring(0, sindex));
+		String urlstr =url.substring(sindex+1);
+		String[] sta = urlstr.split("&");
+		for (int i = 0; i < sta.length; i++) {
+			String[] params = sta[i].split("=");
+			String name = params[0];
+			String value = "";
+			if (params.length > 1)
+				value = params[1];
+			//list.add(new BasicNameValuePair(name, value));
+
+		}
+		HttpParams params = new BasicHttpParams();
+		params.setParameter("", "");
+		httpget.setParams(params);
+		
+		return httpget;
+	}
+	
 	private String setPairByUrl(String url, List<NameValuePair> list) {
 		String urlstr =url.substring(url.indexOf("?")+1);
 		String[] sta = urlstr.split("&");
