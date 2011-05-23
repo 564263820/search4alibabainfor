@@ -250,7 +250,8 @@ public class URLContentManage implements URLContent {
 	}
 	
 	private String setPairByUrl(String url, List<NameValuePair> list) {
-		String urlstr =url.substring(url.indexOf("?")+1);
+		int slocal = url.indexOf("?");
+		String urlstr =url.substring(slocal+1);
 		String[] sta = urlstr.split("&");
 		for (int i = 0; i < sta.length; i++) {
 			String[] params = sta[i].split("=");
@@ -261,7 +262,11 @@ public class URLContentManage implements URLContent {
 			list.add(new BasicNameValuePair(name, value));
 
 		}
-		return url.substring(0, url.indexOf("?"));
+		if(slocal>-1){
+			return url.substring(0,slocal);
+		}else{
+			return url;
+		}
 	}
 
 	public static void main(String[] arg) {
