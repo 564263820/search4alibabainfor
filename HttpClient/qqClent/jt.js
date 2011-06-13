@@ -5819,3 +5819,5 @@ Jet().$package(function(b) {
 	}();
 	b.sound = swfsound;
 });
+
+//http://pingfore.qq.com/pingd?dm=web2.qq.com&url=web2.qq.com&tt=WebQQ2.0%20-%20%u817E%u8BAF%u5B98%u65B9%u4E3A%u60A8%u6253%u9020%u7684%u4E00%u7AD9%u5F0F%u7F51%u7EDC%u670D%u52A1&rdm=-&rurl=-&pvid=-&scr=1440x900&scl=24-bit&lang=zh-cn&java=1&cc=undefined&pf=Win32&tz=-8&flash=10.1%20r85&ct=-&vs=tcss.3.2&ext=2&reserved1=&rand=50415
