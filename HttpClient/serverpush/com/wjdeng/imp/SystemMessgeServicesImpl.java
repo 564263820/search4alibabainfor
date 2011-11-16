@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 
 import com.wjdeng.SystemMessgeServices;
+import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.model.SystemMsgDataEntity;
 import com.wjdeng.model.User;
 
@@ -52,7 +53,7 @@ import com.wjdeng.model.User;
  */
 public class SystemMessgeServicesImpl implements SystemMessgeServices {
     
-    	private Logger logger = Logger.getLogger(SystemMessgeServicesImpl.class);
+	private Logger logger = Logger.getLogger(SystemMessgeServicesImpl.class);
 	
 	
 	/**
@@ -94,7 +95,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * @param clientKey
 	 */
 	private boolean isDestroyClient(String clientKey,String sessionId){
-		//clientKey = StringUtils.trimToNull(clientKey);
+		clientKey = StringUtils.trim2null(clientKey);
 		if(clientKey == null){
 			return false;
 		}
@@ -116,7 +117,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * @param clientKey
 	 */
 	private void unDestroyClient(String clientKey){
-		//clientKey = StringUtils.trimToNull(clientKey);
+		clientKey = StringUtils.trim2null(clientKey);
 		if(clientKey!=null){
 			disable_client.remove(clientKey);
 		}
@@ -144,13 +145,14 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 								continue;
 							}
 							//3.为所有的session的所打开的所有页面都发送消息
-							for(java.util.Map.Entry<String, BlockingQueue<SystemMsgDataEntity>> entry: allClient.entrySet()){
+							for(Entry<String, BlockingQueue<SystemMsgDataEntity>> entry: allClient.entrySet()){
 								BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
-								this.desMsg(msg);
+								msg  = new SystemMsgDataEntity(msg);
+								msg.setClientKey(entry.getKey());
 								bq.put(msg);
 							}
 							//此处打印的数目比实际的客户端要多.这是由于由于失效的客户端在30秒钟后才被清理.在正常情况下比实际情况多出一个是正常的
-							System.out.println("为用户session为:"+sessionId+"的"+allClient.size()+"个客户端发送消息成功.......");
+							System.out.println("为用户id:"+userId+"  session为:"+sessionId+"的"+allClient.size()+"个客户端发送消息成功.......");
 						} catch (InterruptedException e) {
 						    logger.error(e.getMessage());
 						    logger.error("为id为:"+msg.getReceiver().getId()+"的用户发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
@@ -227,7 +229,6 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 		if(allClient!=null){
 			//遍历该session用户下的所有客户端
 			Iterator<Entry<String, BlockingQueue<SystemMsgDataEntity>>>  it  = allClient.entrySet().iterator();
-			//System.out.println(sessionId+"..................共有客户端:"+allClient.size());
 			while(it.hasNext()){
 				java.util.Map.Entry<String, BlockingQueue<SystemMsgDataEntity>> entry = it.next();
 				String key = entry.getKey();
@@ -235,7 +236,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 				BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
 				try {
     				    	//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
-					bq.put((new SystemMsgDataEntity()).setDisable(true).setClientKey(key));
+					bq.put(getDisableMsgEntity(key));
 					//销毁客户端,页面响应时间超过30秒 
 					if(this.isDestroyClient(key, sessionId)){
 						it.remove();
@@ -249,9 +250,6 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	}
 	
 
-
-
-	
 	/**
 	 * (消息机制说明:<br>
 	 * 当用户打开一个页面或者打开一个新的tab页,<br>
@@ -268,7 +266,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	@Override
 	public  List<SystemMsgDataEntity> propmtMSG(User user,String sessionId ,String clientKey,String keepConnect) {
 		if(user==null)return null;
-		//if(null == StringUtils.trimToNull(sessionId))return null;
+		if(null == StringUtils.trim2null(sessionId))return null;
 		List<SystemMsgDataEntity> mslist =this.getInitMsgList(clientKey);
 		//1.处理当前session所有已经废弃的页面---
 		if(!"keepConnect".equals(keepConnect) && null!=waitMsgSet.get(sessionId)){
@@ -295,7 +293,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 					SystemMsgDataEntity msg = it.next();
 					if(msg!=null &&msg.getDisable()!=null && !msg.getDisable()) {
 					    	mslist.add(msg);
-						this.desMsg(msg);
+						msg.setClientKey(clientKey);
 					}
 					it.remove();
 				}
@@ -323,7 +321,6 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 			    mslist.add(this.getDisableMsgEntity(clientKey));
 			}
 		}
-		System.out.println(mslist.size()+"..............................");
 		return operationReturnMsgList(mslist,clientKey,sessionId);//获取消息完毕
 	}
 	
@@ -365,35 +362,11 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	}
 
 	
+	
 	/**
 	 * 
-	 * 清理发送给客户端的消息实体,无用的引用信息不发送给客户端.
-	 * @param msg
+	 * 初始化方法,启动一个线程来清理废弃的资源
 	 */
-	private void  desMsg(SystemMsgDataEntity msg){
-		if(null !=msg){
-			User reuser  = msg.getReceiver();
-			if(reuser!=null){
-				User tru = new User();
-				tru.setId(reuser.getId());
-				tru.setRealName(reuser.getRealName());
-				tru.setName(reuser.getName());
-				msg.setReceiver(tru);
-				
-			}
-			
-			User ceuser  = msg.getCreateUser();
-			if(ceuser!=null){
-				User tcu = new User();
-				tcu.setId(ceuser.getId());
-				tcu.setRealName(ceuser.getRealName());
-				tcu.setName(ceuser.getName());
-				msg.setCreateUser(tcu);
-			}
-		}
-	}
-	
-	
 	public void init(){
 	    Lock lock = new ReentrantLock();
 	    lock.lock();
@@ -403,53 +376,67 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
             		@Override
             		public void run() {
             			try {
-            			    Thread.sleep(600000L);//10分钟轮询 要求等待时间过长的页面重新发送等待请求
-            			    for(Entry<String, String[]>  entry :disable_client.entrySet()){
-            				String clientKey = entry.getKey();
-            				String[] info = entry.getValue();
-            				long time  = Long.valueOf(info[1]);
-            				String sessionId  = info[0];
-            				if(System.currentTimeMillis() - time >30000L){//响应时间超过30秒销毁该请求页面
-            				    session_client.get(sessionId).remove(clientKey);
-            				}
-            				/*if(session_client.get(sessionId).size()==0){
-            				    session_client.remove(sessionId);
-            				    waitMsgSet.remove(sessionId);
-            				}*/
-            			    }
-            			    for(String sessionId :waitMsgSet.keySet()){
-            				 Map<String,BlockingQueue<SystemMsgDataEntity>>  allClient= session_client.get(sessionId);
-            				if(allClient!=null){
+            			    while(true){
+            				Thread.sleep(600000L);
+            				clearClient();
+            				//10分钟轮询 要求等待时间过长的页面重新发送等待请求
+            				for(Entry<String, String>  wentry :waitMsgSet.entrySet()){
+            				    String sessionId = wentry.getKey();
+            				    long time  = Long.valueOf(wentry.getValue());
+            				    if(System.currentTimeMillis() - time <600000L)continue;//等待时间少于10分钟不作处理
+            				    Map<String,BlockingQueue<SystemMsgDataEntity>>  allClient= session_client.get(sessionId);
+            				    if(allClient!=null){
             					//遍历该session用户下的所有客户端
             					Iterator<Entry<String, BlockingQueue<SystemMsgDataEntity>>>  it  = allClient.entrySet().iterator();
             					while(it.hasNext()){
-            						java.util.Map.Entry<String, BlockingQueue<SystemMsgDataEntity>> entry = it.next();
-            						String key = entry.getKey();
-            						BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
-            						try {
-            		    				    	//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
-            							bq.put((new SystemMsgDataEntity()).setDisable(true).setClientKey(key));
-            						} catch (InterruptedException e) {
-            						    logger.error(e.getMessage());
-            						    logger.error("销毁无用的客户端发生异常.");
-            						}
+            					    Entry<String, BlockingQueue<SystemMsgDataEntity>> entry = it.next();
+            					    String key = entry.getKey();
+            					    BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
+            					    try {
+            						//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
+            						bq.put((new SystemMsgDataEntity()).setDisable(true).setClientKey(key));
+            					    } catch (InterruptedException e) {
+            						logger.error(e.getMessage());
+            						logger.warn("要求长时间等待的页面重新发起消息请求失败...");
+            					    }
             					}
+            				    }
+            				    
             				}
-            				
+            				Thread.sleep(30000L);
+            				clearClient();
             			    }
             			    
             			} catch (InterruptedException e) {
             			    e.printStackTrace();
             			}
-            		}});
+            		}
+            		
+            		private void clearClient(){
+            		    Iterator<Entry<String, String[]>> entryIt  = disable_client.entrySet().iterator();
+            		    while(entryIt.hasNext()){
+            			Entry<String, String[]>  entry = entryIt.next();
+            			String clientKey = entry.getKey();
+            			String[] info = entry.getValue();
+            			long time  = Long.valueOf(info[1]);
+            			String sessionId  = info[0];
+            			if(System.currentTimeMillis() - time >30000L){//响应时间超过30秒,销毁该请求页面
+            			    if(session_client.get(sessionId)!=null){
+            				session_client.get(sessionId).remove(clientKey);
+            			    }
+            			    entryIt.remove();
+            			}
+            			
+            		    }
+            		}
+            	    });
             	    th.start();
 	    }
 	    lock.unlock();
 	    
 	}
+	
 
-	
-	
 
 
 }
