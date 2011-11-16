@@ -31,6 +31,21 @@ public class SystemMsgDataEntity implements Serializable {
 	
 	private String url;//处理地址
 	
+	public SystemMsgDataEntity(){
+		
+	}
+	
+	public SystemMsgDataEntity(SystemMsgDataEntity model){
+	    this.createTime  = model.getCreateTime();
+	    this.createUser = model.getCreateUser();
+	    this.receiver = model.getReceiver();
+	    this.title = model.getTitle();
+	    this.memo = model.getMemo();
+	    this.disable = model.disable;
+	    this.newTitle = model.getNewTitle();
+	    this.url = model.url;
+	}
+	
 	//浏览器页面key值,不存储.此属性为系统系统生成
 	private String clientKey;
 
