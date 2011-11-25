@@ -41,7 +41,7 @@ import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
-import com.wjdeng.model.SystemMsgDataEntity;
+import com.wjdeng.model.MsgDataModel;
 import com.wjdeng.model.User;
 
 public class MSGServlet extends HttpServlet {
@@ -109,16 +109,10 @@ public class MSGServlet extends HttpServlet {
 		String sessionId =request.getSession().getId();
 		String clientKey = SysUtils.trim2null(request.getParameter("clientKey"));
 		String keepConnect = SysUtils.trim2null(request.getParameter("keepConnect"));
-		List<SystemMsgDataEntity> msglist= systemMessgeServices.propmtMSG(user, sessionId,clientKey,keepConnect);
+		List<MsgDataModel> msglist= systemMessgeServices.propmtMSG(user, sessionId,clientKey,keepConnect);
 		String str=JSONArray.fromObject(msglist).toString();
 		request.setAttribute("msgs", str);
-		//response.getWriter().write(str);
-		//this.getServletContext().get
-		//request.
-		//response.
-		//this.
 		request.getRequestDispatcher("/WEB-INF/jsps/common/sysMsgCallBackScript.jsp").include(request, response);
-		//return new ActionForward("/WEB-INF/jsps/common/sysMsgCallBackScript.jsp");
 	}
 	
 	
@@ -137,7 +131,7 @@ public class MSGServlet extends HttpServlet {
 		String sessionId =request.getSession().getId();
 		String clientKey = SysUtils.trim2null(request.getParameter("clientKey"));
 		String keepConnect = SysUtils.trim2null(request.getParameter("keepConnect"));
-		List<SystemMsgDataEntity> msglist= systemMessgeServices.propmtMSG(user, sessionId,clientKey,keepConnect);
+		List<MsgDataModel> msglist= systemMessgeServices.propmtMSG(user, sessionId,clientKey,keepConnect);
 		String str=JSONArray.fromObject(msglist).toString();
 		response.getWriter().write(str);
 	}
@@ -161,7 +155,7 @@ public class MSGServlet extends HttpServlet {
 		if(receiverId==null)return ;
 		User rec = new User();
 		rec.setId(Long.valueOf(receiverId));
-		SystemMsgDataEntity msg  = new SystemMsgDataEntity();
+		MsgDataModel msg  = new MsgDataModel();
 		msg.setCreateUser(user);
 		msg.setReceiver(rec);
 		msg.setMemo(msgstr);

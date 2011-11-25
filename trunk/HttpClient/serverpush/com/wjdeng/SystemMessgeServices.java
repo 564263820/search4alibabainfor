@@ -14,7 +14,7 @@ package com.wjdeng;
 import java.util.List;
 
 
-import com.wjdeng.model.SystemMsgDataEntity;
+import com.wjdeng.model.MsgDataModel;
 import com.wjdeng.model.User;
 
 /**
@@ -36,16 +36,26 @@ public interface SystemMessgeServices {
 	 * @param keepConnect 服务器端用来判断是否需要,探测当前session所打开的所有其它页面是否有效
 	 * @return
 	 */
-	public  List<SystemMsgDataEntity> propmtMSG(User user,String sessionId ,String clientKey,String keepConnect);
+	public  List<MsgDataModel> propmtMSG(User user,String sessionId ,String clientKey,String keepConnect);
 	
 	
 	/**
 	 * 
-	 * 添加一条消息(保存此条消息,并且将此消息发送给登录用户)
+	 * 添加一条消息(将此消息发送给登录用户)
 	 * @param msg
 	 * @return
 	 */
-	public Long sendMsg(SystemMsgDataEntity msg);
+	public void sendMsg(MsgDataModel msg);
+	
+	/**
+	 * 
+	 * 将此消息发送给指定的页面
+	 * 
+	 * @param msg
+	 * @param clientKey 需要推送消息的页面列表
+	 * @return
+	 */
+	public void sendMsg(MsgDataModel msg,List<String> clientKey);
 	
 	
 	/**
