@@ -2,12 +2,6 @@
  * Create Author   : wjdeng
  * Create Date     : Dec 28, 2010
  * File Name       : SystemMessgeServicesImpl.java
- *
- * Apex OssWorks是上海泰信科技有限公司自主研发的一款IT运维产品，公司拥有完全自主知识产权及专利，
- * 本系统的源代码归公司所有，任何团体或个人不得以任何形式拷贝、反编译、传播，更不得作为商业用途，对
- * 侵犯产品知识产权的任何行为，上海泰信科技有限公司将依法对其追究法律责任。
- *
- * Copyright 1999 - 2009 Tekview Technology Co.,Ltd. All right reserved.
  ********************************************************************************/
 package com.wjdeng.imp;
 
@@ -29,7 +23,7 @@ import org.apache.log4j.Logger;
 
 import com.wjdeng.SystemMessgeServices;
 import com.wjdeng.client.util.StringUtils;
-import com.wjdeng.model.SystemMsgDataEntity;
+import com.wjdeng.model.MsgDataModel;
 import com.wjdeng.model.User;
 
 /**
@@ -49,11 +43,10 @@ import com.wjdeng.model.User;
  * @author wjdeng
  * 
  * @version 1.0
- * @since Apex OssWorks 5.5
  */
 public class SystemMessgeServicesImpl implements SystemMessgeServices {
     
-	private Logger logger = Logger.getLogger(SystemMessgeServicesImpl.class);
+    private Logger logger = Logger.getLogger(SystemMessgeServicesImpl.class);
 	
 	
 	/**
@@ -72,7 +65,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * 		) ;<br>
 	 * 
 	 */
-	private static final Map<String,Map<String,BlockingQueue<SystemMsgDataEntity>>> session_client = new ConcurrentHashMap<String,Map<String,BlockingQueue<SystemMsgDataEntity>>>();
+	private static final Map<String,Map<String,BlockingQueue<Msg>>> session_client = new ConcurrentHashMap<String,Map<String,BlockingQueue<Msg>>>();
 	
 	/**
 	 * 已经进入等待状态的客户端
@@ -123,9 +116,31 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 		}
 	}
 	
+
+	@Override
+	public void sendMsg(MsgDataModel msg, List<String> clientKey) {
+		if(clientKey==null)return;
+		Iterator<Map<String, BlockingQueue<Msg>>> it  = session_client.values().iterator();
+		while(it.hasNext()){
+			Map<String, BlockingQueue<Msg>> map  = it.next();
+			for(String key :clientKey){
+				BlockingQueue<Msg>  bq = map.get(key);
+				try {
+    				if(bq!=null){
+    					Msg sendmsg  = new Msg(msg);
+    					sendmsg.setClientKey(key);
+    					bq.put(sendmsg);
+    				}
+				} catch (InterruptedException e) {
+					 logger.error(e.getMessage());
+				    logger.error("为客户端:"+key+"的用户发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
+				}
+			}
+		}
+	}
 	
 	@Override
-	public Long sendMsg(SystemMsgDataEntity msg) {
+	public void sendMsg(MsgDataModel msg) {
 		if(msg!=null){
 			
 			if(msg.getReceiver()!=null){
@@ -134,22 +149,22 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 				if(userId!=null){
 					//2.使用该用户登录的所有session
 					Set<String> sessions = session_user.get(userId);
-					if(sessions==null)return null;
+					if(sessions==null)return ;
 					Iterator<String> it  = sessions.iterator();
 					while(it.hasNext()){
 						String sessionId = it.next();
 						try {
-							Map<String,BlockingQueue<SystemMsgDataEntity>>  allClient= session_client.get(sessionId);
+							Map<String,BlockingQueue<Msg>>  allClient= session_client.get(sessionId);
 							if(null == allClient){
 								it.remove();
 								continue;
 							}
 							//3.为所有的session的所打开的所有页面都发送消息
-							for(Entry<String, BlockingQueue<SystemMsgDataEntity>> entry: allClient.entrySet()){
-								BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
-								msg  = new SystemMsgDataEntity(msg);
-								msg.setClientKey(entry.getKey());
-								bq.put(msg);
+							for(Entry<String, BlockingQueue<Msg>> entry: allClient.entrySet()){
+								BlockingQueue<Msg>  bq = entry.getValue();
+								Msg sendmsg  = new Msg(msg);
+								sendmsg.setClientKey(entry.getKey());
+								bq.put(sendmsg);
 							}
 							//此处打印的数目比实际的客户端要多.这是由于由于失效的客户端在30秒钟后才被清理.在正常情况下比实际情况多出一个是正常的
 							System.out.println("为用户id:"+userId+"  session为:"+sessionId+"的"+allClient.size()+"个客户端发送消息成功.......");
@@ -159,10 +174,8 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 						}
 					}
 				}
-				return null;
 			}
 		}
-		return null;
 	}
 
 	
@@ -176,16 +189,16 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 		if(null ==clientKey){
 			clientKey =System.currentTimeMillis()+"_"+Math.random();
 		}
-		Map<String,BlockingQueue<SystemMsgDataEntity>> msgMap = session_client.get(sessionId);
+		Map<String,BlockingQueue<Msg>> msgMap = session_client.get(sessionId);
 		if(msgMap==null){
 			//1.该用户没有登录过,初始化消息集合
-			msgMap = new HashMap<String, BlockingQueue<SystemMsgDataEntity>>();
+			msgMap = new HashMap<String, BlockingQueue<Msg>>();
 		}
 		//2.当前用户一个session所拥有的客户端集合.
 		session_client.put(sessionId, msgMap);
-		BlockingQueue<SystemMsgDataEntity> msgs = msgMap.get(clientKey);
+		BlockingQueue<Msg> msgs = msgMap.get(clientKey);
 		if(msgs==null){
-			msgs = new LinkedBlockingQueue<SystemMsgDataEntity>();
+			msgs = new LinkedBlockingQueue<Msg>();
 		}
 		msgMap.put(clientKey, msgs);
 		//3.当前用户的所有session集合
@@ -203,13 +216,17 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * 销毁已经退出的sessionId
 	 */
 	public  void destoryedMsgSet(String sessionId){
-		Map<String,BlockingQueue<SystemMsgDataEntity>>  allClient= session_client.get(sessionId);
-		for(java.util.Map.Entry<String, BlockingQueue<SystemMsgDataEntity>> entry: allClient.entrySet()){
+		Map<String,BlockingQueue<Msg>>  allClient= session_client.get(sessionId);
+		if(allClient==null){
+			waitMsgSet.remove(sessionId);
+			return;
+		}
+		for(Entry<String, BlockingQueue<Msg>> entry: allClient.entrySet()){
 			String key = entry.getKey();
-			BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
+			BlockingQueue<Msg>  bq = entry.getValue();
 			//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
 			try {
-				bq.put((new SystemMsgDataEntity()).setDisable(true).setClientKey(key));
+				bq.put(this.getDisableMsgEntity(key));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -225,15 +242,15 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * @param clientKey
 	 */
 	private void findDisabledClientAndDestory(String sessionId,String clientKey){
-	    Map<String,BlockingQueue<SystemMsgDataEntity>>  allClient= session_client.get(sessionId);
+	    Map<String,BlockingQueue<Msg>>  allClient= session_client.get(sessionId);
 		if(allClient!=null){
 			//遍历该session用户下的所有客户端
-			Iterator<Entry<String, BlockingQueue<SystemMsgDataEntity>>>  it  = allClient.entrySet().iterator();
+			Iterator<Entry<String, BlockingQueue<Msg>>>  it  = allClient.entrySet().iterator();
 			while(it.hasNext()){
-				java.util.Map.Entry<String, BlockingQueue<SystemMsgDataEntity>> entry = it.next();
+				Entry<String, BlockingQueue<Msg>> entry = it.next();
 				String key = entry.getKey();
 				if(key.equals(clientKey))continue;//当前请求页面,不作处理
-				BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
+				BlockingQueue<Msg>  bq = entry.getValue();
 				try {
     				    	//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
 					bq.put(getDisableMsgEntity(key));
@@ -264,17 +281,17 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * @return  Map  key: 
 	 */
 	@Override
-	public  List<SystemMsgDataEntity> propmtMSG(User user,String sessionId ,String clientKey,String keepConnect) {
+	public  List<MsgDataModel> propmtMSG(User user,String sessionId ,String clientKey,String keepConnect) {
 		if(user==null)return null;
 		if(null == StringUtils.trim2null(sessionId))return null;
-		List<SystemMsgDataEntity> mslist =this.getInitMsgList(clientKey);
+		List<MsgDataModel> mslist =this.getInitMsgList(clientKey);
 		//1.处理当前session所有已经废弃的页面---
 		if(!"keepConnect".equals(keepConnect) && null!=waitMsgSet.get(sessionId)){
 		    //当前sessionId的客户端可能存在正在等待消息的线程,当对应的页面关闭或离开后此线程已经是无效的线程,给这个线程发送一条废弃的消息,使此线程停止等待消息运行到结束
 		    this.findDisabledClientAndDestory(sessionId, clientKey);
 		}
 		//2.获取当前sessionId的客户端 所有的page页面  (key:客户端key ,value:消息队列)
-		Map<String,BlockingQueue<SystemMsgDataEntity>> clients  =session_client.get(sessionId);
+		Map<String,BlockingQueue<Msg>> clients  =session_client.get(sessionId);
 		//3.处理消息的发送---
 		//当该sessionId客户端第一次访问或者该sessionId的客户端打开一个新页面
 		if(null == clients || (clients!=null && clients.get(clientKey)==null)){
@@ -285,35 +302,36 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 			return operationReturnMsgList(mslist,clientKey,sessionId);
 		}else{//该页面不是第一次访问
 		    	try {
-			    BlockingQueue<SystemMsgDataEntity> msgs = clients.get(clientKey);
-			    if(msgs.size()>0){//消息集合中已经有未传送到客户端的消息
-				//取消该sessionId的客户端已经废弃的消息等待列队
-				Iterator<SystemMsgDataEntity> it = msgs.iterator();
-				while(it.hasNext()){
-					SystemMsgDataEntity msg = it.next();
-					if(msg!=null &&msg.getDisable()!=null && !msg.getDisable()) {
-					    	mslist.add(msg);
-						msg.setClientKey(clientKey);
+				BlockingQueue<Msg> msgs = clients.get(clientKey);
+				if (msgs.size() > 0) {// 消息集合中已经有未传送到客户端的消息
+					// 取消该sessionId的客户端已经废弃的消息等待列队
+					Iterator<Msg> it = msgs.iterator();
+					while (it.hasNext()) {
+						Msg msg = it.next();
+						if (msg != null && msg.getDisable() != null && !msg.getDisable()) {
+							mslist.add(msg);
+							msg.setClientKey(clientKey);
+						}
+						it.remove();
 					}
-					it.remove();
 				}
-			    }
 			    if(mslist.size()>0)return operationReturnMsgList(mslist,clientKey,sessionId);;
 			    //消息集合中没有有消息,等待消息的送达
 			    waitMsgSet.put(sessionId,Long.valueOf(System.currentTimeMillis()).toString());//等待消息的客户端
 			    //消息集合中的消息为空,等待消息的送达.
-			    SystemMsgDataEntity fmsg = msgs.take();//等待消息的送达。推送机制的核心在这里............
+			    MsgDataModel fmsg = msgs.take();//等待消息的送达。推送机制的核心在这里............
 			    waitMsgSet.remove(sessionId);//该客户端已经获取到消息,取消等待
 			    if(fmsg.getDisable()!=null && fmsg.getDisable()){
-				mslist.add(fmsg);
-				return operationReturnMsgList(mslist,clientKey,sessionId);
+			    	mslist.add(fmsg);
+			    	return operationReturnMsgList(mslist,clientKey,sessionId);
 			    }
 			    mslist.add(fmsg);
-			    Iterator<SystemMsgDataEntity> it = msgs.iterator();
+			    Iterator<Msg> it = msgs.iterator();
 			    while(it.hasNext()){
-				mslist.add(it.next());
-				it.remove();
+			    	mslist.add(it.next());
+			    	it.remove();
 			    }
+			    System.out.println(mslist.toString());
 			} catch (InterruptedException e) {
 			    logger.error("推送消息异常:"+user.getName()+" ... "+user.getId());
 			    logger.error(e.getMessage());
@@ -329,10 +347,10 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * 返回客户端消息列表
 	 * @return
 	 */
-	private List<SystemMsgDataEntity> getInitMsgList(String clientKey){
+	private List<MsgDataModel> getInitMsgList(String clientKey){
 	    //将客户端从待销毁列表中移除
 	    unDestroyClient(clientKey);
-	    return new ArrayList<SystemMsgDataEntity>();
+	    return new ArrayList<MsgDataModel>();
 	}
 	
 	/**
@@ -342,7 +360,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * @param clientKey
 	 * @return
 	 */
-	private List<SystemMsgDataEntity> operationReturnMsgList(List<SystemMsgDataEntity> mslist,String clientKey,String sessionId){
+	private List<MsgDataModel> operationReturnMsgList(List<MsgDataModel> mslist,String clientKey,String sessionId){
 	    //将该客户端加入待销毁列表
 	    disable_client.put(clientKey, new String[]{sessionId,System.currentTimeMillis()+""});
 	    return mslist;
@@ -354,10 +372,11 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	 * @param clientKey
 	 * @return
 	 */
-	private SystemMsgDataEntity getDisableMsgEntity(String clientKey){
-	    SystemMsgDataEntity fmsg = new SystemMsgDataEntity();
+	private Msg getDisableMsgEntity(String clientKey){
+		
+		Msg fmsg = new Msg();
 	    //给客户端推送一条废弃的消息并且指定clientKey,要求客户端以clientKey重新发起消息请求.
-	    fmsg.setDisable(true).setClientKey(clientKey);
+	    fmsg.setDisablec(true).setClientKey(clientKey);
 	    return fmsg;
 	}
 
@@ -384,17 +403,17 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
             				    String sessionId = wentry.getKey();
             				    long time  = Long.valueOf(wentry.getValue());
             				    if(System.currentTimeMillis() - time <600000L)continue;//等待时间少于10分钟不作处理
-            				    Map<String,BlockingQueue<SystemMsgDataEntity>>  allClient= session_client.get(sessionId);
+            				    Map<String,BlockingQueue<Msg>>  allClient= session_client.get(sessionId);
             				    if(allClient!=null){
             					//遍历该session用户下的所有客户端
-            					Iterator<Entry<String, BlockingQueue<SystemMsgDataEntity>>>  it  = allClient.entrySet().iterator();
+            					Iterator<Entry<String, BlockingQueue<Msg>>>  it  = allClient.entrySet().iterator();
             					while(it.hasNext()){
-            					    Entry<String, BlockingQueue<SystemMsgDataEntity>> entry = it.next();
+            					    Entry<String, BlockingQueue<Msg>> entry = it.next();
             					    String key = entry.getKey();
-            					    BlockingQueue<SystemMsgDataEntity>  bq = entry.getValue();
+            					    BlockingQueue<Msg>  bq = entry.getValue();
             					    try {
-            						//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
-            						bq.put((new SystemMsgDataEntity()).setDisable(true).setClientKey(key));
+            					    	//发送一条废弃的消息,通知目前等待作废,是浏览器重新发起获取消息请求来等待消息的送达.
+            					    	bq.put(getDisableMsgEntity(key));
             					    } catch (InterruptedException e) {
             						logger.error(e.getMessage());
             						logger.warn("要求长时间等待的页面重新发起消息请求失败...");
@@ -422,7 +441,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
             			String sessionId  = info[0];
             			if(System.currentTimeMillis() - time >30000L){//响应时间超过30秒,销毁该请求页面
             			    if(session_client.get(sessionId)!=null){
-            				session_client.get(sessionId).remove(clientKey);
+            			    	session_client.get(sessionId).remove(clientKey);
             			    }
             			    entryIt.remove();
             			}
@@ -435,9 +454,38 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	    lock.unlock();
 	    
 	}
+
 	
+}
 
+/**
+ * 
+ *消息对象子类(能够访问disable、clientKey属性)
+ * @author Administrator
+ * @version 1.0
+ * @since APEX OSSWorks 5.5
+ */
+class Msg extends MsgDataModel{
+	
+	
+	private static final long serialVersionUID = 8152920759437360762L;
 
-
+	public Msg(){
+		super();
+	}
+	
+	public Msg(MsgDataModel msg){
+		super(msg);
+	}
+	
+	Msg setDisablec(Boolean disable) {
+		super.setDisable(disable);
+		return this;
+	}
+	
+	Msg setClientKey(String clientKey) {
+		super.setClientKeyS(clientKey);
+		return this;
+	}
 }
 
