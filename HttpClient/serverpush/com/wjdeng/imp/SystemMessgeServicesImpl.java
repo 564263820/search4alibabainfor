@@ -192,7 +192,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 		Map<String,BlockingQueue<Msg>> msgMap = session_client.get(sessionId);
 		if(msgMap==null){
 			//1.该用户没有登录过,初始化消息集合
-			msgMap = new HashMap<String, BlockingQueue<Msg>>();
+			msgMap = new ConcurrentHashMap<String, BlockingQueue<Msg>>();
 		}
 		//2.当前用户一个session所拥有的客户端集合.
 		session_client.put(sessionId, msgMap);
@@ -294,7 +294,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 		Map<String,BlockingQueue<Msg>> clients  =session_client.get(sessionId);
 		//3.处理消息的发送---
 		//当该sessionId客户端第一次访问或者该sessionId的客户端打开一个新页面
-		if(null == clients || (clients!=null && clients.get(clientKey)==null)){
+		if(clientKey==null || null == clients ||  (clients!=null && clients.get(clientKey)==null)){
 			//为该页面初始化消息存储对象
 			clientKey = this.initMsgSet(user, sessionId,clientKey);
 			//给客户端推送一条废弃的消息并且指定clientKey,要求客户端以clientKey重新发起消息请求.
