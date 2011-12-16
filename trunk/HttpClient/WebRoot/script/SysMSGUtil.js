@@ -72,14 +72,28 @@ function PropmtMsg(){
 	      timeout:1210000,//20分钟(自行检查是否掉线) 这个超时配置配置需要配合后台的轮询(周期10分钟)清理超长等待的线程
 	      url : '/common/systemMsg.do?content=&method=getMSGByAjax',
 	      success : function(jsonStr){
-	      	try{
-	      	  if(window.JSON){
-		      	  var data = JSON.parse(jsonStr);
-	      	  }else{
-	      	  	  var data = eval("("+jsonStr+")");
-	      	  }
-		      that.getCallBack()(data);
-		    }catch(e){}
+	      	var data;
+	      	if(jsonStr){
+		      	try{
+		      	  if(window.JSON){
+			      	  data = JSON.parse(jsonStr);
+		      	  }else{
+		      	  	  data = eval("("+jsonStr+")");
+		      	  }
+			    }catch(e){
+			    	//alert('数据有误,当前用户没有登录或者由于当前用户已经退出系统！');
+			    }
+	      	}
+      		if( xmlRequest.status===0){//火狐在页面按下exc键会将页面到服务器的连接终止,需要重启连接
+      		  	getMsg("keepConnect");
+      		  	return;
+      		}
+		    try{
+			    that.getCallBack()(data);//处理收到的推送消息
+		    }catch(e){ 
+		    	getMsg("keepConnect");
+		    	//alert('消息回调方法发生错误');
+		    }
 	      },
 	      complete : function(XMLHttpRequest, textStatus){
 	      		if(textStatus==='timeout'){
