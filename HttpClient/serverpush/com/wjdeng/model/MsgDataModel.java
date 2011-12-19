@@ -26,21 +26,48 @@ public class MsgDataModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Long createTime; // 创建时间
+	/**
+	 * 消息生成时间
+	 */
+	private Long createTime; 
 
-	private Muser createUser; // 创建人
+	/**
+	 * 
+	// 创建人
+	 */
+	private Muser createUser; 
 
-	private Muser receiver; // 接收人
+	/**
+	 * 
+	// 接收人
+	 */
+	private Muser receiver; 
 
-	private String title; // 标题
-
-	private String memo; // 描述
-
-	private Boolean disable = false; // 是否失效
+	/***
+	 * 
+	// 标题
+	 */
+	private String title; 
+	
+	/**
+	 * 
+	// 描述
+	 */
+	private String memo;
+    
+	/**
+	 * 
+	// 是否失效
+	 */
+	private Boolean disable = false; 
 
 	private String newTitle; // 用于页面展示
 
-	private String url;//处理地址
+	/**
+	 *
+	//处理地址
+	 */
+	private String url;
 	
 	/**
 	 * js监听事件的类型key, 在js响应页面在获取到该消息后会以该消息为参数调用js监听方法

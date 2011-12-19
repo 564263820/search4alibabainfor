@@ -8,6 +8,7 @@ package com.wjdeng.imp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +46,21 @@ import com.wjdeng.model.User;
  * @version 1.0
  */
 public class SystemMessgeServicesImpl implements SystemMessgeServices {
+	
+	private volatile static SystemMessgeServices msgService=null;
+	
+	private SystemMessgeServicesImpl(){
+		
+	}
+	
+	public final static SystemMessgeServices  getInstance(){
+		synchronized (SystemMessgeServices.class) {
+			if(msgService==null){
+				msgService = new SystemMessgeServicesImpl();
+			}
+		}
+		return msgService;
+	}
     
     private Logger logger = Logger.getLogger(SystemMessgeServicesImpl.class);
 	
@@ -106,7 +122,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	
 	/**
 	 * 
-	 * 将客户端从待销毁列表中移除
+	 * 将客户端从待销毁列表中移除(取消销毁)
 	 * @param clientKey
 	 */
 	private void unDestroyClient(String clientKey){
@@ -116,10 +132,40 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 		}
 	}
 	
+	/**
+	 * 
+	 * 为指定session发送消息
+	 * @param msg
+	 * @param sessionId
+	 * @return
+	 */
+	@Override
+	public boolean sendMsg2SessionId(MsgDataModel msg, String sessionId) {
+		try{
+			Map<String,BlockingQueue<Msg>>  allClient= session_client.get(sessionId);
+			if(null == allClient){
+				return false;
+			}
+			//3.为所有的session的所打开的所有页面都发送消息
+			for(Entry<String, BlockingQueue<Msg>> entry: allClient.entrySet()){
+				BlockingQueue<Msg>  bq = entry.getValue();
+				Msg sendmsg  = new Msg(msg);
+				sendmsg.setClientKey(entry.getKey());
+				bq.put(sendmsg);
+			}
+		} catch (InterruptedException e) {
+		    logger.error(e.getMessage());
+		    logger.error("为id为:"+msg.getReceiver().getId()+"的用户session"+sessionId+"发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
+		    return false;
+		}
+		return true;
+	}
 
 	@Override
-	public void sendMsg(MsgDataModel msg, List<String> clientKey) {
-		if(clientKey==null)return;
+	public List<String> sendMsg(MsgDataModel msg, List<String> clientKey) {
+		List<String> clientKeyCopy= new LinkedList<String>();
+		if(clientKey==null)return clientKeyCopy;
+		clientKeyCopy.addAll(clientKey);
 		Iterator<Map<String, BlockingQueue<Msg>>> it  = session_client.values().iterator();
 		while(it.hasNext()){
 			Map<String, BlockingQueue<Msg>> map  = it.next();
@@ -130,6 +176,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
     					Msg sendmsg  = new Msg(msg);
     					sendmsg.setClientKey(key);
     					bq.put(sendmsg);
+    					clientKeyCopy.remove(key);
     				}
 				} catch (InterruptedException e) {
 					 logger.error(e.getMessage());
@@ -137,7 +184,9 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 				}
 			}
 		}
+		return clientKeyCopy;
 	}
+	
 	
 	@Override
 	public void sendMsg(MsgDataModel msg) {
@@ -215,6 +264,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	/**
 	 * 销毁已经退出的sessionId
 	 */
+	@Override
 	public  void destoryedMsgSet(String sessionId){
 		Map<String,BlockingQueue<Msg>>  allClient= session_client.get(sessionId);
 		if(allClient==null){
