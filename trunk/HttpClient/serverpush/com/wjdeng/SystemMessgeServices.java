@@ -49,13 +49,22 @@ public interface SystemMessgeServices {
 	
 	/**
 	 * 
+	 * 为指定session发送消息
+	 * @param msg
+	 * @param sessionId
+	 * @return
+	 */
+	public boolean sendMsg2SessionId(MsgDataModel msg, String sessionId);
+	
+	/**
+	 * 
 	 * 将此消息发送给指定的页面
 	 * 
 	 * @param msg
 	 * @param clientKey 需要推送消息的页面列表
-	 * @return
+	 * @return 返回已经失效的客户端（断开连接）
 	 */
-	public void sendMsg(MsgDataModel msg,List<String> clientKey);
+	public List<String> sendMsg(MsgDataModel msg,List<String> clientKey);
 	
 	
 	/**
