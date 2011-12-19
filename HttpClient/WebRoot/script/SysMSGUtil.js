@@ -7,24 +7,6 @@
  	});
  * 
  */
-var d_msg={};
-var d_msg_head = document.getElementsByTagName("HEAD");
-//加载jquery文件
-if( typeof(jQuery)=='undefined'){
-	d_msg.jqueryf = document.createElement('SCRIPT');
-	d_msg.jqueryf.setAttribute("type","text/javascript");
-	d_msg.jqueryf.src = '/js/jquery/jquery_last.js';
-}
-
-
-//将js文件加载到文档中
-for(var par in d_msg){
-	if(d_msg_head){
-		d_msg_head[0].appendChild(d_msg[par]); 
-	}else{
-		document.body.appendChild(d_msg[par]);
-	}
-}
 //--------------------------------------------------分割线 iframe方式 ----------------------------------------------------	
 //服务器推送消息服务JS结构
 function PropmtMsg(){
