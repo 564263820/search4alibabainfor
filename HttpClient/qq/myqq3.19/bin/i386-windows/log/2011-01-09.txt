@@ -1,0 +1,24 @@
+13:00:37 [src/qqsocket.c]qqsocket_init(48): WSA Startup.
+13:01:20 [src/qqsocket.c]qqsocket_init(48): WSA Startup.
+13:01:36 [src/qqclient.c]qqclient_login(158): login
+13:01:36 [src/qqconn.c]qqconn_connect(192): connecting to 219.133.49.171:8000
+13:01:36 [src/qqclient.c]qqclient_keepalive(117): keepalive
+13:01:37 [src/prot_login.c]prot_login_touch_reply(113): redirecting to 183.60.1.30
+13:01:37 [src/qqconn.c]qqconn_connect(192): connecting to 183.60.1.30:8000
+13:01:37 [src/prot_login.c]prot_login_request_reply(211): process verify password
+13:01:38 [src/prot_login.c]prot_login_get_info_reply(370): Hello, ...
+13:01:39 [src/prot_login.c]prot_login_send_info_reply(532): session key: 
+65 73 71 50 46 38 5a 43 74 57 67 32 70 69 69 66 
+13:01:39 [src/prot_login.c]prot_login_send_info_reply(558): last login time: Sat Jan 08 22:34:13 2011
+
+13:01:39 [src/prot_user.c]prot_user_change_status_reply(85): change status to 40
+13:01:39 [src/prot_user.c]prot_user_get_level_reply(280): level: 0  active_days: 1  upgrade_days: 4
+13:01:40 [src/prot_buddy.c]prot_buddy_update_list_reply(68): buddy_count: 2
+13:01:41 [src/prot_buddy.c]prot_buddy_update_signiture(164): signature finished.
+13:01:41 [src/prot_buddy.c]prot_buddy_update_account(235): account finished.
+13:01:44 [src/prot_im.c]prot_im_recv_msg(444): Unknown message type : 6d
+13:02:28 [src/prot_im.c]prot_im_recv_msg(444): Unknown message type : 6d
+13:03:52 [src/prot_buddy.c]prot_buddy_update_list_reply(68): buddy_count: 2
+13:03:53 [src/prot_buddy.c]prot_buddy_update_signiture(164): signature finished.
+13:03:53 [src/prot_buddy.c]prot_buddy_update_account(235): account finished.
+13:03:59 [src/packetmgr.c]packetmgr_check_packet(376): [1732960362] resend packet cmd: 3e

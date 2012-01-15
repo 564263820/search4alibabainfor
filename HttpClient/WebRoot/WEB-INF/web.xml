@@ -28,7 +28,7 @@
 		</filter>
 		
 		<listener>
-			<listener-class>com.wjdeng.web.SessionListener</listener-class>
+			<listener-class>com.wjdeng.web.MsgSessionListener</listener-class>
 		</listener>
 		<listener>
 			<listener-class> com.wjdeng.web.InitListener</listener-class>
@@ -50,6 +50,14 @@
     <servlet-name>PaserCtroLServlet</servlet-name>
     <servlet-class>com.wjdeng.web.PaserCtroLServlet</servlet-class>
   </servlet>
+  
+  
+  <servlet>
+    <description>消息推送</description>
+    <servlet-name>MSGServlet</servlet-name>
+    <servlet-class>com.wjdeng.web.MSGServlet</servlet-class>
+  </servlet>
+  
   <filter-mapping>
   	<filter-name>encodingFilter</filter-name><url-pattern>/*</url-pattern>
   </filter-mapping>
@@ -122,6 +130,11 @@
     <servlet-name>Valide</servlet-name>
     <url-pattern>/infor/Valide</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MSGServlet</servlet-name>
+    <url-pattern>/common/systemMsg.do</url-pattern>
+  </servlet-mapping>
+  
   
   
   <welcome-file-list>

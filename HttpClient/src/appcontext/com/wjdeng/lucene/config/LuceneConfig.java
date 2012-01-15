@@ -27,7 +27,6 @@ import com.wjdeng.client.util.StringUtils;
  *此类在初始化时从indexConfig.properties文件中 加载lucene字段的配置
  * @author Administrator
  * @version 1.0
- * @since Apex OssWorks 5.5
  */
 final public class LuceneConfig {
 
@@ -79,7 +78,6 @@ final public class LuceneConfig {
 	 *
 	 * @author Administrator
 	 * @version 1.0
-	 * @since Apex OssWorks 5.5
 	 */
 	private static final class INDEX{
 		private static Map<String, Index> index = new HashMap<String, Index>();

@@ -6,8 +6,16 @@
  ********************************************************************************/
 package com.wjdeng;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,13 +49,49 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Test test = new Test();
-		try {
-
-			test.test();
-		} catch (Exception e) {
-			e.printStackTrace();
+		String fn ="F:\\proset\\temp";
+		File f = new File(fn);
+		File[] fs =f.listFiles();
+		for(File t :fs){
+			t.renameTo(new File(fn+"\\"+t.getName()+".jpg"));
 		}
+		
+//		Test test = new Test();
+//		try {
+//
+//			test.connetctionIp();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
+	
+	private void connetctionIp(){
+        try {
+            URI url  = new URI("http://wjdeng.gicp.net:25");
+            URLConnection con = url.toURL().openConnection();
+            InputStream input  = con.getInputStream();
+            //Socket sk = new Socket("192.168.0.126",80);
+            //InputStream input  = sk.getInputStream();
+            Scanner sc = new Scanner(input);
+            while(sc.hasNextLine()){
+                System.out.println(sc.nextLine());
+            }
+            //sk.connect(endpoint)
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        //SocketAddress  sadd  = 
+        //sk.connect(endpoint)
+    }
+    
+
 
 }

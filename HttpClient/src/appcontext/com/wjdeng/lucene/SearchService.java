@@ -170,7 +170,6 @@ public class SearchService {
 	 *
 	 * @author Administrator
 	 * @version 1.0
-	 * @since Apex OssWorks 5.5
 	 */
 	interface ConverDoc{
 		public List<Map<String,String>> convertDoc(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs,int totalHits)

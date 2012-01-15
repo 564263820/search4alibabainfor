@@ -12,7 +12,6 @@ package com.wjdeng.client.model.ctronl;
  * 
  * @author Administrator
  * @version 1.0
- * @since Apex OssWorks 5.5
  */
 public class ContinueRunCommand implements Command {
 

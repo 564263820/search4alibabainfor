@@ -42,7 +42,7 @@ import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
 import com.wjdeng.model.MsgDataModel;
-import com.wjdeng.model.User;
+import com.wjdeng.model.DefalutUser;
 
 public class MSGServlet extends HttpServlet {
 	
@@ -105,7 +105,7 @@ public class MSGServlet extends HttpServlet {
 	 * @throws Exception
 	 */
 	public void getMSG(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		User user = (User) request.getSession().getAttribute("");
+		DefalutUser user = (DefalutUser) request.getSession().getAttribute("");
 		String sessionId =request.getSession().getId();
 		String clientKey = SysUtils.trim2null(request.getParameter("clientKey"));
 		String keepConnect = SysUtils.trim2null(request.getParameter("keepConnect"));
@@ -127,7 +127,7 @@ public class MSGServlet extends HttpServlet {
 	 * @throws Exception
 	 */
 	public void getMSGByAjax(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		User user = (User) request.getSession().getAttribute("");
+		DefalutUser user = (DefalutUser) request.getSession().getAttribute("");
 		String sessionId =request.getSession().getId();
 		String clientKey = SysUtils.trim2null(request.getParameter("clientKey"));
 		String keepConnect = SysUtils.trim2null(request.getParameter("keepConnect"));
@@ -149,18 +149,17 @@ public class MSGServlet extends HttpServlet {
 	 */
 	public void sendMSG( HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
-		User user = (User) request.getSession().getAttribute("");
+		DefalutUser user = (DefalutUser) request.getSession().getAttribute("");
 		String receiverId = SysUtils.trim2null(request.getParameter("receiverId"));
 		String msgstr = SysUtils.trim2null(request.getParameter("msgstr"));
 		if(receiverId==null)return ;
-		User rec = new User();
+		DefalutUser rec = new DefalutUser();
 		rec.setId(Long.valueOf(receiverId));
 		MsgDataModel msg  = new MsgDataModel();
 		msg.setCreateUser(user);
-		msg.setReceiver(rec);
 		msg.setMemo(msgstr);
 		msg.setCreateTime(System.currentTimeMillis());
-		systemMessgeServices.sendMsg(msg);
+		systemMessgeServices.sendMsg(msg,user.getId());
 	}
 
 	/**

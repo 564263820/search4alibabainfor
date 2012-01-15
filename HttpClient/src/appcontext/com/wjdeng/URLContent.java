@@ -18,7 +18,6 @@ import com.wjdeng.client.model.api.IDocument;
  * 
  * @author JoveDeng
  * @version 1.0
- * @since Apex OssWorks 5.5
  */
 public interface URLContent {
 

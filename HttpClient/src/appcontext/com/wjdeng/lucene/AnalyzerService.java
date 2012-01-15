@@ -9,7 +9,6 @@ import com.chenlb.mmseg4j.analysis.MaxWordAnalyzer;
  * 
  * @author chenchen
  * @version 1.0
- * @since Apex OssWorks 5.5
  */
 public class AnalyzerService {
 
