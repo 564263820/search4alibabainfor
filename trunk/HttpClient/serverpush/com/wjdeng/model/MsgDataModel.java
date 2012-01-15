@@ -14,7 +14,6 @@ public class MsgDataModel implements Serializable {
 	public MsgDataModel(MsgDataModel model) {
 		this.createTime = model.getCreateTime();
 		this.createUser = model.getCreateUser();
-		this.receiver = model.getReceiver();
 		this.title = model.getTitle();
 		this.memo = model.getMemo();
 		this.disable = model.disable;
@@ -41,7 +40,6 @@ public class MsgDataModel implements Serializable {
 	 * 
 	// 接收人
 	 */
-	private Muser receiver; 
 
 	/***
 	 * 
@@ -61,7 +59,10 @@ public class MsgDataModel implements Serializable {
 	 */
 	private Boolean disable = false; 
 
-	private String newTitle; // 用于页面展示
+	/** 用于页面展示
+	 * 
+	 */
+	private String newTitle; 
 
 	/**
 	 *
@@ -135,7 +136,7 @@ public class MsgDataModel implements Serializable {
 		return createUser;
 	}
 
-	public void setCreateUser(User createUser) {
+	public void setCreateUser(DefalutUser createUser) {
 		if (createUser != null) {
 			this.createUser = new Muser();
 			this.createUser.setId(createUser.getId());
@@ -177,18 +178,6 @@ public class MsgDataModel implements Serializable {
 		return this;
 	}
 
-	public Muser getReceiver() {
-		return receiver;
-	}
-
-	public void setReceiver(User receiver) {
-		if (receiver != null) {
-			this.receiver = new Muser();
-			this.receiver.setId(receiver.getId());
-			this.receiver.setRealName(receiver.getRealName());
-			this.receiver.setName(receiver.getName());
-		}
-	}
 
 	public String getClientKey() {
 		return clientKey;
@@ -203,7 +192,6 @@ public class MsgDataModel implements Serializable {
 	 * 发往客户端的user需要尽量精简
 	 * @author wjdeng
 	 * @version 1.0
-	 * @since APEX OSSWorks 5.5
 	 */
 	public class Muser{
 		private long id;

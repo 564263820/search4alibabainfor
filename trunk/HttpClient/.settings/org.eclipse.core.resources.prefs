@@ -1,9 +1,9 @@
-#Tue Sep 28 19:59:29 CST 2010
+#Sat Jan 08 10:21:36 CST 2011
 eclipse.preferences.version=1
 encoding//WebRoot/common.jsp=UTF-8
 encoding//WebRoot/index.jsp=UTF-8
 encoding//WebRoot/input.jsp=UTF-8
 encoding//WebRoot/login.jsp=UTF-8
-encoding//WebRoot/qq.js=UTF-8
+encoding//qqClent/test.js=UTF-8
 encoding//src/config/log4j.properties=UTF-8
 encoding/<project>=UTF-8

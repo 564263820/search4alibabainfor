@@ -10,7 +10,7 @@ package com.wjdeng.model;
  * @author jove
  * @version 1.0
  */
-public class User implements java.io.Serializable {
+public class DefalutUser implements  com.wjdeng.User,java.io.Serializable {
 
 	private static final long serialVersionUID = 2500471860354748649L;
 
@@ -19,16 +19,16 @@ public class User implements java.io.Serializable {
 	/** 登录时用的用户名，不是姓名 */
 	private String name;
 
-	/** 真实姓名 */
+	/** 显示名 */
 	private String realName;
 
 	/** 密码（需加密） */
 	private String password;
 	
-	public User() {
+	public DefalutUser() {
 	}
 
-	public User(long id) {
+	public DefalutUser(long id) {
 		this.id = id;
 	}
 

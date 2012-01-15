@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import com.wjdeng.SystemMessgeServices;
 import com.wjdeng.client.model.api.AppContext;
 import com.wjdeng.client.model.ctronl.AppStatus;
 import com.wjdeng.client.model.ctronl.ContinueRunCommand;
@@ -38,6 +39,8 @@ import com.wjdeng.client.util.LogUtil;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.client.util.SysUtils;
 import com.wjdeng.imp.ExcelUtils;
+import com.wjdeng.imp.SystemMessgeServicesImpl;
+import com.wjdeng.model.MsgDataModel;
 
 public class PaserCtroLServlet extends HttpServlet {
 
@@ -77,7 +80,77 @@ public class PaserCtroLServlet extends HttpServlet {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		this.doPost(request, response);
+		response.setHeader("Cache-Control", "no-cache");
+		response.setContentType("text/html;charset=UTF-8");
+		String url = request.getParameter("url");
+		url = java.net.URLDecoder.decode(url, "utf-8");
+		String operation = request.getParameter("operation");
+		ModeParament par = map.get(request.getRequestedSessionId());
+		if (par == null) {
+			/*
+			 * if(!SysUtils.IsUrl(url)){
+			 * response.getWriter().write(getStatusJson(AppStatus.error,"填写的网址不正确！"));
+			 * return; }
+			 */
+			if (!this.testNet(url, request, response))
+				return;
+		}
+		if ("retry".equals(operation)) {
+			if (null != par) {
+				DefaultAppContext.exeCommand(new PuaseCommand(), par);// 停止
+			}
+			par = null;
+		} else if ("pause".equals(operation)) {
+			DefaultAppContext.exeCommand(new PuaseCommand(), par);// 暂停
+		} else if ("continuerun".equals(operation)) {
+			DefaultAppContext.exeCommand(new ContinueRunCommand(), par);// 继续 回复运行
+		} else if ("downloadExcel".equals(operation)) {
+			this.downloadExcel(response, par);
+			map.remove(request.getRequestedSessionId());
+		}
+		
+	}
+	
+	
+	
+	private void runTask(String url,int deep,final String sessionId) throws Exception{
+		AppContext app;
+		ModeParament  par=null;
+		if (par == null) {
+			app = DefaultAppContext.Instance(url, deep);
+		} else {
+			app = DefaultAppContext.Instance(par);
+		}
+		par = app.getModeParament();
+		map.put(sessionId, par);
+		final Thread th = new Thread(app);
+		th.start();
+		final SystemMessgeServices msgService =SystemMessgeServicesImpl.getInstance();
+		app.addListener4AfterNextPage(new Listener(){
+			String session = sessionId;
+			
+			@Override
+			public void execute(Event ev) {
+				//new MsgDataModel().setAttribute("", obj)
+				msgService.sendMsg2SessionId(new MsgDataModel(),this.session);
+				ev.getModeParament().getDatatemp();
+				
+			}});
+		app.addListener4AfterPaserInfor(new Listener(){
+
+			@Override
+			public void execute(Event ev) {
+				// TODO Auto-generated method stub
+				
+			}});
+		app.addListener4End(new Listener(){
+
+			@Override
+			public void execute(Event ev) {
+				// TODO Auto-generated method stub
+				
+			}});
+		
 	}
 
 	private void downloadExcel(HttpServletResponse response, ModeParament par) {
@@ -251,7 +324,6 @@ public class PaserCtroLServlet extends HttpServlet {
 	 *
 	 * @author Administrator
 	 * @version 1.0
-	 * @since Apex OssWorks 5.5
 	 */
 	class getPageInfor implements Listener {
 		private StringBuffer sb;
@@ -294,7 +366,6 @@ public class PaserCtroLServlet extends HttpServlet {
 	 *
 	 * @author Administrator
 	 * @version 1.0
-	 * @since Apex OssWorks 5.5
 	 */
 	class nextPage implements Listener {
 		final private StringBuffer sb;
@@ -335,7 +406,6 @@ public class PaserCtroLServlet extends HttpServlet {
 	 *
 	 * @author Administrator
 	 * @version 1.0
-	 * @since Apex OssWorks 5.5
 	 */
 	class endtask implements Listener {
 		final private StringBuffer sb;
@@ -390,8 +460,7 @@ public class PaserCtroLServlet extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 			LogUtil.getLogger(this.getClass().getSimpleName()).error(e);
-			response.getWriter().write(
-					this.getStatusJson(AppStatus.error, "访问该网站失败！"));
+			response.getWriter().write(this.getStatusJson(AppStatus.error, "访问该网站失败！"));
 			return false;
 		}
 		return true;

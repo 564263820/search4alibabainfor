@@ -8,6 +8,8 @@
 		<title>客户数据搜索</title>
 		<link href="<c:url value="/css/main.css"/>"  rel="stylesheet" type="text/css">
 		<script type='text/javascript' src='<c:url value="/script/paser.js"/>'></script>
+		<script type='text/javascript' src='<c:url value="/script/jQuery1.4.2.js"/>'></script>
+		<script type='text/javascript' src='<c:url value="/script/SysMSGUtil.js"/>'></script>
 	</head>
 	<body>
 		<center>

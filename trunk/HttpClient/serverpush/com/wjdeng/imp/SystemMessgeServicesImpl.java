@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import com.wjdeng.SystemMessgeServices;
 import com.wjdeng.client.util.StringUtils;
 import com.wjdeng.model.MsgDataModel;
-import com.wjdeng.model.User;
+import com.wjdeng.User;
 
 /**
  * 
@@ -155,7 +155,7 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 			}
 		} catch (InterruptedException e) {
 		    logger.error(e.getMessage());
-		    logger.error("为id为:"+msg.getReceiver().getId()+"的用户session"+sessionId+"发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
+		    logger.error("为用户sessionID为"+sessionId+"的用户发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
 		    return false;
 		}
 		return true;
@@ -189,12 +189,10 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	
 	
 	@Override
-	public void sendMsg(MsgDataModel msg) {
+	public void sendMsg(MsgDataModel msg,Long userId) {
 		if(msg!=null){
 			
-			if(msg.getReceiver()!=null){
 				//1.消息的接收人
-				Long userId  = msg.getReceiver().getId();
 				if(userId!=null){
 					//2.使用该用户登录的所有session
 					Set<String> sessions = session_user.get(userId);
@@ -219,10 +217,9 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 							System.out.println("为用户id:"+userId+"  session为:"+sessionId+"的"+allClient.size()+"个客户端发送消息成功.......");
 						} catch (InterruptedException e) {
 						    logger.error(e.getMessage());
-						    logger.error("为id为:"+msg.getReceiver().getId()+"的用户发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
+						    logger.error("为id为:"+userId+"的用户发送 消息失败! 标题:"+msg.getTitle()+"  内容:"+msg.getMemo());
 						}
 					}
-				}
 			}
 		}
 	}
@@ -505,6 +502,21 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
 	    
 	}
 
+	@Override
+	public Long countOnlineSession() {
+		return Long.valueOf(session_client.size());
+	}
+
+	@Override
+	public Long countOnlineUser() {
+		return Long.valueOf(session_user.size());
+	}
+
+	@Override
+	public Set<Long> getOnlineUsers() {
+		return session_user.keySet();
+	}
+
 	
 }
 
@@ -513,7 +525,6 @@ public class SystemMessgeServicesImpl implements SystemMessgeServices {
  *消息对象子类(能够访问disable、clientKey属性)
  * @author Administrator
  * @version 1.0
- * @since APEX OSSWorks 5.5
  */
 class Msg extends MsgDataModel{
 	
